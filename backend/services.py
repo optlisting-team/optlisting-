@@ -37,34 +37,59 @@ def detect_source(image_url: str, sku: str) -> str:
 
 def analyze_zombie_listings(
     db: Session,
-    days_old: int = 60,
-    min_sold_qty: int = 0
+    min_days: int = 60,
+    max_sales: int = 0,
+    max_watch_count: int = 10,
+    source_filter: str = "All",
+    marketplace_filter: str = "All"
 ) -> List[Listing]:
     """
     Zombie Filter Logic
-    Filters listings based on criteria:
-    - date_listed > days_old days ago
-    - sold_qty == min_sold_qty
+    Filters listings based on dynamic criteria:
+    - date_listed > min_days days ago
+    - sold_qty <= max_sales
+    - watch_count <= max_watch_count
+    - source matches source_filter (if not "All")
     """
-    cutoff_date = date.today() - timedelta(days=days_old)
+    # Ensure min_days is at least 0
+    min_days = max(0, min_days)
+    # Ensure max_sales is at least 0
+    max_sales = max(0, max_sales)
+    # Ensure max_watch_count is at least 0
+    max_watch_count = max(0, max_watch_count)
     
-    zombies = db.query(Listing).filter(
+    cutoff_date = date.today() - timedelta(days=min_days)
+    
+    # Build query with filters
+    query = db.query(Listing).filter(
         and_(
             Listing.date_listed < cutoff_date,
-            Listing.sold_qty == min_sold_qty
+            Listing.sold_qty <= max_sales,
+            Listing.watch_count <= max_watch_count
         )
-    ).all()
+    )
+    
+    # Apply marketplace filter if not "All"
+    if marketplace_filter and marketplace_filter != "All":
+        query = query.filter(Listing.marketplace == marketplace_filter)
+    
+    # Apply source filter if not "All"
+    if source_filter and source_filter != "All":
+        query = query.filter(Listing.source == source_filter)
+    
+    zombies = query.all()
     
     return zombies
 
 
 def generate_export_csv(
-    listings: List[Listing],
+    listings,
     export_mode: str
 ) -> str:
     """
     Smart Export Feature
     Generates CSV file based on the selected Listing Tool.
+    Accepts both Listing objects and dictionaries.
     
     Modes:
     1. AutoDS: Headers: "Source ID", "File Action" | Values: [ASIN], "delete"
@@ -79,7 +104,15 @@ def generate_export_csv(
     data = []
     
     for listing in listings:
-        asin = listing.sku  # Can be refined to extract actual ASIN
+        # Handle both Listing objects and dictionaries
+        if isinstance(listing, dict):
+            sku = listing.get("sku", "")
+            ebay_item_id = listing.get("ebay_item_id", "")
+        else:
+            sku = listing.sku
+            ebay_item_id = listing.ebay_item_id
+        
+        asin = sku  # Can be refined to extract actual ASIN
         
         if export_mode == "autods":
             data.append({
@@ -94,7 +127,7 @@ def generate_export_csv(
         elif export_mode == "ebay":
             data.append({
                 "Action": "End",
-                "ItemID": listing.ebay_item_id
+                "ItemID": ebay_item_id
             })
         else:
             raise ValueError(f"Unknown export mode: {export_mode}")

@@ -1,12 +1,22 @@
 function SourceBadge({ source }) {
   const getBadgeColor = (source) => {
     switch (source) {
-      case 'Amazon':
+      case 'AliExpress':
+        return 'bg-red-100 text-red-800'
+      case 'CJ Dropshipping':
+        return 'bg-gray-800 text-white'
+      case 'Home Depot':
         return 'bg-orange-100 text-orange-800'
+      case 'Wayfair':
+        return 'bg-violet-100 text-violet-800'
+      case 'Costco':
+        return 'bg-blue-50 text-blue-700'
+      case 'Amazon':
+        return 'bg-yellow-50 text-yellow-700'
       case 'Walmart':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-cyan-50 text-cyan-700'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-500'
     }
   }
 
