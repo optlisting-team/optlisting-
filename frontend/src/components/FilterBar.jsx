@@ -50,7 +50,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Filter Zombie Listings
+        Filter Low Interest Items
       </h3>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         {/* Platform Filter - First and Most Important */}

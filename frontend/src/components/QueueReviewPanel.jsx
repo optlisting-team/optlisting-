@@ -166,7 +166,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate }
         <div className="text-4xl mb-4">🗑️</div>
         <p className="text-lg font-semibold text-gray-700 mb-2">No Items in Queue</p>
         <p className="text-sm text-gray-500">
-          Add items from the zombies list to review them here.
+          Add items from the low interest items list to review them here.
         </p>
       </div>
     )

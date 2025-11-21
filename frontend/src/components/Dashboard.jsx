@@ -55,7 +55,7 @@ function Dashboard() {
       console.log('Platform Breakdown:', platformBreakdown) // Debug log
       setError(null)
     } catch (err) {
-      setError('Failed to fetch zombie listings')
+      setError('Failed to fetch low interest listings')
       console.error(err)
     } finally {
       setLoading(false)
@@ -315,16 +315,16 @@ function Dashboard() {
             {viewMode === 'all' && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  📋 <strong>Viewing All Listings</strong> - Click "Zombies Detected" card to filter and start cleaning.
+                  📋 <strong>Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
                 </p>
               </div>
             )}
 
-            {/* Briefing Text for Zombies View */}
+            {/* Briefing Text for Low Interest Items View */}
             {viewMode === 'zombies' && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <p className="text-sm text-gray-700">
-                  🔍 <strong>Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong>All Platforms</strong> : <strong>[{filters.marketplace_filter}]</strong>} listings older than <strong>{filters.min_days} days</strong> with <strong>{filters.max_sales} sales</strong> and <strong>≤ {filters.max_watch_count} views</strong>.
+                  🔍 <strong>Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong>All Platforms</strong> : <strong>[{filters.marketplace_filter}]</strong>} listings older than <strong>{filters.min_days} days</strong> with <strong>{filters.max_sales} sales</strong> and <strong>≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
                 </p>
               </div>
             )}
@@ -413,7 +413,7 @@ function Dashboard() {
                   <HistoryTable logs={historyLogs} loading={loading} />
                 ) : loading ? (
                   <div className="p-8 text-center text-gray-500">
-                    Loading {viewMode === 'all' ? 'all' : 'zombie'} listings...
+                    Loading {viewMode === 'all' ? 'all' : 'low interest'} listings...
                   </div>
                 ) : error ? (
                   <div className="p-8 text-center text-red-500">
@@ -430,7 +430,7 @@ function Dashboard() {
                           ? "No listings found."
                           : queue.length > 0 
                             ? "All items have been moved to the queue. Apply new filters to see more candidates."
-                            : "No zombie listings found! 🎉"
+                            : "No low interest items found! Your inventory is performing well. 🎉"
                         }
                       </div>
                     )
