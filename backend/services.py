@@ -1,7 +1,8 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from typing import List, Optional, Dict, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
+from sqlalchemy.dialects.postgresql import insert
 from backend.models import Listing
 import pandas as pd
 from io import StringIO
@@ -297,6 +298,133 @@ def analyze_zombie_listings(
     zombies = query.all()
     
     return zombies
+
+
+def upsert_listings(db: Session, listings: List[Listing]) -> int:
+    """
+    UPSERT listings using PostgreSQL's ON CONFLICT DO UPDATE.
+    
+    This function handles duplicate key conflicts by updating existing records
+    instead of raising IntegrityError. Uses the unique index 'idx_user_platform_item'
+    which is on (user_id, platform, item_id).
+    
+    For PostgreSQL: Uses INSERT ... ON CONFLICT DO UPDATE
+    For SQLite: Falls back to individual INSERT OR REPLACE (less efficient but compatible)
+    
+    Args:
+        db: Database session
+        listings: List of Listing objects to upsert
+        
+    Returns:
+        Number of listings processed
+    """
+    if not listings:
+        return 0
+    
+    # Check if we're using PostgreSQL (has insert().on_conflict_do_update)
+    # or SQLite (needs different approach)
+    from sqlalchemy import inspect
+    from backend.models import engine
+    
+    is_postgresql = engine.dialect.name == 'postgresql'
+    
+    if is_postgresql:
+        # PostgreSQL: Use bulk INSERT ... ON CONFLICT DO UPDATE
+        table = Listing.__table__
+        
+        # Prepare data dictionaries for bulk insert
+        values_list = []
+        for listing in listings:
+            # Convert Listing object to dictionary
+            values = {
+                'user_id': listing.user_id,
+                'platform': listing.platform,
+                'item_id': listing.item_id,
+                'title': listing.title,
+                'image_url': listing.image_url,
+                'sku': listing.sku,
+                'source_name': listing.source_name,
+                'source_id': listing.source_id,
+                'brand': listing.brand,
+                'upc': listing.upc,
+                'metrics': listing.metrics if listing.metrics else {},
+                'raw_data': listing.raw_data if listing.raw_data else {},
+                'last_synced_at': listing.last_synced_at if listing.last_synced_at else datetime.utcnow(),
+                'updated_at': datetime.utcnow(),
+                # Legacy fields
+                'price': listing.price,
+                'date_listed': listing.date_listed,
+                'sold_qty': listing.sold_qty if listing.sold_qty is not None else 0,
+                'watch_count': listing.watch_count if listing.watch_count is not None else 0,
+            }
+            values_list.append(values)
+        
+        # Use PostgreSQL's INSERT ... ON CONFLICT DO UPDATE
+        stmt = insert(table).values(values_list)
+        
+        # On conflict, update these fields (but preserve created_at)
+        # Use excluded table reference for PostgreSQL ON CONFLICT
+        excluded = stmt.excluded
+        stmt = stmt.on_conflict_do_update(
+            index_elements=['user_id', 'platform', 'item_id'],
+            set_={
+                'title': excluded.title,
+                'image_url': excluded.image_url,
+                'sku': excluded.sku,
+                'source_name': excluded.source_name,
+                'source_id': excluded.source_id,
+                'brand': excluded.brand,
+                'upc': excluded.upc,
+                'metrics': excluded.metrics,
+                'raw_data': excluded.raw_data,
+                'last_synced_at': excluded.last_synced_at,
+                'updated_at': datetime.utcnow(),
+                # Legacy fields
+                'price': excluded.price,
+                'date_listed': excluded.date_listed,
+                'sold_qty': excluded.sold_qty,
+                'watch_count': excluded.watch_count,
+            }
+        )
+        
+        # Execute the statement
+        db.execute(stmt)
+        db.commit()
+    else:
+        # SQLite: Use individual INSERT OR REPLACE (less efficient but compatible)
+        for listing in listings:
+            # Check if listing exists
+            existing = db.query(Listing).filter(
+                Listing.user_id == listing.user_id,
+                Listing.platform == listing.platform,
+                Listing.item_id == listing.item_id
+            ).first()
+            
+            if existing:
+                # Update existing record
+                existing.title = listing.title
+                existing.image_url = listing.image_url
+                existing.sku = listing.sku
+                existing.source_name = listing.source_name
+                existing.source_id = listing.source_id
+                existing.brand = listing.brand
+                existing.upc = listing.upc
+                existing.metrics = listing.metrics if listing.metrics else {}
+                existing.raw_data = listing.raw_data if listing.raw_data else {}
+                existing.last_synced_at = listing.last_synced_at if listing.last_synced_at else datetime.utcnow()
+                existing.updated_at = datetime.utcnow()
+                existing.price = listing.price
+                existing.date_listed = listing.date_listed
+                existing.sold_qty = listing.sold_qty if listing.sold_qty is not None else 0
+                existing.watch_count = listing.watch_count if listing.watch_count is not None else 0
+            else:
+                # Insert new record
+                listing.updated_at = datetime.utcnow()
+                db.add(listing)
+        
+        db.commit()
+    
+    return len(listings)
 
 
 def generate_export_csv(

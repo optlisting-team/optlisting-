@@ -3,7 +3,7 @@ import random
 import json
 from sqlalchemy.orm import Session
 from backend.models import Listing
-from backend.services import extract_source_info
+from backend.services import extract_source_info, upsert_listings
 
 
 def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "default-user"):
@@ -15,11 +15,10 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
         db: Database session
         count: Number of listings to generate
         user_id: User ID for the listings (default: "default-user")
-    """
-    # Clear existing data for this user (optional - comment out to keep existing data)
-    # db.query(Listing).filter(Listing.user_id == user_id).delete()
-    # db.commit()
     
+    Note: Table clearing is handled in the API endpoint (create_dummy_data)
+    to ensure clean state before generating test data.
+    """
     # Sample data
     titles = [
         "Wireless Bluetooth Headphones",
@@ -245,9 +244,8 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
             
             batch_listings.append(listing)
         
-        # Add batch to database
-        db.add_all(batch_listings)
-        db.commit()
+        # Upsert batch to database (handles duplicates gracefully)
+        upsert_listings(db, batch_listings)
         listings.extend(batch_listings)
         
         # Progress indicator

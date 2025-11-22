@@ -481,6 +481,10 @@ def create_dummy_data(
     db: Session = Depends(get_db)
 ):
     """Generate dummy listings for testing with new hybrid schema"""
+    # Clear all existing listings before generating new dummy data
+    db.query(Listing).delete()
+    db.commit()
+    
     generate_dummy_listings(db, count=count, user_id=user_id)
     return {"message": f"Generated {count} dummy listings"}
 
