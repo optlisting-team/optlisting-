@@ -82,12 +82,13 @@ def root():
 def get_listings(
     skip: int = 0,
     limit: int = 100,
+    user_id: str = "default-user",  # Default user ID for MVP phase
     db: Session = Depends(get_db)
 ):
-    """Get all listings"""
-    listings = db.query(Listing).offset(skip).limit(limit).all()
+    """Get all listings for a specific user"""
+    listings = db.query(Listing).filter(Listing.user_id == user_id).offset(skip).limit(limit).all()
     return {
-        "total": db.query(Listing).count(),
+        "total": db.query(Listing).filter(Listing.user_id == user_id).count(),
         "listings": [
             {
                 "id": l.id,

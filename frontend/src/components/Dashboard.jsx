@@ -8,6 +8,7 @@ import HistoryTable from './HistoryTable'
 import QueueReviewPanel from './QueueReviewPanel'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
 
 function Dashboard() {
   const [zombies, setZombies] = useState([])
@@ -36,6 +37,7 @@ function Dashboard() {
       setLoading(true)
       const response = await axios.get(`${API_BASE_URL}/api/analyze`, {
         params: {
+          user_id: CURRENT_USER_ID,
           marketplace: filterParams.marketplace_filter || 'All',
           min_days: filterParams.min_days,
           max_sales: filterParams.max_sales,
@@ -71,6 +73,7 @@ function Dashboard() {
       try {
         const listingsResponse = await axios.get(`${API_BASE_URL}/api/listings`, {
           params: {
+            user_id: CURRENT_USER_ID,
             skip: 0,
             limit: 10000 // Get all listings
           }
@@ -85,6 +88,7 @@ function Dashboard() {
       try {
         const statsResponse = await axios.get(`${API_BASE_URL}/api/analyze`, {
           params: {
+            user_id: CURRENT_USER_ID,
             min_days: 0, // No filter
             max_sales: 999999, // No filter
             max_watch_count: 999999, // No filter
