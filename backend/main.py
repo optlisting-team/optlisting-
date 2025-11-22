@@ -17,9 +17,19 @@ app = FastAPI(title="OptListing API", version="1.0.0")
 # Allow both local development and production frontend URLs
 import os
 cors_origins = [
+    # Production Vercel deployment
+    "https://optlisting.vercel.app",
+    
+    # Local development environments
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "http://localhost:3000",
+    
+    # Environment variable for additional frontend URLs
     os.getenv("FRONTEND_URL", ""),  # Production frontend URL from environment
+    
+    # Railway public domain (uncomment when Railway domain is available)
+    # "https://web-production-xxxx.up.railway.app",
 ]
 # Filter out empty strings
 cors_origins = [origin for origin in cors_origins if origin]
