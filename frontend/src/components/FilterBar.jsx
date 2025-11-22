@@ -64,11 +64,51 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             onChange={(e) => setMarketplaceFilter(e.target.value)}
             className="w-full px-3 py-2 border-2 border-purple-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-purple-50"
           >
-            <option value="All">All</option>
-            <option value="eBay">eBay</option>
-            <option value="Amazon">Amazon</option>
-            <option value="Shopify">Shopify</option>
-            <option value="Walmart">Walmart</option>
+            <option value="All">All Platforms</option>
+            
+            <optgroup label="🇰🇷 South Korea">
+              <option value="Naver Smart Store">Naver Smart Store</option>
+              <option value="Coupang">Coupang</option>
+              <option value="Gmarket">Gmarket</option>
+              <option value="11st">11st</option>
+            </optgroup>
+            
+            <optgroup label="🇺🇸 North America">
+              <option value="eBay">eBay</option>
+              <option value="Amazon">Amazon</option>
+              <option value="Shopify">Shopify</option>
+              <option value="Walmart">Walmart</option>
+              <option value="Etsy">Etsy</option>
+              <option value="Target">Target</option>
+            </optgroup>
+            
+            <optgroup label="🇯🇵🇹🇼 Japan & Taiwan">
+              <option value="Rakuten">Rakuten</option>
+              <option value="Qoo10">Qoo10</option>
+              <option value="Shopee TW">Shopee TW</option>
+              <option value="Momo">Momo</option>
+              <option value="Ruten">Ruten</option>
+            </optgroup>
+            
+            <optgroup label="🌏 South East Asia">
+              <option value="Shopee">Shopee</option>
+              <option value="Lazada">Lazada</option>
+              <option value="Tokopedia">Tokopedia</option>
+            </optgroup>
+            
+            <optgroup label="🇪🇺 Europe">
+              <option value="Allegro">Allegro</option>
+              <option value="Zalando">Zalando</option>
+              <option value="Cdiscount">Cdiscount</option>
+              <option value="Otto">Otto</option>
+            </optgroup>
+            
+            <optgroup label="🌎 Latin America & Others">
+              <option value="Mercado Libre">Mercado Libre</option>
+              <option value="Wildberries">Wildberries</option>
+              <option value="Flipkart">Flipkart</option>
+              <option value="Ozon">Ozon</option>
+            </optgroup>
           </select>
         </div>
 

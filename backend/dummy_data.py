@@ -48,9 +48,28 @@ def generate_dummy_listings(db: Session, count: int = 50):
             # Random title
             title = random.choice(titles) + f" - Model {i+1}"
             
-            # Random marketplace (eBay, Amazon, Shopify, Walmart)
-            marketplaces = ["eBay", "Amazon", "Shopify", "Walmart"]
-            marketplace = random.choice(marketplaces)
+            # Global marketplace list (weighted distribution)
+            # South Korea: 25%, North America: 30%, Japan/Taiwan: 15%, 
+            # South East Asia: 15%, Europe: 10%, Latin America & Others: 5%
+            marketplace_rand = random.random()
+            if marketplace_rand < 0.25:
+                # South Korea
+                marketplace = random.choice(["Naver Smart Store", "Coupang", "Gmarket", "11st"])
+            elif marketplace_rand < 0.55:
+                # North America
+                marketplace = random.choice(["eBay", "Amazon", "Shopify", "Walmart", "Etsy", "Target"])
+            elif marketplace_rand < 0.70:
+                # Japan & Taiwan
+                marketplace = random.choice(["Rakuten", "Qoo10", "Shopee TW", "Momo", "Ruten"])
+            elif marketplace_rand < 0.85:
+                # South East Asia
+                marketplace = random.choice(["Shopee", "Lazada", "Tokopedia"])
+            elif marketplace_rand < 0.95:
+                # Europe
+                marketplace = random.choice(["Allegro", "Zalando", "Cdiscount", "Otto"])
+            else:
+                # Latin America & Others
+                marketplace = random.choice(["Mercado Libre", "Wildberries", "Flipkart", "Ozon"])
             
             # Determine source (diverse suppliers + pro aggregators)
             # Amazon: 15%, Walmart: 12%, AliExpress: 15%, CJ Dropshipping: 12%, 

@@ -31,6 +31,11 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
               <span className="text-xs font-medium text-purple-600">
                 🟣 eBay: {platformBreakdown?.eBay || 0}
               </span>
+              {platformBreakdown?.["Naver Smart Store"] > 0 && (
+                <span className="text-xs font-medium text-green-600">
+                  🟢 Naver: {platformBreakdown["Naver Smart Store"]}
+                </span>
+              )}
               {platformBreakdown?.Amazon > 0 && (
                 <span className="text-xs font-medium text-yellow-600">
                   🟡 Amazon: {platformBreakdown.Amazon}
@@ -44,6 +49,11 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
               {platformBreakdown?.Walmart > 0 && (
                 <span className="text-xs font-medium text-blue-600">
                   🔵 Walmart: {platformBreakdown.Walmart}
+                </span>
+              )}
+              {platformBreakdown?.Coupang > 0 && (
+                <span className="text-xs font-medium text-rose-600">
+                  🔴 Coupang: {platformBreakdown.Coupang}
                 </span>
               )}
             </div>

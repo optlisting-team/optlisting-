@@ -146,8 +146,22 @@ def analyze_zombies(
     - zombie_count: Number of filtered zombie listings
     - zombies: List of zombie listings
     """
-    # Validate marketplace
-    valid_marketplaces = ["All", "eBay", "Amazon", "Shopify", "Walmart"]
+    # Validate marketplace - Global marketplace list
+    valid_marketplaces = [
+        "All",
+        # South Korea
+        "Naver Smart Store", "Coupang", "Gmarket", "11st",
+        # North America
+        "eBay", "Amazon", "Shopify", "Walmart", "Etsy", "Target",
+        # Japan & Taiwan
+        "Rakuten", "Qoo10", "Shopee TW", "Momo", "Ruten",
+        # South East Asia
+        "Shopee", "Lazada", "Tokopedia",
+        # Europe
+        "Allegro", "Zalando", "Cdiscount", "Otto",
+        # Latin America & Others
+        "Mercado Libre", "Wildberries", "Flipkart", "Ozon"
+    ]
     if marketplace not in valid_marketplaces:
         raise HTTPException(
             status_code=400,
@@ -173,8 +187,8 @@ def analyze_zombies(
     
     # Calculate breakdown by source for ALL listings
     total_breakdown = {"Amazon": 0, "Walmart": 0, "AliExpress": 0, "CJ Dropshipping": 0, "Home Depot": 0, "Wayfair": 0, "Costco": 0, "Wholesale2B": 0, "Spocket": 0, "SaleHoo": 0, "Inventory Source": 0, "Dropified": 0, "Unverified": 0, "Unknown": 0}
-    # Calculate breakdown by platform for ALL listings
-    platform_breakdown = {"eBay": 0, "Amazon": 0, "Shopify": 0, "Walmart": 0}
+    # Calculate breakdown by platform for ALL listings (dynamic - includes all marketplaces)
+    platform_breakdown = {}
     for listing in all_listings:
         source = listing.source
         if source in total_breakdown:
@@ -182,12 +196,17 @@ def analyze_zombies(
         else:
             total_breakdown["Unknown"] += 1
         
-        # Platform breakdown
+        # Platform breakdown (dynamic - add all marketplaces found)
         marketplace = getattr(listing, 'marketplace', 'eBay') or 'eBay'
-        if marketplace in platform_breakdown:
-            platform_breakdown[marketplace] += 1
-        else:
-            platform_breakdown["eBay"] += 1  # Default to eBay if unknown
+        if marketplace not in platform_breakdown:
+            platform_breakdown[marketplace] = 0
+        platform_breakdown[marketplace] += 1
+    
+    # Ensure key marketplaces are always present (even if count is 0)
+    key_marketplaces = ["eBay", "Amazon", "Shopify", "Walmart", "Naver Smart Store", "Coupang"]
+    for key in key_marketplaces:
+        if key not in platform_breakdown:
+            platform_breakdown[key] = 0
     
     # Get zombie listings (filtered)
     zombies = analyze_zombie_listings(
