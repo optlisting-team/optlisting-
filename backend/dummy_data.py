@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 import random
 from sqlalchemy.orm import Session
-from models import Listing
+from backend.models import Listing
 
 
 def generate_dummy_listings(db: Session, count: int = 50):

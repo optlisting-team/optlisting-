@@ -7,9 +7,9 @@ from datetime import date
 import json
 from pydantic import BaseModel
 
-from models import init_db, get_db, Listing, DeletionLog
-from services import detect_source, analyze_zombie_listings, generate_export_csv
-from dummy_data import generate_dummy_listings
+from backend.models import init_db, get_db, Listing, DeletionLog
+from backend.services import detect_source, analyze_zombie_listings, generate_export_csv
+from backend.dummy_data import generate_dummy_listings
 
 app = FastAPI(title="OptListing API", version="1.0.0")
 
