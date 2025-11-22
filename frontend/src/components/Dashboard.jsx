@@ -7,7 +7,7 @@ import DeleteQueue from './DeleteQueue'
 import HistoryTable from './HistoryTable'
 import QueueReviewPanel from './QueueReviewPanel'
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function Dashboard() {
   const [zombies, setZombies] = useState([])
@@ -197,6 +197,41 @@ function Dashboard() {
 
   const handleRemoveFromQueue = (id) => {
     setQueue(queue.filter(item => item.id !== id))
+  }
+
+  const handleSourceChange = async (itemId, newSource) => {
+    try {
+      // Step 1: Update in backend database
+      await axios.patch(`${API_BASE_URL}/api/listing/${itemId}`, {
+        source: newSource
+      })
+
+      // Step 2: Update in local state (candidates/zombies/allListings)
+      const updateItemInList = (list) => {
+        return list.map(item => 
+          item.id === itemId ? { ...item, source: newSource } : item
+        )
+      }
+
+      if (viewMode === 'all') {
+        setAllListings(updateItemInList(allListings))
+      } else if (viewMode === 'zombies') {
+        setZombies(updateItemInList(zombies))
+      }
+
+      // Step 3: If item is in queue, update it there too (will auto-regroup by source)
+      const itemInQueue = queue.find(item => item.id === itemId)
+      if (itemInQueue) {
+        setQueue(updateItemInList(queue))
+        // Note: QueueReviewPanel automatically regroups by source, so the item will move to the correct group
+      }
+
+      console.log(`Source updated for item ${itemId}: ${newSource}`)
+    } catch (err) {
+      console.error('Failed to update source:', err)
+      alert('Failed to update source. Please try again.')
+      // Optionally: revert the change in UI if backend update fails
+    }
   }
 
   useEffect(() => {
@@ -398,6 +433,7 @@ function Dashboard() {
               <QueueReviewPanel
                 queue={queue}
                 onRemove={handleRemoveFromQueue}
+                onSourceChange={handleSourceChange}
                 onExportComplete={(exportedIds) => {
                   // Remove exported items from queue
                   setQueue(queue.filter(item => !exportedIds.includes(item.id)))
@@ -442,6 +478,7 @@ function Dashboard() {
                       selectedIds={selectedIds}
                       onSelect={handleSelect}
                       onSelectAll={handleSelectAll}
+                      onSourceChange={handleSourceChange}
                     />
                   )
                 })()}

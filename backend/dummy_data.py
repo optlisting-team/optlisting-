@@ -52,42 +52,86 @@ def generate_dummy_listings(db: Session, count: int = 50):
             marketplaces = ["eBay", "Amazon", "Shopify", "Walmart"]
             marketplace = random.choice(marketplaces)
             
-            # Determine source (diverse suppliers)
-            # Amazon: 20%, Walmart: 15%, AliExpress: 20%, CJ Dropshipping: 15%, 
-            # Home Depot: 10%, Wayfair: 8%, Costco: 7%, Unknown: 5%
+            # Determine source (diverse suppliers + pro aggregators)
+            # Amazon: 15%, Walmart: 12%, AliExpress: 15%, CJ Dropshipping: 12%, 
+            # Home Depot: 8%, Wayfair: 6%, Costco: 5%,
+            # Pro Aggregators: Wholesale2B: 8%, Spocket: 6%, SaleHoo: 4%, Inventory Source: 3%, Dropified: 2%, Unverified: 4%
+            # Note: Unverified items require manual source identification (strict classification policy)
             source_rand = random.random()
-            if source_rand < 0.20:
+            brand = None
+            upc = None
+            
+            if source_rand < 0.15:
                 source = "Amazon"
                 sku = f"AMZ{random.randint(100000, 999999)}"
                 image_url = f"https://ssl-images-amazon.com/images/I/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.35:
+                # Add Amazon exclusive brands for forensic detection
+                if random.random() < 0.3:  # 30% chance
+                    brand = random.choice(["AmazonBasics", "Solimo", "Happy Belly"])
+            elif source_rand < 0.27:
                 source = "Walmart"
                 sku = f"WM{random.randint(100000, 999999)}"
                 image_url = f"https://i5.walmartimages.com/asr/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.55:
+                # Add Walmart exclusive brands for forensic detection
+                if random.random() < 0.4:  # 40% chance
+                    brand = random.choice(["Mainstays", "Great Value", "Equate", "Pen+Gear", "Hyper Tough"])
+                    # Add Walmart UPC prefix for some items
+                    if random.random() < 0.2:  # 20% chance
+                        upc = f"681131{random.randint(100000, 999999)}"
+            elif source_rand < 0.42:
                 source = "AliExpress"
                 sku = f"AE{random.randint(100000, 999999)}"
                 image_url = f"https://ae01.alicdn.com/kf/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.70:
+            elif source_rand < 0.54:
                 source = "CJ Dropshipping"
                 sku = f"CJ{random.randint(100000, 999999)}"
                 image_url = f"https://cdn.cjdropshipping.com/images/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.80:
+            elif source_rand < 0.62:
                 source = "Home Depot"
                 sku = f"HD{random.randint(100000, 999999)}"
                 image_url = f"https://images.homedepot-static.com/productImages/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.88:
+                # Add Home Depot exclusive brands for forensic detection
+                if random.random() < 0.3:  # 30% chance
+                    brand = random.choice(["Husky", "HDX", "Glacier Bay"])
+            elif source_rand < 0.68:
                 source = "Wayfair"
                 sku = f"WF{random.randint(100000, 999999)}"
                 image_url = f"https://images.wayfair.com/images/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.95:
+                # Add Wayfair exclusive brands for forensic detection
+                if random.random() < 0.3:  # 30% chance
+                    brand = random.choice(["Wayfair Basics", "Mercury Row"])
+            elif source_rand < 0.73:
                 source = "Costco"
                 sku = f"CO{random.randint(100000, 999999)}"
                 image_url = f"https://images.costco-static.com/{random.randint(100000, 999999)}.jpg"
+                # Add Costco exclusive brands for forensic detection
+                if random.random() < 0.5:  # 50% chance
+                    brand = random.choice(["Kirkland", "Kirkland Signature"])
+            elif source_rand < 0.81:
+                source = "Wholesale2B"
+                sku = f"W2B{random.randint(100000, 999999)}"
+                image_url = f"https://wholesale2b.com/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.87:
+                source = "Spocket"
+                sku = f"SPK{random.randint(100000, 999999)}"
+                image_url = f"https://spocket.co/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.91:
+                source = "SaleHoo"
+                sku = f"SH{random.randint(100000, 999999)}"
+                image_url = f"https://salehoo.com/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.94:
+                source = "Inventory Source"
+                sku = f"IS{random.randint(100000, 999999)}"
+                image_url = f"https://inventorysource.com/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.96:
+                source = "Dropified"
+                sku = f"DF{random.randint(100000, 999999)}"
+                image_url = f"https://dropified.com/images/{random.randint(100000, 999999)}.jpg"
             else:
-                source = "Unknown"
-                sku = f"SKU{random.randint(100000, 999999)}"
-                image_url = f"https://example.com/images/{random.randint(100000, 999999)}.jpg"
+                # Unverified: No clear pattern match - requires manual verification
+                source = "Unverified"
+                sku = f"SKU{random.randint(100000, 999999)}"  # Generic SKU without prefix
+                image_url = f"https://example.com/images/{random.randint(100000, 999999)}.jpg"  # Generic domain
             
             # Random price
             price = round(random.uniform(9.99, 199.99), 2)
@@ -114,11 +158,17 @@ def generate_dummy_listings(db: Session, count: int = 50):
             # eBay item ID (unique for up to 99999 items)
             ebay_item_id = f"123456789{i:05d}"
             
+            # Update title to include brand if available (for forensic detection)
+            if brand:
+                title = f"{brand} {title}"
+            
             listing = Listing(
                 ebay_item_id=ebay_item_id,
                 title=title,
                 sku=sku,
                 image_url=image_url,
+                brand=brand,
+                upc=upc,
                 marketplace=marketplace,
                 source=source,
                 price=price,

@@ -14,9 +14,19 @@ from dummy_data import generate_dummy_listings
 app = FastAPI(title="OptListing API", version="1.0.0")
 
 # CORS middleware for React frontend
+# Allow both local development and production frontend URLs
+import os
+cors_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    os.getenv("FRONTEND_URL", ""),  # Production frontend URL from environment
+]
+# Filter out empty strings
+cors_origins = [origin for origin in cors_origins if origin]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Vite default port
+    allow_origins=cors_origins if cors_origins else ["*"],  # Fallback to all if no origins specified
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,6 +77,8 @@ def get_listings(
                 "title": l.title,
                 "sku": l.sku,
                 "image_url": l.image_url,
+                "brand": getattr(l, 'brand', None),
+                "upc": getattr(l, 'upc', None),
                 "marketplace": getattr(l, 'marketplace', 'eBay'),
                 "source": l.source,
                 "price": l.price,
@@ -81,13 +93,25 @@ def get_listings(
 
 @app.post("/api/listings/detect-source")
 def detect_listing_source(
-    image_url: str,
-    sku: str,
+    image_url: str = "",
+    sku: str = "",
+    title: str = "",
+    brand: str = "",
+    upc: str = "",
     db: Session = Depends(get_db)
 ):
-    """Detect source for a listing"""
-    source = detect_source(image_url, sku)
-    return {"source": source}
+    """Detect source for a listing with forensic analysis"""
+    source, confidence = detect_source(
+        image_url=image_url,
+        sku=sku,
+        title=title,
+        brand=brand,
+        upc=upc
+    )
+    return {
+        "source": source,
+        "confidence_level": confidence
+    }
 
 
 @app.get("/api/analyze")
@@ -123,7 +147,7 @@ def analyze_zombies(
         )
     
     # Validate source_filter
-    valid_sources = ["All", "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Unknown"]
+    valid_sources = ["All", "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
     if source_filter not in valid_sources:
         raise HTTPException(
             status_code=400,
@@ -140,7 +164,7 @@ def analyze_zombies(
     total_count = len(all_listings)
     
     # Calculate breakdown by source for ALL listings
-    total_breakdown = {"Amazon": 0, "Walmart": 0, "AliExpress": 0, "CJ Dropshipping": 0, "Home Depot": 0, "Wayfair": 0, "Costco": 0, "Unknown": 0}
+    total_breakdown = {"Amazon": 0, "Walmart": 0, "AliExpress": 0, "CJ Dropshipping": 0, "Home Depot": 0, "Wayfair": 0, "Costco": 0, "Wholesale2B": 0, "Spocket": 0, "SaleHoo": 0, "Inventory Source": 0, "Dropified": 0, "Unverified": 0, "Unknown": 0}
     # Calculate breakdown by platform for ALL listings
     platform_breakdown = {"eBay": 0, "Amazon": 0, "Shopify": 0, "Walmart": 0}
     for listing in all_listings:
@@ -212,7 +236,7 @@ def export_csv(
         )
     
     # Validate source_filter
-    valid_sources = ["All", "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Unknown"]
+    valid_sources = ["All", "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
     if source_filter not in valid_sources:
         raise HTTPException(
             status_code=400,
@@ -366,6 +390,45 @@ def get_deletion_history(
             }
             for log in logs
         ]
+    }
+
+
+class UpdateListingRequest(BaseModel):
+    source: Optional[str] = None
+
+@app.patch("/api/listing/{listing_id}")
+def update_listing(
+    listing_id: int,
+    request: UpdateListingRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Update a listing's source (manual override)
+    Allows users to correct auto-detected sources
+    """
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    
+    # Validate source if provided
+    if request.source is not None:
+        valid_sources = ["Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
+        if request.source not in valid_sources:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid source. Must be one of: {', '.join(valid_sources)}"
+            )
+        listing.source = request.source
+    
+    db.commit()
+    db.refresh(listing)
+    
+    return {
+        "id": listing.id,
+        "ebay_item_id": listing.ebay_item_id,
+        "title": listing.title,
+        "source": listing.source,
+        "message": "Listing updated successfully"
     }
 
 

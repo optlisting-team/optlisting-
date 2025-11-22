@@ -1,7 +1,7 @@
 import SourceBadge from './SourceBadge'
 import PlatformBadge from './PlatformBadge'
 
-function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll }) {
+function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChange }) {
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A'
     const date = new Date(dateString)
@@ -76,7 +76,12 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll }) {
                 {zombie.title}
               </td>
               <td className="px-6 py-5 whitespace-nowrap">
-                <SourceBadge source={zombie.source} />
+                <SourceBadge 
+                  source={zombie.source} 
+                  editable={!!onSourceChange}
+                  onSourceChange={onSourceChange}
+                  itemId={zombie.id}
+                />
               </td>
               <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
                 {zombie.sku}

@@ -3,9 +3,9 @@ import SourceBadge from './SourceBadge'
 import PlatformBadge from './PlatformBadge'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate }) {
+function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, onSourceChange }) {
   // Group items by source
   const groupedBySource = queue.reduce((acc, item) => {
     if (!acc[item.source]) {
@@ -148,6 +148,61 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate }
           buttonBg: 'bg-blue-500',
           buttonHover: 'hover:bg-blue-600'
         }
+      // Pro Aggregators - Professional look
+      case 'Wholesale2B':
+        return {
+          headerBg: 'bg-blue-900',
+          headerText: 'text-white',
+          border: 'border-blue-700',
+          bg: 'bg-blue-50',
+          buttonBg: 'bg-blue-900',
+          buttonHover: 'hover:bg-blue-950'
+        }
+      case 'Spocket':
+        return {
+          headerBg: 'bg-purple-600',
+          headerText: 'text-white',
+          border: 'border-purple-400',
+          bg: 'bg-purple-50',
+          buttonBg: 'bg-purple-600',
+          buttonHover: 'hover:bg-purple-700'
+        }
+      case 'SaleHoo':
+        return {
+          headerBg: 'bg-sky-500',
+          headerText: 'text-white',
+          border: 'border-sky-300',
+          bg: 'bg-sky-50',
+          buttonBg: 'bg-sky-500',
+          buttonHover: 'hover:bg-sky-600'
+        }
+      case 'Inventory Source':
+        return {
+          headerBg: 'bg-green-700',
+          headerText: 'text-white',
+          border: 'border-green-500',
+          bg: 'bg-green-50',
+          buttonBg: 'bg-green-700',
+          buttonHover: 'hover:bg-green-800'
+        }
+      case 'Dropified':
+        return {
+          headerBg: 'bg-gray-900',
+          headerText: 'text-white',
+          border: 'border-gray-700',
+          bg: 'bg-gray-50',
+          buttonBg: 'bg-gray-900',
+          buttonHover: 'hover:bg-black'
+        }
+      case 'Unverified':
+        return {
+          headerBg: 'bg-amber-500',
+          headerText: 'text-white',
+          border: 'border-amber-300',
+          bg: 'bg-amber-50',
+          buttonBg: 'bg-gray-400',
+          buttonHover: 'hover:bg-gray-400'
+        }
       default:
         return {
           headerBg: 'bg-gray-600',
@@ -207,6 +262,9 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate }
                       Title
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Source
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       SKU
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -228,6 +286,14 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate }
                       </td>
                       <td className="px-4 py-3 text-sm font-semibold text-gray-900 max-w-xs truncate" title={item.title}>
                         {item.title}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <SourceBadge 
+                          source={item.source} 
+                          editable={!!onSourceChange}
+                          onSourceChange={onSourceChange}
+                          itemId={item.id}
+                        />
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                         {item.sku}
@@ -251,13 +317,38 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate }
 
             {/* Footer (Download Button) */}
             <div className="bg-gray-50 px-4 py-4 border-t border-gray-200 flex-shrink-0">
-              <button
-                onClick={() => handleSourceExport(source, items)}
-                className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md`}
-              >
-                <span>📥</span>
-                <span>Download {source} CSV ({items.length} items)</span>
-              </button>
+              {source === 'Unverified' ? (
+                <div className="space-y-3">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <span className="text-amber-600 text-lg">⚠️</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-amber-800 mb-1">
+                          Source Verification Required
+                        </p>
+                        <p className="text-xs text-amber-700">
+                          Please identify the source manually to generate the correct CSV. Click on the source badges above to verify each item.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    disabled
+                    className="w-full bg-gray-400 text-gray-600 font-bold py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <span>🔒</span>
+                    <span>Download Disabled - Verify Sources First</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleSourceExport(source, items)}
+                  className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md`}
+                >
+                  <span>📥</span>
+                  <span>Download {source} CSV ({items.length} items)</span>
+                </button>
+              )}
             </div>
           </div>
         )

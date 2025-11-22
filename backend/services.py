@@ -7,32 +7,108 @@ import pandas as pd
 from io import StringIO
 
 
-def detect_source(image_url: str, sku: str) -> str:
+def detect_source(
+    image_url: str = "",
+    sku: str = "",
+    title: str = "",
+    brand: str = "",
+    upc: str = ""
+) -> tuple[str, str]:
     """
-    Source Detective Logic
-    Analyzes image_url and sku to determine the source.
+    Advanced Source Detection with Forensic Analysis
+    Uses multiple data points to identify source with confidence scoring.
     
-    Rules:
-    - If image_url contains "amazon" or "ssl-images-amazon" OR sku starts with "AMZ" -> "Amazon"
-    - If image_url contains "walmart" OR sku starts with "WM" -> "Walmart"
-    - Else -> "Unknown"
+    Detection Methods (in priority order):
+    1. Exclusive Brand/Keyword Match (HIGH confidence)
+    2. SKU Prefix Match (HIGH confidence)
+    3. UPC/EAN Prefix Match (HIGH confidence)
+    4. Image URL Domain Match (MEDIUM confidence)
+    
+    Returns: (source, confidence_level)
+    - source: Detected source name or "Unverified"
+    - confidence_level: "High", "Medium", "Low"
     """
-    image_url_lower = image_url.lower()
-    sku_upper = sku.upper()
+    image_url_lower = image_url.lower() if image_url else ""
+    sku_upper = sku.upper() if sku else ""
+    title_lower = title.lower() if title else ""
+    brand_lower = brand.lower() if brand else ""
+    upc_str = upc.strip() if upc else ""
     
-    # Check for Amazon
-    if (
-        "amazon" in image_url_lower 
-        or "ssl-images-amazon" in image_url_lower 
-        or sku_upper.startswith("AMZ")
-    ):
-        return "Amazon"
+    # Exclusive Brand/Keyword Dictionary (HIGH confidence indicators)
+    exclusive_brands = {
+        "Walmart": ["mainstays", "great value", "equate", "pen+gear", "pen & gear", "hyper tough"],
+        "Costco": ["kirkland", "kirkland signature"],
+        "Amazon": ["amazonbasics", "solimo", "happy belly"],
+        "Home Depot": ["husky", "hdx", "glacier bay"],
+        "Wayfair": ["wayfair basics", "mercury row"]
+    }
     
-    # Check for Walmart
-    if "walmart" in image_url_lower or sku_upper.startswith("WM"):
-        return "Walmart"
+    # SKU Prefix Patterns (HIGH confidence)
+    sku_patterns = {
+        "Amazon": ["AMZ"],
+        "Walmart": ["WM"],
+        "AliExpress": ["AE", "ALI"],
+        "CJ Dropshipping": ["CJ"],
+        "Home Depot": ["HD"],
+        "Wayfair": ["WF"],
+        "Costco": ["CO"],
+        "Wholesale2B": ["W2B"],
+        "Spocket": ["SPK"],
+        "SaleHoo": ["SH"],
+        "Inventory Source": ["IS"],
+        "Dropified": ["DF"]
+    }
     
-    return "Unknown"
+    # UPC/EAN Prefix Patterns (HIGH confidence)
+    # Real implementation would query UPC database
+    upc_patterns = {
+        "Walmart": ["681131"],  # Walmart UPC prefix
+        # Add more UPC prefixes as needed
+    }
+    
+    # Image URL Domain Patterns (MEDIUM confidence)
+    url_patterns = {
+        "Amazon": ["amazon", "ssl-images-amazon"],
+        "Walmart": ["walmart", "walmartimages"],
+        "AliExpress": ["alicdn", "aliexpress"],
+        "CJ Dropshipping": ["cjdropshipping"],
+        "Home Depot": ["homedepot"],
+        "Wayfair": ["wayfair"],
+        "Costco": ["costco"],
+        "Wholesale2B": ["wholesale2b"],
+        "Spocket": ["spocket"],
+        "SaleHoo": ["salehoo"],
+        "Inventory Source": ["inventorysource"],
+        "Dropified": ["dropified"]
+    }
+    
+    # Priority 1: Check Exclusive Brands/Keywords (HIGH confidence)
+    # Check both title and brand field
+    search_text = f"{title_lower} {brand_lower}".strip()
+    for source, keywords in exclusive_brands.items():
+        for keyword in keywords:
+            if keyword in search_text:
+                return (source, "High")
+    
+    # Priority 2: Check SKU Prefix (HIGH confidence)
+    for source, prefixes in sku_patterns.items():
+        if any(sku_upper.startswith(prefix) for prefix in prefixes):
+            return (source, "High")
+    
+    # Priority 3: Check UPC/EAN Prefix (HIGH confidence)
+    if upc_str:
+        for source, prefixes in upc_patterns.items():
+            if any(upc_str.startswith(prefix) for prefix in prefixes):
+                return (source, "High")
+    
+    # Priority 4: Check Image URL Domain (MEDIUM confidence)
+    if image_url_lower:
+        for source, keywords in url_patterns.items():
+            if any(keyword in image_url_lower for keyword in keywords):
+                return (source, "Medium")
+    
+    # No match found -> Unverified (LOW confidence)
+    return ("Unverified", "Low")
 
 
 def analyze_zombie_listings(

@@ -19,6 +19,8 @@ class Listing(Base):
     title = Column(String, nullable=False)
     sku = Column(String, nullable=False)
     image_url = Column(String, nullable=False)
+    brand = Column(String, nullable=True)  # Brand name for forensic source detection
+    upc = Column(String, nullable=True)  # UPC/EAN code for source identification
     marketplace = Column(String, nullable=True, default="eBay")  # "eBay", "Amazon", "Shopify", "Walmart"
     source = Column(String, nullable=False)  # "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Unknown"
     price = Column(Float, nullable=False)
