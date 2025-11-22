@@ -477,10 +477,11 @@ def update_listing(
 @app.post("/api/dummy-data")
 def create_dummy_data(
     count: int = 50,
+    user_id: str = "default-user",
     db: Session = Depends(get_db)
 ):
-    """Generate dummy listings for testing"""
-    generate_dummy_listings(db, count=count)
+    """Generate dummy listings for testing with new hybrid schema"""
+    generate_dummy_listings(db, count=count, user_id=user_id)
     return {"message": f"Generated {count} dummy listings"}
 
 
