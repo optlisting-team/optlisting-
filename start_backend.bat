@@ -4,7 +4,7 @@ echo ========================================
 echo OptListing Backend Server
 echo ========================================
 echo.
-cd /d %~dp0..
+cd /d %~dp0
 echo 현재 폴더: %CD%
 echo.
 echo Python 확인 중...
@@ -39,3 +39,6 @@ if errorlevel 1 (
     echo 에러 메시지를 확인하세요.
     pause
 )
+
+
+

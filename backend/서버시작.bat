@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul
 echo ========================================
-echo OptListing Backend Server
+echo OptListing 백엔드 서버 시작
 echo ========================================
 echo.
-cd /d %~dp0..
+cd /d %~dp0
 echo 현재 폴더: %CD%
 echo.
 echo Python 확인 중...
@@ -31,7 +31,7 @@ echo 서버를 중지하려면 Ctrl+C를 누르세요.
 echo ========================================
 echo.
 
-%PYTHON_CMD% -m backend.main
+%PYTHON_CMD% main.py
 
 if errorlevel 1 (
     echo.
@@ -39,3 +39,4 @@ if errorlevel 1 (
     echo 에러 메시지를 확인하세요.
     pause
 )
+

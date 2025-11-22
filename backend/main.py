@@ -8,7 +8,7 @@ import json
 from pydantic import BaseModel
 
 from backend.models import init_db, get_db, Listing, DeletionLog, Base, engine
-from backend.services import detect_source, analyze_zombie_listings, generate_export_csv
+from backend.services import detect_source, extract_source_info, analyze_zombie_listings, generate_export_csv
 from backend.dummy_data import generate_dummy_listings
 
 app = FastAPI(title="OptListing API", version="1.0.0")
@@ -47,7 +47,7 @@ def startup_event():
             count = db.query(Listing).count()
             if count == 0:
                 print("Generating 5000 dummy listings... This may take a moment.")
-                generate_dummy_listings(db, count=5000)
+                generate_dummy_listings(db, count=5000, user_id="default-user")
                 print("Dummy data generated successfully")
             else:
                 print(f"Database already contains {count} listings")
@@ -129,6 +129,7 @@ def analyze_zombies(
     max_watch_count: int = 10,
     source_filter: str = "All",
     marketplace: str = "All",
+    user_id: str = "default-user",  # Default user ID for backward compatibility
     db: Session = Depends(get_db)
 ):
     """
@@ -181,8 +182,8 @@ def analyze_zombies(
     max_sales = max(0, max_sales)
     max_watch_count = max(0, max_watch_count)
     
-    # Get ALL listings for total stats (not just zombies)
-    all_listings = db.query(Listing).all()
+    # Get ALL listings for total stats (not just zombies) - filter by user_id
+    all_listings = db.query(Listing).filter(Listing.user_id == user_id).all()
     total_count = len(all_listings)
     
     # Calculate breakdown by source for ALL listings
@@ -190,17 +191,18 @@ def analyze_zombies(
     # Calculate breakdown by platform for ALL listings (dynamic - includes all marketplaces)
     platform_breakdown = {}
     for listing in all_listings:
-        source = listing.source
+        # Use source_name if available, otherwise fallback to source (legacy)
+        source = getattr(listing, 'source_name', None) or getattr(listing, 'source', 'Unknown')
         if source in total_breakdown:
             total_breakdown[source] += 1
         else:
             total_breakdown["Unknown"] += 1
         
-        # Platform breakdown (dynamic - add all marketplaces found)
-        marketplace = getattr(listing, 'marketplace', 'eBay') or 'eBay'
-        if marketplace not in platform_breakdown:
-            platform_breakdown[marketplace] = 0
-        platform_breakdown[marketplace] += 1
+        # Platform breakdown (use platform if available, otherwise marketplace)
+        platform = getattr(listing, 'platform', None) or getattr(listing, 'marketplace', 'eBay') or 'eBay'
+        if platform not in platform_breakdown:
+            platform_breakdown[platform] = 0
+        platform_breakdown[platform] += 1
     
     # Ensure key marketplaces are always present (even if count is 0)
     key_marketplaces = ["eBay", "Amazon", "Shopify", "Walmart", "Naver Smart Store", "Coupang"]
@@ -208,14 +210,15 @@ def analyze_zombies(
         if key not in platform_breakdown:
             platform_breakdown[key] = 0
     
-    # Get zombie listings (filtered)
+    # Get zombie listings (filtered) - pass user_id
     zombies = analyze_zombie_listings(
-        db, 
+        db,
+        user_id=user_id,
         min_days=min_days, 
         max_sales=max_sales,
         max_watch_count=max_watch_count,
         source_filter=source_filter,
-        marketplace_filter=marketplace
+        platform_filter=marketplace
     )
     
     return {
@@ -226,16 +229,20 @@ def analyze_zombies(
         "zombies": [
             {
                 "id": z.id,
-                "ebay_item_id": z.ebay_item_id,
+                "item_id": getattr(z, 'item_id', None) or getattr(z, 'ebay_item_id', ''),
+                "ebay_item_id": getattr(z, 'item_id', None) or getattr(z, 'ebay_item_id', ''),  # Backward compatibility
                 "title": z.title,
                 "sku": z.sku,
                 "image_url": z.image_url,
-                "marketplace": getattr(z, 'marketplace', 'eBay'),
-                "source": z.source,
-                "price": z.price,
+                "platform": getattr(z, 'platform', None) or getattr(z, 'marketplace', 'eBay'),
+                "marketplace": getattr(z, 'platform', None) or getattr(z, 'marketplace', 'eBay'),  # Backward compatibility
+                "source_name": getattr(z, 'source_name', None) or getattr(z, 'source', 'Unknown'),
+                "source": getattr(z, 'source_name', None) or getattr(z, 'source', 'Unknown'),  # Backward compatibility
+                "source_id": getattr(z, 'source_id', None),
+                "price": getattr(z, 'price', None) or (z.metrics.get('price') if hasattr(z, 'metrics') and z.metrics else None),
                 "date_listed": z.date_listed.isoformat() if z.date_listed else None,
-                "sold_qty": z.sold_qty,
-                "watch_count": z.watch_count
+                "sold_qty": getattr(z, 'sold_qty', 0) or (z.metrics.get('sales') if hasattr(z, 'metrics') and z.metrics else 0),
+                "watch_count": getattr(z, 'watch_count', 0) or (z.metrics.get('views') if hasattr(z, 'metrics') and z.metrics else 0)
             }
             for z in zombies
         ]
@@ -308,7 +315,8 @@ def export_csv(
 
 class ExportQueueRequest(BaseModel):
     items: List[Dict]
-    export_mode: str
+    target_tool: Optional[str] = None  # New parameter: "autods", "wholesale2b", "shopify_matrixify", etc.
+    export_mode: Optional[str] = None  # Legacy parameter for backward compatibility
 
 @app.post("/api/export-queue")
 def export_queue_csv(
@@ -318,34 +326,41 @@ def export_queue_csv(
     """
     Export CSV from queue items (staging area)
     Accepts a list of items directly from the frontend queue
+    Supports multiple export formats via target_tool parameter.
     """
     items = request.items
-    export_mode = request.export_mode
     
-    if export_mode not in ["autods", "yaballe", "ebay"]:
+    # Support both new target_tool and legacy export_mode
+    target_tool = request.target_tool or request.export_mode or "autods"
+    
+    valid_tools = ["autods", "yaballe", "ebay", "wholesale2b", "shopify_matrixify", "shopify_tagging"]
+    if target_tool not in valid_tools:
         raise HTTPException(
             status_code=400,
-            detail="Invalid export_mode. Must be one of: autods, yaballe, ebay"
+            detail=f"Invalid target_tool. Must be one of: {', '.join(valid_tools)}"
         )
     
     if not items:
         raise HTTPException(status_code=400, detail="No items in queue to export")
     
-    # Generate CSV directly from items (dictionaries)
-    csv_content = generate_export_csv(items, export_mode)
+    # Generate CSV directly from items (dictionaries) with target_tool
+    csv_content = generate_export_csv(items, target_tool)
     
     # Determine filename
     filename_map = {
-        "autods": "zombies_autods.csv",
-        "yaballe": "zombies_yaballe.csv",
-        "ebay": "zombies_ebay.csv"
+        "autods": "queue_autods.csv",
+        "yaballe": "queue_yaballe.csv",
+        "ebay": "queue_ebay.csv",
+        "wholesale2b": "queue_wholesale2b.csv",
+        "shopify_matrixify": "queue_shopify_matrixify.csv",
+        "shopify_tagging": "queue_shopify_tagging.csv"
     }
     
     return Response(
         content=csv_content,
         media_type="text/csv",
         headers={
-            "Content-Disposition": f"attachment; filename={filename_map[export_mode]}"
+            "Content-Disposition": f"attachment; filename={filename_map[target_tool]}"
         }
     )
 

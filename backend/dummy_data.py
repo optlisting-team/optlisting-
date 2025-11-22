@@ -1,17 +1,24 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import random
+import json
 from sqlalchemy.orm import Session
 from backend.models import Listing
+from backend.services import extract_source_info
 
 
-def generate_dummy_listings(db: Session, count: int = 50):
+def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "default-user"):
     """
-    Generate dummy listings for testing
+    Generate dummy listings for testing with new hybrid schema
     Mix of Amazon/Walmart, some zombies, some active
+    
+    Args:
+        db: Database session
+        count: Number of listings to generate
+        user_id: User ID for the listings (default: "default-user")
     """
-    # Clear existing data
-    db.query(Listing).delete()
-    db.commit()
+    # Clear existing data for this user (optional - comment out to keep existing data)
+    # db.query(Listing).filter(Listing.user_id == user_id).delete()
+    # db.commit()
     
     # Sample data
     titles = [
@@ -174,22 +181,62 @@ def generate_dummy_listings(db: Session, count: int = 50):
             # Watch count
             watch_count = random.randint(0, 50)
             
-            # eBay item ID (unique for up to 99999 items)
-            ebay_item_id = f"123456789{i:05d}"
+            # Item ID (unique for up to 99999 items)
+            item_id = f"123456789{i:05d}"
             
             # Update title to include brand if available (for forensic detection)
             if brand:
                 title = f"{brand} {title}"
             
+            # Extract source info using extract_source_info function
+            source_name, source_id = extract_source_info(
+                sku=sku,
+                image_url=image_url,
+                title=title,
+                brand=brand,
+                upc=upc
+            )
+            
+            # Build metrics JSONB
+            metrics = {
+                "sales": sold_qty,
+                "views": watch_count,
+                "price": price,
+                "currency": "USD",
+                "date_listed": date_listed.isoformat() if date_listed else None
+            }
+            
+            # Build raw_data JSONB (simulated API response)
+            raw_data = {
+                "item_id": item_id,
+                "title": title,
+                "sku": sku,
+                "image_url": image_url,
+                "price": price,
+                "date_listed": date_listed.isoformat() if date_listed else None,
+                "sold_qty": sold_qty,
+                "watch_count": watch_count,
+                "platform": marketplace,
+                "source": source,
+                "brand": brand,
+                "upc": upc
+            }
+            
             listing = Listing(
-                ebay_item_id=ebay_item_id,
+                user_id=user_id,
+                platform=marketplace,
+                item_id=item_id,
                 title=title,
                 sku=sku,
                 image_url=image_url,
+                source_name=source_name,
+                source_id=source_id,
                 brand=brand,
                 upc=upc,
-                marketplace=marketplace,
-                source=source,
+                metrics=metrics,
+                raw_data=raw_data,
+                last_synced_at=datetime.utcnow(),
+                # Legacy fields for backward compatibility
                 price=price,
                 date_listed=date_listed,
                 sold_qty=sold_qty,

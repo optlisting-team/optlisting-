@@ -1,19 +1,65 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import SourceBadge from './SourceBadge'
 import PlatformBadge from './PlatformBadge'
 import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
+// Available export tools
+const EXPORT_TOOLS = [
+  { value: 'autods', label: 'AutoDS' },
+  { value: 'yaballe', label: 'Yaballe' },
+  { value: 'shopify_matrixify', label: 'Shopify (Matrixify)' },
+  { value: 'shopify_tagging', label: 'Shopify (Tagging)' },
+  { value: 'wholesale2b', label: 'Wholesale2B' },
+  { value: 'ebay', label: 'eBay Direct' }
+]
+
+// Tool display names for download button
+const TOOL_DISPLAY_NAMES = {
+  'autods': 'AutoDS',
+  'yaballe': 'Yaballe',
+  'shopify_matrixify': 'Shopify Matrixify',
+  'shopify_tagging': 'Shopify Tagging',
+  'wholesale2b': 'Wholesale2B',
+  'ebay': 'eBay Direct'
+}
+
 function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, onSourceChange }) {
+  // Tool mapping state: { "Amazon": "autods", "Walmart": "wholesale2b", ... }
+  const [toolMapping, setToolMapping] = useState(() => {
+    // Load from localStorage
+    const saved = localStorage.getItem('optlisting_tool_mapping')
+    return saved ? JSON.parse(saved) : {}
+  })
+
+  // Save to localStorage whenever toolMapping changes
+  useEffect(() => {
+    localStorage.setItem('optlisting_tool_mapping', JSON.stringify(toolMapping))
+  }, [toolMapping])
+
   // Group items by source
   const groupedBySource = queue.reduce((acc, item) => {
-    if (!acc[item.source]) {
-      acc[item.source] = []
+    const source = item.source_name || item.source || 'Unknown'
+    if (!acc[source]) {
+      acc[source] = []
     }
-    acc[item.source].push(item)
+    acc[source].push(item)
     return acc
   }, {})
+
+  // Get tool for a source (with default fallback)
+  const getToolForSource = (source) => {
+    return toolMapping[source] || 'autods' // Default to AutoDS
+  }
+
+  // Update tool for a source
+  const updateToolForSource = (source, tool) => {
+    setToolMapping(prev => ({
+      ...prev,
+      [source]: tool
+    }))
+  }
 
   const formatPrice = (price) => {
     return `$${price.toFixed(2)}`
@@ -29,9 +75,14 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
     })
   }
 
-  const handleSourceExport = async (source, items) => {
+  const handleSourceExport = async (source, items, targetTool) => {
     if (items.length === 0) {
       alert(`No ${source} items in queue to export.`)
+      return
+    }
+
+    if (!targetTool) {
+      alert(`Please select an export tool for ${source} items.`)
       return
     }
 
@@ -45,12 +96,12 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
         console.error('Failed to log deletion:', logErr)
       }
 
-      // Export CSV
+      // Export CSV with target_tool parameter
       const response = await axios.post(
         `${API_BASE_URL}/api/export-queue`,
         {
           items: items,
-          export_mode: 'autods'
+          target_tool: targetTool  // Changed from export_mode to target_tool
         },
         {
           responseType: 'blob'
@@ -62,8 +113,9 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
       const link = document.createElement('a')
       link.href = url
       
-      const sourceLower = source.toLowerCase()
-      link.setAttribute('download', `${sourceLower}_delete.csv`)
+      const sourceLower = source.toLowerCase().replace(/\s+/g, '_')
+      const toolName = TOOL_DISPLAY_NAMES[targetTool] || targetTool
+      link.setAttribute('download', `${sourceLower}_${toolName}_delete.csv`)
       document.body.appendChild(link)
       link.click()
       link.remove()
@@ -78,7 +130,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
         onHistoryUpdate()
       }
     } catch (err) {
-      alert(`Failed to export ${source} CSV`)
+      alert(`Failed to export ${source} CSV for ${TOOL_DISPLAY_NAMES[targetTool] || targetTool}`)
       console.error(err)
     }
   }
@@ -239,11 +291,27 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
           >
             {/* Header */}
             <div className={`${colors.headerBg} ${colors.headerText} px-6 py-4 flex-shrink-0`}>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
                 <h2 className="text-xl font-bold">
                   {source.toUpperCase()} - {items.length} Item{items.length !== 1 ? 's' : ''}
                 </h2>
                 <SourceBadge source={source} />
+              </div>
+              {/* Tool Selection Dropdown */}
+              <div className="flex items-center gap-2 mt-2">
+                <label className="text-sm font-medium opacity-90">via</label>
+                <select
+                  value={getToolForSource(source)}
+                  onChange={(e) => updateToolForSource(source, e.target.value)}
+                  className="bg-white text-gray-900 border border-white/20 rounded-md px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-white/50"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {EXPORT_TOOLS.map(tool => (
+                    <option key={tool.value} value={tool.value}>
+                      {tool.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -279,17 +347,17 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                   {items.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <PlatformBadge marketplace={item.marketplace || 'eBay'} />
+                        <PlatformBadge marketplace={item.platform || item.marketplace || 'eBay'} />
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
-                        {item.ebay_item_id}
+                        {item.item_id || item.ebay_item_id}
                       </td>
                       <td className="px-4 py-3 text-sm font-semibold text-gray-900 max-w-xs truncate" title={item.title}>
                         {item.title}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <SourceBadge 
-                          source={item.source} 
+                          source={item.source_name || item.source} 
                           editable={!!onSourceChange}
                           onSourceChange={onSourceChange}
                           itemId={item.id}
@@ -342,11 +410,11 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                 </div>
               ) : (
                 <button
-                  onClick={() => handleSourceExport(source, items)}
+                  onClick={() => handleSourceExport(source, items, getToolForSource(source))}
                   className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md`}
                 >
                   <span>📥</span>
-                  <span>Download {source} CSV ({items.length} items)</span>
+                  <span>Download CSV for [{TOOL_DISPLAY_NAMES[getToolForSource(source)] || 'Tool'}] ({items.length} items)</span>
                 </button>
               )}
             </div>

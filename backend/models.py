@@ -1,9 +1,11 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, create_engine
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, create_engine, Index, BigInteger
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import date, datetime
+import uuid
 
 # Load environment variables from .env file
 load_dotenv()
@@ -14,22 +16,49 @@ Base = declarative_base()
 class Listing(Base):
     __tablename__ = "listings"
 
-    id = Column(Integer, primary_key=True, index=True)
-    ebay_item_id = Column(String, unique=True, index=True, nullable=False)
+    # Core Columns
+    id = Column(BigInteger, primary_key=True, index=True)
+    user_id = Column(String, nullable=False, index=True)  # UUID as string for compatibility
+    platform = Column(String, nullable=False)  # "eBay", "Shopify", etc.
+    item_id = Column(String, nullable=False)  # External platform ID (eBay ItemID, Shopify Product ID, etc.)
+    
+    # Basic Info
     title = Column(String, nullable=False)
-    sku = Column(String, nullable=False)
     image_url = Column(String, nullable=False)
+    sku = Column(String, nullable=False)
+    
+    # Source Detection (CRITICAL)
+    source_name = Column(String, nullable=False)  # Detected Source: "Amazon", "Walmart", "Unverified", etc.
+    source_id = Column(String, nullable=True)  # Extracted Source ID: ASIN "B08...", Walmart ID, etc.
+    
+    # Metadata
     brand = Column(String, nullable=True)  # Brand name for forensic source detection
     upc = Column(String, nullable=True)  # UPC/EAN code for source identification
-    marketplace = Column(String, nullable=True, default="eBay")  # "eBay", "Amazon", "Shopify", "Walmart"
-    source = Column(String, nullable=False)  # "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Unknown"
-    price = Column(Float, nullable=False)
-    date_listed = Column(Date, nullable=False)
-    sold_qty = Column(Integer, default=0)
-    watch_count = Column(Integer, default=0)
+    
+    # Metrics (stored as JSONB for flexibility)
+    metrics = Column(JSONB, nullable=True, default={})  # {"sales": 0, "views": 10, "price": 29.99, "currency": "USD"}
+    
+    # Raw Data (full API response backup)
+    raw_data = Column(JSONB, nullable=True)  # Store complete original API response
+    
+    # Timestamps
+    last_synced_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # Legacy fields for backward compatibility (deprecated, use metrics instead)
+    price = Column(Float, nullable=True)  # Use metrics['price'] instead
+    date_listed = Column(Date, nullable=True)  # Use metrics['date_listed'] instead
+    sold_qty = Column(Integer, default=0)  # Use metrics['sales'] instead
+    watch_count = Column(Integer, default=0)  # Use metrics['views'] instead
+    
+    # Unique constraint: prevent duplicates per user/platform/item_id
+    __table_args__ = (
+        Index('idx_user_platform_item', 'user_id', 'platform', 'item_id', unique=True),
+    )
 
     def __repr__(self):
-        return f"<Listing(ebay_item_id={self.ebay_item_id}, title={self.title}, source={self.source})>"
+        return f"<Listing(platform={self.platform}, item_id={self.item_id}, source_name={self.source_name}, source_id={self.source_id})>"
 
 
 class DeletionLog(Base):
