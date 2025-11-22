@@ -7,7 +7,7 @@ from datetime import date
 import json
 from pydantic import BaseModel
 
-from backend.models import init_db, get_db, Listing, DeletionLog
+from backend.models import init_db, get_db, Listing, DeletionLog, Base, engine
 from backend.services import detect_source, analyze_zombie_listings, generate_export_csv
 from backend.dummy_data import generate_dummy_listings
 
@@ -36,7 +36,11 @@ app.add_middleware(
 @app.on_event("startup")
 def startup_event():
     try:
-        init_db()
+        # Create tables if they don't exist (works for both SQLite and Supabase)
+        print("Creating database tables if they don't exist...")
+        Base.metadata.create_all(bind=engine)
+        print("Database tables created/verified successfully")
+        
         # Generate dummy data on first startup
         db = next(get_db())
         try:
@@ -45,8 +49,12 @@ def startup_event():
                 print("Generating 5000 dummy listings... This may take a moment.")
                 generate_dummy_listings(db, count=5000)
                 print("Dummy data generated successfully")
+            else:
+                print(f"Database already contains {count} listings")
         except Exception as e:
             print(f"Error generating dummy data: {e}")
+            import traceback
+            traceback.print_exc()
         finally:
             db.close()
     except Exception as e:
