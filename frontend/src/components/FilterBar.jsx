@@ -67,47 +67,47 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             <option value="All">All Platforms</option>
             
             <optgroup label="🇰🇷 South Korea">
-              <option value="Naver Smart Store">Naver Smart Store</option>
-              <option value="Coupang">Coupang</option>
-              <option value="Gmarket">Gmarket</option>
-              <option value="11st">11st</option>
+              <option value="Naver Smart Store">🇰🇷 Naver Smart Store</option>
+              <option value="Coupang">🇰🇷 Coupang</option>
+              <option value="Gmarket">🇰🇷 Gmarket</option>
+              <option value="11st">🇰🇷 11st</option>
             </optgroup>
             
             <optgroup label="🇺🇸 North America">
-              <option value="eBay">eBay</option>
-              <option value="Amazon">Amazon</option>
-              <option value="Shopify">Shopify</option>
-              <option value="Walmart">Walmart</option>
-              <option value="Etsy">Etsy</option>
-              <option value="Target">Target</option>
+              <option value="eBay">🇺🇸 eBay</option>
+              <option value="Amazon">🇺🇸 Amazon</option>
+              <option value="Shopify">🇨🇦 Shopify</option>
+              <option value="Walmart">🇺🇸 Walmart</option>
+              <option value="Etsy">🇺🇸 Etsy</option>
+              <option value="Target">🇺🇸 Target</option>
             </optgroup>
             
             <optgroup label="🇯🇵🇹🇼 Japan & Taiwan">
-              <option value="Rakuten">Rakuten</option>
-              <option value="Qoo10">Qoo10</option>
-              <option value="Shopee TW">Shopee TW</option>
-              <option value="Momo">Momo</option>
-              <option value="Ruten">Ruten</option>
+              <option value="Rakuten">🇯🇵 Rakuten</option>
+              <option value="Qoo10">🇸🇬 Qoo10</option>
+              <option value="Shopee TW">🇹🇼 Shopee TW</option>
+              <option value="Momo">🇹🇼 Momo</option>
+              <option value="Ruten">🇹🇼 Ruten</option>
             </optgroup>
             
             <optgroup label="🌏 South East Asia">
-              <option value="Shopee">Shopee</option>
-              <option value="Lazada">Lazada</option>
-              <option value="Tokopedia">Tokopedia</option>
+              <option value="Shopee">🇸🇬 Shopee</option>
+              <option value="Lazada">🇸🇬 Lazada</option>
+              <option value="Tokopedia">🇮🇩 Tokopedia</option>
             </optgroup>
             
             <optgroup label="🇪🇺 Europe">
-              <option value="Allegro">Allegro</option>
-              <option value="Zalando">Zalando</option>
-              <option value="Cdiscount">Cdiscount</option>
-              <option value="Otto">Otto</option>
+              <option value="Allegro">🇵🇱 Allegro</option>
+              <option value="Zalando">🇩🇪 Zalando</option>
+              <option value="Cdiscount">🇫🇷 Cdiscount</option>
+              <option value="Otto">🇩🇪 Otto</option>
             </optgroup>
             
             <optgroup label="🌎 Latin America & Others">
-              <option value="Mercado Libre">Mercado Libre</option>
-              <option value="Wildberries">Wildberries</option>
-              <option value="Flipkart">Flipkart</option>
-              <option value="Ozon">Ozon</option>
+              <option value="Mercado Libre">🇦🇷 Mercado Libre</option>
+              <option value="Wildberries">🇷🇺 Wildberries</option>
+              <option value="Flipkart">🇮🇳 Flipkart</option>
+              <option value="Ozon">🇷🇺 Ozon</option>
             </optgroup>
           </select>
         </div>
