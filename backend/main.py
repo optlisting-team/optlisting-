@@ -208,16 +208,32 @@ def analyze_zombies(
     max_sales = max(0, max_sales)
     max_watch_count = max(0, max_watch_count)
     
+    # Build base query with user_id filter
+    base_query = db.query(Listing).filter(Listing.user_id == user_id)
+    
+    # Apply store filter if store_id is provided and not 'all'
+    if store_id and store_id != 'all':
+        if hasattr(Listing, 'store_id'):
+            base_query = base_query.filter(Listing.store_id == store_id)
+    # If store_id is 'all' or None, DO NOT filter by store (return all for user)
+    
     # Get total count using SQL COUNT
-    total_count = db.query(Listing).filter(Listing.user_id == user_id).count()
+    total_count = base_query.count()
     
     # Calculate breakdown by supplier using SQL GROUP BY
-    supplier_results = db.query(
+    supplier_query = db.query(
         Listing.supplier_name,
         func.count(Listing.id).label('count')
     ).filter(
         Listing.user_id == user_id
-    ).group_by(Listing.supplier_name).all()
+    )
+    
+    # Apply store filter to supplier breakdown
+    if store_id and store_id != 'all':
+        if hasattr(Listing, 'store_id'):
+            supplier_query = supplier_query.filter(Listing.store_id == store_id)
+    
+    supplier_results = supplier_query.group_by(Listing.supplier_name).all()
     
     total_breakdown = {"Amazon": 0, "Walmart": 0, "AliExpress": 0, "CJ Dropshipping": 0, "Home Depot": 0, "Wayfair": 0, "Costco": 0, "Wholesale2B": 0, "Spocket": 0, "SaleHoo": 0, "Inventory Source": 0, "Dropified": 0, "Unverified": 0, "Unknown": 0}
     for supplier_name, count in supplier_results:
