@@ -25,37 +25,31 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
           <div className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">
             Total Listings
           </div>
-          {/* Platform Breakdown (판매처 플랫폼만 표시) */}
-          {!loading && totalListings > 0 && (
+          {/* Platform Breakdown (동적 표시 - 0개인 플랫폼은 필터링) */}
+          {!loading && totalListings > 0 && platformBreakdown && (
             <div className="flex gap-2 justify-center mt-2 flex-wrap">
-              <span className="text-xs font-medium text-purple-600">
-                🟣 eBay: {platformBreakdown?.eBay || 0}
-              </span>
-              {platformBreakdown?.["Naver Smart Store"] > 0 && (
-                <span className="text-xs font-medium text-green-600">
-                  🟢 Naver: {platformBreakdown["Naver Smart Store"]}
-                </span>
-              )}
-              {platformBreakdown?.Amazon > 0 && (
-                <span className="text-xs font-medium text-yellow-600">
-                  🟡 Amazon: {platformBreakdown.Amazon}
-                </span>
-              )}
-              {platformBreakdown?.Shopify > 0 && (
-                <span className="text-xs font-medium text-green-600">
-                  🟢 Shopify: {platformBreakdown.Shopify}
-                </span>
-              )}
-              {platformBreakdown?.Walmart > 0 && (
-                <span className="text-xs font-medium text-blue-600">
-                  🔵 Walmart: {platformBreakdown.Walmart}
-                </span>
-              )}
-              {platformBreakdown?.Coupang > 0 && (
-                <span className="text-xs font-medium text-rose-600">
-                  🔴 Coupang: {platformBreakdown.Coupang}
-                </span>
-              )}
+              {Object.entries(platformBreakdown)
+                .filter(([platform, count]) => count > 0) // 0개인 플랫폼 필터링
+                .map(([platform, count]) => {
+                  // 플랫폼별 색상 매핑 (기본값: 회색)
+                  const colorMap = {
+                    'eBay': 'text-purple-600',
+                    'Amazon': 'text-yellow-600',
+                    'Shopify': 'text-green-600',
+                    'Walmart': 'text-blue-600',
+                    'Coupang': 'text-rose-600',
+                    'Naver Smart Store': 'text-green-600',
+                    'Gmarket': 'text-orange-600',
+                    '11st': 'text-red-600',
+                  }
+                  const colorClass = colorMap[platform] || 'text-gray-600'
+                  
+                  return (
+                    <span key={platform} className={`text-xs font-medium ${colorClass}`}>
+                      {platform}: {count}
+                    </span>
+                  )
+                })}
             </div>
           )}
         </div>

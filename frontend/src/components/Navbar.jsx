@@ -35,7 +35,7 @@ function Navbar() {
           {/* Right: Status & User Menu */}
           <div className="flex items-center gap-4">
             {/* Plan Badge */}
-            <div className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase border ${getPlanStyles(currentPlan)}`}>
+            <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
               PLAN: {currentPlan}
             </div>
 

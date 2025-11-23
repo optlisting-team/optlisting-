@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import Optional, List, Dict
 from datetime import date
 import json
@@ -197,33 +198,37 @@ def analyze_zombies(
     max_sales = max(0, max_sales)
     max_watch_count = max(0, max_watch_count)
     
-    # Get ALL listings for total stats (not just zombies) - filter by user_id
-    all_listings = db.query(Listing).filter(Listing.user_id == user_id).all()
-    total_count = len(all_listings)
+    # Get total count using SQL COUNT
+    total_count = db.query(Listing).filter(Listing.user_id == user_id).count()
     
-    # Calculate breakdown by supplier for ALL listings
+    # Calculate breakdown by supplier using SQL GROUP BY
+    supplier_results = db.query(
+        Listing.supplier_name,
+        func.count(Listing.id).label('count')
+    ).filter(
+        Listing.user_id == user_id
+    ).group_by(Listing.supplier_name).all()
+    
     total_breakdown = {"Amazon": 0, "Walmart": 0, "AliExpress": 0, "CJ Dropshipping": 0, "Home Depot": 0, "Wayfair": 0, "Costco": 0, "Wholesale2B": 0, "Spocket": 0, "SaleHoo": 0, "Inventory Source": 0, "Dropified": 0, "Unverified": 0, "Unknown": 0}
-    # Calculate breakdown by platform for ALL listings (dynamic - includes all marketplaces)
-    platform_breakdown = {}
-    for listing in all_listings:
-        # Use supplier_name if available, otherwise fallback to supplier (legacy)
-        supplier = getattr(listing, 'supplier_name', None) or getattr(listing, 'supplier', 'Unknown')
-        if supplier in total_breakdown:
-            total_breakdown[supplier] += 1
+    for supplier_name, count in supplier_results:
+        if supplier_name in total_breakdown:
+            total_breakdown[supplier_name] = count
         else:
-            total_breakdown["Unknown"] += 1
-        
-        # Platform breakdown (use platform if available, otherwise marketplace)
-        platform = getattr(listing, 'platform', None) or getattr(listing, 'marketplace', 'eBay') or 'eBay'
-        if platform not in platform_breakdown:
-            platform_breakdown[platform] = 0
-        platform_breakdown[platform] += 1
+            total_breakdown["Unknown"] = total_breakdown.get("Unknown", 0) + count
     
-    # Ensure key marketplaces are always present (even if count is 0)
-    key_marketplaces = ["eBay", "Amazon", "Shopify", "Walmart", "Naver Smart Store", "Coupang"]
-    for key in key_marketplaces:
-        if key not in platform_breakdown:
-            platform_breakdown[key] = 0
+    # Calculate breakdown by platform using SQL GROUP BY (dynamic - includes all marketplaces)
+    platform_results = db.query(
+        Listing.platform,
+        func.count(Listing.id).label('count')
+    ).filter(
+        Listing.user_id == user_id
+    ).group_by(Listing.platform).all()
+    
+    # Build platform breakdown dictionary from SQL results
+    platform_breakdown = {}
+    for platform, count in platform_results:
+        if platform:  # Only include non-null platforms
+            platform_breakdown[platform] = count
     
     # Get zombie listings (filtered) - pass user_id
     zombies = analyze_zombie_listings(
