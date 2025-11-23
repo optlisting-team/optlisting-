@@ -307,7 +307,7 @@ def analyze_zombie_listings(
         )
     )
     
-    # Sales filter: use metrics['sales'] (JSONB) or fallback to sold_qty (legacy)
+    # Sales filter: use metrics['sales'] (JSONB only - no legacy fallback)
     query = query.filter(
         or_(
             # Use metrics JSONB if available
@@ -316,21 +316,17 @@ def analyze_zombie_listings(
                 Listing.metrics.has_key('sales'),
                 cast(Listing.metrics['sales'].astext, Integer) <= max_sales
             ),
-            # Fallback to legacy sold_qty field
+            # If metrics doesn't have sales, assume 0 (default for new schema)
             and_(
                 or_(
                     Listing.metrics == None,
                     ~Listing.metrics.has_key('sales')
-                ),
-                or_(
-                    Listing.sold_qty == None,
-                    Listing.sold_qty <= max_sales
                 )
             )
         )
     )
     
-    # Watch count filter: use metrics['views'] (JSONB) or fallback to watch_count (legacy)
+    # Watch count filter: use metrics['views'] (JSONB only - no legacy fallback)
     query = query.filter(
         or_(
             # Use metrics JSONB if available
@@ -339,15 +335,11 @@ def analyze_zombie_listings(
                 Listing.metrics.has_key('views'),
                 cast(Listing.metrics['views'].astext, Integer) <= max_watch_count
             ),
-            # Fallback to legacy watch_count field
+            # If metrics doesn't have views, assume 0 (default for new schema)
             and_(
                 or_(
                     Listing.metrics == None,
                     ~Listing.metrics.has_key('views')
-                ),
-                or_(
-                    Listing.watch_count == None,
-                    Listing.watch_count <= max_watch_count
                 )
             )
         )
