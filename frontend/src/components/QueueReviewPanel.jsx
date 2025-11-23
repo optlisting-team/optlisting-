@@ -155,15 +155,6 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
           buttonBg: 'bg-blue-600',
           buttonHover: 'hover:bg-blue-700'
         }
-      case 'AliExpress':
-        return {
-          headerBg: 'bg-red-600',
-          headerText: 'text-white',
-          border: 'border-red-300',
-          bg: 'bg-red-50',
-          buttonBg: 'bg-red-600',
-          buttonHover: 'hover:bg-red-700'
-        }
       case 'CJ Dropshipping':
         return {
           headerBg: 'bg-gray-800',
@@ -173,78 +164,42 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
           buttonBg: 'bg-gray-800',
           buttonHover: 'hover:bg-gray-900'
         }
-      case 'Home Depot':
-        return {
-          headerBg: 'bg-orange-500',
-          headerText: 'text-white',
-          border: 'border-orange-300',
-          bg: 'bg-orange-50',
-          buttonBg: 'bg-orange-500',
-          buttonHover: 'hover:bg-orange-600'
-        }
-      case 'Wayfair':
-        return {
-          headerBg: 'bg-blue-600',
-          headerText: 'text-white',
-          border: 'border-blue-300',
-          bg: 'bg-blue-50',
-          buttonBg: 'bg-blue-600',
-          buttonHover: 'hover:bg-blue-700'
-        }
-      case 'Costco':
-        return {
-          headerBg: 'bg-blue-500',
-          headerText: 'text-white',
-          border: 'border-blue-300',
-          bg: 'bg-blue-50',
-          buttonBg: 'bg-blue-500',
-          buttonHover: 'hover:bg-blue-600'
-        }
-      // Pro Aggregators - Professional look
+      // Pro Dropshipping Aggregators - High-Volume Sellers
       case 'Wholesale2B':
         return {
-          headerBg: 'bg-blue-900',
+          headerBg: 'bg-blue-700',
           headerText: 'text-white',
-          border: 'border-blue-700',
+          border: 'border-blue-500',
           bg: 'bg-blue-50',
-          buttonBg: 'bg-blue-900',
-          buttonHover: 'hover:bg-blue-950'
+          buttonBg: 'bg-blue-700',
+          buttonHover: 'hover:bg-blue-800'
+        }
+      case 'Doba':
+        return {
+          headerBg: 'bg-teal-500',
+          headerText: 'text-white',
+          border: 'border-teal-300',
+          bg: 'bg-teal-50',
+          buttonBg: 'bg-teal-500',
+          buttonHover: 'hover:bg-teal-600'
+        }
+      case 'DSers':
+        return {
+          headerBg: 'bg-rose-500',
+          headerText: 'text-white',
+          border: 'border-rose-300',
+          bg: 'bg-rose-50',
+          buttonBg: 'bg-rose-500',
+          buttonHover: 'hover:bg-rose-600'
         }
       case 'Spocket':
         return {
-          headerBg: 'bg-slate-700',
+          headerBg: 'bg-purple-600',
           headerText: 'text-white',
-          border: 'border-slate-400',
-          bg: 'bg-slate-50',
-          buttonBg: 'bg-slate-700',
-          buttonHover: 'hover:bg-slate-800'
-        }
-      case 'SaleHoo':
-        return {
-          headerBg: 'bg-sky-500',
-          headerText: 'text-white',
-          border: 'border-sky-300',
-          bg: 'bg-sky-50',
-          buttonBg: 'bg-sky-500',
-          buttonHover: 'hover:bg-sky-600'
-        }
-      case 'Inventory Source':
-        return {
-          headerBg: 'bg-green-700',
-          headerText: 'text-white',
-          border: 'border-green-500',
-          bg: 'bg-green-50',
-          buttonBg: 'bg-green-700',
-          buttonHover: 'hover:bg-green-800'
-        }
-      case 'Dropified':
-        return {
-          headerBg: 'bg-gray-900',
-          headerText: 'text-white',
-          border: 'border-gray-700',
-          bg: 'bg-gray-50',
-          buttonBg: 'bg-gray-900',
-          buttonHover: 'hover:bg-black'
+          border: 'border-purple-400',
+          bg: 'bg-purple-50',
+          buttonBg: 'bg-purple-600',
+          buttonHover: 'hover:bg-purple-700'
         }
       case 'Unverified':
         return {

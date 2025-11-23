@@ -208,11 +208,11 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             <option value="All">All Suppliers</option>
             <option value="Amazon">Amazon</option>
             <option value="Walmart">Walmart</option>
-            <option value="AliExpress">AliExpress</option>
+            <option value="Wholesale2B">Wholesale2B</option>
+            <option value="Doba">Doba</option>
+            <option value="DSers">DSers</option>
+            <option value="Spocket">Spocket</option>
             <option value="CJ Dropshipping">CJ Dropshipping</option>
-            <option value="Home Depot">Home Depot</option>
-            <option value="Wayfair">Wayfair</option>
-            <option value="Costco">Costco</option>
             <option value="Unknown">Unknown</option>
           </select>
           </div>

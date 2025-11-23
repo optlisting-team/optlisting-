@@ -77,23 +77,55 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
                 # Latin America & Others
                 marketplace = random.choice(["Mercado Libre", "Wildberries", "Flipkart", "Ozon"])
             
-            # Determine source (diverse suppliers + pro aggregators)
-            # Amazon: 15%, Walmart: 12%, AliExpress: 15%, CJ Dropshipping: 12%, 
-            # Home Depot: 8%, Wayfair: 6%, Costco: 5%,
-            # Pro Aggregators: Wholesale2B: 8%, Spocket: 6%, SaleHoo: 4%, Inventory Source: 3%, Dropified: 2%, Unverified: 4%
-            # Note: Unverified items require manual source identification (strict classification policy)
+            # Determine source (Pro Dropshipping Aggregators - High-Volume Sellers)
+            # Weighted distribution targeting automation tools users:
+            # Amazon: 25% (Most common entry point)
+            # DSers: 25% (AliExpress automation standard)
+            # Wholesale2B: 15% (Huge catalog for eBay - Pro users)
+            # Doba: 15% (US-based dropshipping - Pro users)
+            # Spocket: 6% (US/EU high quality)
+            # CJ Dropshipping: 6% (China fulfillment)
+            # Walmart: 5% (Still high volume)
+            # Unverified: 3% (Requires manual verification)
             source_rand = random.random()
             brand = None
             upc = None
             
-            if source_rand < 0.15:
+            if source_rand < 0.25:
+                # Amazon: 25% - Most common entry point
                 source = "Amazon"
                 sku = f"AMZ{random.randint(100000, 999999)}"
                 image_url = f"https://ssl-images-amazon.com/images/I/{random.randint(100000, 999999)}.jpg"
                 # Add Amazon exclusive brands for forensic detection
                 if random.random() < 0.3:  # 30% chance
                     brand = random.choice(["AmazonBasics", "Solimo", "Happy Belly"])
-            elif source_rand < 0.27:
+            elif source_rand < 0.50:
+                # DSers: 25% - AliExpress automation standard
+                source = "DSers"
+                sku = f"DS{random.randint(100000, 999999)}"
+                image_url = f"https://ae01.alicdn.com/kf/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.65:
+                # Wholesale2B: 15% - Huge catalog for eBay (Pro users)
+                source = "Wholesale2B"
+                sku = f"W2B{random.randint(100000, 999999)}"
+                image_url = f"https://wholesale2b.com/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.80:
+                # Doba: 15% - US-based dropshipping (Pro users)
+                source = "Doba"
+                sku = f"DOBA{random.randint(100000, 999999)}"
+                image_url = f"https://doba.com/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.86:
+                # Spocket: 6% - US/EU high quality
+                source = "Spocket"
+                sku = f"SPK{random.randint(100000, 999999)}"
+                image_url = f"https://spocket.co/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.92:
+                # CJ Dropshipping: 6% - China fulfillment
+                source = "CJ Dropshipping"
+                sku = f"CJ{random.randint(100000, 999999)}"
+                image_url = f"https://cdn.cjdropshipping.com/images/{random.randint(100000, 999999)}.jpg"
+            elif source_rand < 0.97:
+                # Walmart: 5% - Still high volume
                 source = "Walmart"
                 sku = f"WM{random.randint(100000, 999999)}"
                 image_url = f"https://i5.walmartimages.com/asr/{random.randint(100000, 999999)}.jpg"
@@ -103,57 +135,8 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
                     # Add Walmart UPC prefix for some items
                     if random.random() < 0.2:  # 20% chance
                         upc = f"681131{random.randint(100000, 999999)}"
-            elif source_rand < 0.42:
-                source = "AliExpress"
-                sku = f"AE{random.randint(100000, 999999)}"
-                image_url = f"https://ae01.alicdn.com/kf/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.54:
-                source = "CJ Dropshipping"
-                sku = f"CJ{random.randint(100000, 999999)}"
-                image_url = f"https://cdn.cjdropshipping.com/images/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.62:
-                source = "Home Depot"
-                sku = f"HD{random.randint(100000, 999999)}"
-                image_url = f"https://images.homedepot-static.com/productImages/{random.randint(100000, 999999)}.jpg"
-                # Add Home Depot exclusive brands for forensic detection
-                if random.random() < 0.3:  # 30% chance
-                    brand = random.choice(["Husky", "HDX", "Glacier Bay"])
-            elif source_rand < 0.68:
-                source = "Wayfair"
-                sku = f"WF{random.randint(100000, 999999)}"
-                image_url = f"https://images.wayfair.com/images/{random.randint(100000, 999999)}.jpg"
-                # Add Wayfair exclusive brands for forensic detection
-                if random.random() < 0.3:  # 30% chance
-                    brand = random.choice(["Wayfair Basics", "Mercury Row"])
-            elif source_rand < 0.73:
-                source = "Costco"
-                sku = f"CO{random.randint(100000, 999999)}"
-                image_url = f"https://images.costco-static.com/{random.randint(100000, 999999)}.jpg"
-                # Add Costco exclusive brands for forensic detection
-                if random.random() < 0.5:  # 50% chance
-                    brand = random.choice(["Kirkland", "Kirkland Signature"])
-            elif source_rand < 0.81:
-                source = "Wholesale2B"
-                sku = f"W2B{random.randint(100000, 999999)}"
-                image_url = f"https://wholesale2b.com/images/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.87:
-                source = "Spocket"
-                sku = f"SPK{random.randint(100000, 999999)}"
-                image_url = f"https://spocket.co/images/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.91:
-                source = "SaleHoo"
-                sku = f"SH{random.randint(100000, 999999)}"
-                image_url = f"https://salehoo.com/images/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.94:
-                source = "Inventory Source"
-                sku = f"IS{random.randint(100000, 999999)}"
-                image_url = f"https://inventorysource.com/images/{random.randint(100000, 999999)}.jpg"
-            elif source_rand < 0.96:
-                source = "Dropified"
-                sku = f"DF{random.randint(100000, 999999)}"
-                image_url = f"https://dropified.com/images/{random.randint(100000, 999999)}.jpg"
             else:
-                # Unverified: No clear pattern match - requires manual verification
+                # Unverified: 3% - No clear pattern match - requires manual verification
                 source = "Unverified"
                 sku = f"SKU{random.randint(100000, 999999)}"  # Generic SKU without prefix
                 image_url = f"https://example.com/images/{random.randint(100000, 999999)}.jpg"  # Generic domain
