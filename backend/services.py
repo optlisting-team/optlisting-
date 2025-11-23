@@ -1,7 +1,7 @@
 from datetime import date, timedelta, datetime
 from typing import List, Optional, Dict, Tuple
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, cast, Integer
+from sqlalchemy import and_, or_, cast, Integer, String, Date
 from sqlalchemy.dialects.postgresql import insert
 from backend.models import Listing
 import pandas as pd
@@ -278,20 +278,79 @@ def analyze_zombie_listings(
             query = query.filter(Listing.store_id == store_id)
     # If store_id is 'all' or None, DO NOT filter by store (return all for user)
     
-    # Date filter: use date_listed (legacy field exists, use it directly)
+    # Date filter: use metrics['date_listed'] (JSONB) or fallback to date_listed (legacy)
     query = query.filter(
-        Listing.date_listed < cutoff_date
+        or_(
+            # Use metrics JSONB if available
+            and_(
+                Listing.metrics != None,
+                Listing.metrics.has_key('date_listed'),
+                cast(Listing.metrics['date_listed'].astext, Date) < cutoff_date
+            ),
+            # Fallback to legacy date_listed field
+            and_(
+                or_(
+                    Listing.metrics == None,
+                    ~Listing.metrics.has_key('date_listed')
+                ),
+                Listing.date_listed < cutoff_date
+            ),
+            # If both are None, use last_synced_at as fallback
+            and_(
+                Listing.date_listed == None,
+                or_(
+                    Listing.metrics == None,
+                    ~Listing.metrics.has_key('date_listed')
+                ),
+                Listing.last_synced_at < cutoff_date
+            )
+        )
     )
     
-    # Sales filter: use legacy sold_qty field (always exists in schema)
-    # This is simpler and avoids JSONB complexity issues
+    # Sales filter: use metrics['sales'] (JSONB) or fallback to sold_qty (legacy)
     query = query.filter(
-        Listing.sold_qty <= max_sales
+        or_(
+            # Use metrics JSONB if available
+            and_(
+                Listing.metrics != None,
+                Listing.metrics.has_key('sales'),
+                cast(Listing.metrics['sales'].astext, Integer) <= max_sales
+            ),
+            # Fallback to legacy sold_qty field
+            and_(
+                or_(
+                    Listing.metrics == None,
+                    ~Listing.metrics.has_key('sales')
+                ),
+                or_(
+                    Listing.sold_qty == None,
+                    Listing.sold_qty <= max_sales
+                )
+            )
+        )
     )
     
-    # Watch count filter: use legacy watch_count field (always exists in schema)
+    # Watch count filter: use metrics['views'] (JSONB) or fallback to watch_count (legacy)
     query = query.filter(
-        Listing.watch_count <= max_watch_count
+        or_(
+            # Use metrics JSONB if available
+            and_(
+                Listing.metrics != None,
+                Listing.metrics.has_key('views'),
+                cast(Listing.metrics['views'].astext, Integer) <= max_watch_count
+            ),
+            # Fallback to legacy watch_count field
+            and_(
+                or_(
+                    Listing.metrics == None,
+                    ~Listing.metrics.has_key('views')
+                ),
+                or_(
+                    Listing.watch_count == None,
+                    Listing.watch_count <= max_watch_count
+                )
+            )
+        )
     )
     
     # Apply platform filter if not "All"
