@@ -92,14 +92,18 @@ def get_listings(
         "listings": [
             {
                 "id": l.id,
-                "ebay_item_id": l.ebay_item_id,
+                "item_id": l.item_id,
+                "ebay_item_id": l.item_id,  # Backward compatibility
                 "title": l.title,
                 "sku": l.sku,
                 "image_url": l.image_url,
                 "brand": getattr(l, 'brand', None),
                 "upc": getattr(l, 'upc', None),
-                "marketplace": getattr(l, 'marketplace', 'eBay'),
-                "supplier": getattr(l, 'supplier_name', None) or getattr(l, 'supplier', 'Unknown'),
+                "platform": l.platform,
+                "marketplace": l.platform,  # Backward compatibility
+                "supplier_name": l.supplier_name,
+                "supplier": l.supplier_name,  # Backward compatibility
+                "supplier_id": l.supplier_id,
                 "price": l.price,
                 "date_listed": l.date_listed.isoformat() if l.date_listed else None,
                 "sold_qty": l.sold_qty,
@@ -240,20 +244,20 @@ def analyze_zombies(
         "zombies": [
             {
                 "id": z.id,
-                "item_id": getattr(z, 'item_id', None) or getattr(z, 'ebay_item_id', ''),
-                "ebay_item_id": getattr(z, 'item_id', None) or getattr(z, 'ebay_item_id', ''),  # Backward compatibility
+                "item_id": z.item_id,
+                "ebay_item_id": z.item_id,  # Backward compatibility
                 "title": z.title,
                 "sku": z.sku,
                 "image_url": z.image_url,
-                "platform": getattr(z, 'platform', None) or getattr(z, 'marketplace', 'eBay'),
-                "marketplace": getattr(z, 'platform', None) or getattr(z, 'marketplace', 'eBay'),  # Backward compatibility
-                "supplier_name": getattr(z, 'supplier_name', None) or getattr(z, 'source_name', None) or getattr(z, 'supplier', 'Unknown'),
-                "supplier": getattr(z, 'supplier_name', None) or getattr(z, 'source_name', None) or getattr(z, 'supplier', 'Unknown'),  # Backward compatibility
-                "supplier_id": getattr(z, 'supplier_id', None) or getattr(z, 'source_id', None),
-                "price": getattr(z, 'price', None) or (z.metrics.get('price') if hasattr(z, 'metrics') and z.metrics else None),
+                "platform": z.platform,
+                "marketplace": z.platform,  # Backward compatibility
+                "supplier_name": z.supplier_name,
+                "supplier": z.supplier_name,  # Backward compatibility
+                "supplier_id": z.supplier_id,
+                "price": z.price or (z.metrics.get('price') if z.metrics else None),
                 "date_listed": z.date_listed.isoformat() if z.date_listed else None,
-                "sold_qty": getattr(z, 'sold_qty', 0) or (z.metrics.get('sales') if hasattr(z, 'metrics') and z.metrics else 0),
-                "watch_count": getattr(z, 'watch_count', 0) or (z.metrics.get('views') if hasattr(z, 'metrics') and z.metrics else 0)
+                "sold_qty": z.sold_qty or (z.metrics.get('sales') if z.metrics else 0),
+                "watch_count": z.watch_count or (z.metrics.get('views') if z.metrics else 0)
             }
             for z in zombies
         ]
@@ -479,9 +483,11 @@ def update_listing(
     
     return {
         "id": listing.id,
-        "ebay_item_id": listing.item_id,
+        "item_id": listing.item_id,
+        "ebay_item_id": listing.item_id,  # Backward compatibility
         "title": listing.title,
-        "supplier": listing.supplier_name,
+        "supplier_name": listing.supplier_name,
+        "supplier": listing.supplier_name,  # Backward compatibility
         "message": "Listing updated successfully"
     }
 
