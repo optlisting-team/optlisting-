@@ -49,9 +49,6 @@ function LandingPage() {
             <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 leading-tight">
               Bulk Delete 'Zero Sale' Items.
             </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6 max-w-3xl mx-auto">
-              Stop Wasting Time on Dead Stock. Start Finding Winners.
-            </h2>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Automated cleanup for your eBay inventory. We remove the non-performers so you can focus 100% of your energy on sourcing the next big winner.
             </p>
