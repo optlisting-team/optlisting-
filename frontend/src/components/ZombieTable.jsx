@@ -78,8 +78,25 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
 
   return (
     <div className="w-full border border-gray-200 rounded-lg overflow-hidden">
-      {/* Search Bar */}
-      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-end">
+      {/* Search Bar & Rows Selector */}
+      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+        {/* Left: Rows per page selector */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-700">Show</span>
+          <select
+            value={rowsPerPage}
+            onChange={(e) => handleRowsPerPageChange(Number(e.target.value))}
+            className="border border-gray-300 rounded-md px-2 py-1 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+          <span className="text-sm text-gray-700">items</span>
+        </div>
+
+        {/* Right: Search Bar */}
         <div className="relative w-64">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span className="text-gray-400 text-sm">🔍</span>
@@ -191,25 +208,12 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
       {/* Pagination Footer */}
       {filteredZombies.length > 0 && (
         <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between">
-          {/* Left: Rows per page selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">Rows per page:</span>
-            <select
-              value={rowsPerPage}
-              onChange={(e) => handleRowsPerPageChange(Number(e.target.value))}
-              className="border border-gray-300 rounded-md px-2 py-1 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-          </div>
-
-          {/* Center: Page info */}
+          {/* Left: Page info (moved from center) */}
           <div className="text-sm text-gray-700">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredZombies.length)} of {filteredZombies.length} items
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredZombies.length)} of {filteredZombies.length} listings
             {searchQuery && ` (filtered from ${zombies.length} total)`}
           </div>
+
 
           {/* Right: Navigation buttons */}
           <div className="flex items-center gap-2">
