@@ -46,12 +46,14 @@ function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-              Don't Let 'Stale Listings'<br />
-              <span className="text-rose-600">Kill Your eBay Account</span>
+            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 leading-tight">
+              Bulk Delete 'Zero Sale' Items.
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Automatically detect and purge low-interest inventory. Boost your sell-through rate and free up selling limits in seconds.
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6 max-w-3xl mx-auto">
+              Stop Wasting Time on Dead Stock. Start Finding Winners.
+            </h2>
+            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Automated cleanup for your eBay inventory. We remove the non-performers so you can focus 100% of your energy on sourcing the next big winner.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <motion.a
