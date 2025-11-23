@@ -165,12 +165,17 @@ function Dashboard() {
     }
   }
 
-  const handleSelectAll = (checked) => {
-    const currentData = viewMode === 'all' ? allListings : viewMode === 'queue' ? queue : zombies
-    if (checked) {
-      setSelectedIds(currentData.map(item => item.id))
+  const handleSelectAll = (checkedOrIds) => {
+    // Support both boolean (legacy) and array (new pagination mode)
+    if (Array.isArray(checkedOrIds)) {
+      setSelectedIds(checkedOrIds)
     } else {
-      setSelectedIds([])
+      const currentData = viewMode === 'all' ? allListings : viewMode === 'queue' ? queue : zombies
+      if (checkedOrIds) {
+        setSelectedIds(currentData.map(item => item.id))
+      } else {
+        setSelectedIds([])
+      }
     }
   }
 
