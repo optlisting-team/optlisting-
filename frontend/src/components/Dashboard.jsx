@@ -334,8 +334,8 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-slate-50 font-sans">
+      <div className="container mx-auto px-4 py-8">
 
         {/* Summary Card */}
         <div className="mb-8">
@@ -354,7 +354,7 @@ function Dashboard() {
         </div>
 
         {/* Dynamic Layout: Full Width for 'all', Split View for 'zombies' */}
-        <div className={`flex gap-6 transition-all duration-300 ${
+        <div className={`flex gap-8 transition-all duration-300 ${
           viewMode === 'all' ? '' : ''
         }`}>
           {/* Left Column - Dynamic Width */}

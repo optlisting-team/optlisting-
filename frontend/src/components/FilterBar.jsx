@@ -48,22 +48,20 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Filter Low Interest Items
-      </h3>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-        {/* Platform Filter - First and Most Important */}
-        <div>
-          <label htmlFor="marketplaceFilter" className="block text-sm font-medium text-gray-700 mb-2">
-            <span className="mr-1">🏪</span> Platform
-          </label>
-          <select
-            id="marketplaceFilter"
-            value={marketplaceFilter}
-            onChange={(e) => setMarketplaceFilter(e.target.value)}
-            className="w-full px-3 py-2 border-2 border-purple-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-purple-50"
-          >
+    <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm mb-8">
+      <form onSubmit={handleSubmit} className="flex items-center gap-4 flex-wrap">
+        {/* Platform Filter */}
+        <div className="flex-1 min-w-[200px]">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-400 text-sm">🏪</span>
+            </div>
+            <select
+              id="marketplaceFilter"
+              value={marketplaceFilter}
+              onChange={(e) => setMarketplaceFilter(e.target.value)}
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+            >
             <option value="All">All Platforms</option>
             
             <optgroup label="🇰🇷 South Korea">
@@ -113,64 +111,71 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
         </div>
 
         {/* Days Older Than */}
-        <div>
-          <label htmlFor="minDays" className="block text-sm font-medium text-gray-700 mb-2">
-            Days Older Than
-          </label>
-          <input
-            type="number"
-            id="minDays"
-            min="0"
-            value={minDays}
-            onChange={(e) => setMinDays(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="3"
-          />
+        <div className="min-w-[140px]">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-400 text-sm">📅</span>
+            </div>
+            <input
+              type="number"
+              id="minDays"
+              min="0"
+              value={minDays}
+              onChange={(e) => setMinDays(e.target.value)}
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              placeholder="3"
+            />
+          </div>
         </div>
 
         {/* Max Sales */}
-        <div>
-          <label htmlFor="maxSales" className="block text-sm font-medium text-gray-700 mb-2">
-            Max Sales
-          </label>
-          <input
-            type="number"
-            id="maxSales"
-            min="0"
-            value={maxSales}
-            onChange={(e) => setMaxSales(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="0"
-          />
+        <div className="min-w-[120px]">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-400 text-sm">💰</span>
+            </div>
+            <input
+              type="number"
+              id="maxSales"
+              min="0"
+              value={maxSales}
+              onChange={(e) => setMaxSales(e.target.value)}
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              placeholder="0"
+            />
+          </div>
         </div>
 
         {/* Max Watch Count */}
-        <div>
-          <label htmlFor="maxWatchCount" className="block text-sm font-medium text-gray-700 mb-2">
-            Max Watch Count
-          </label>
-          <input
-            type="number"
-            id="maxWatchCount"
-            min="0"
-            value={maxWatchCount}
-            onChange={(e) => setMaxWatchCount(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="10"
-          />
+        <div className="min-w-[140px]">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-400 text-sm">👁️</span>
+            </div>
+            <input
+              type="number"
+              id="maxWatchCount"
+              min="0"
+              value={maxWatchCount}
+              onChange={(e) => setMaxWatchCount(e.target.value)}
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              placeholder="10"
+            />
+          </div>
         </div>
 
         {/* Supplier Filter */}
-        <div>
-          <label htmlFor="supplierFilter" className="block text-sm font-medium text-gray-700 mb-2">
-            Supplier
-          </label>
-          <select
-            id="supplierFilter"
-            value={supplierFilter}
-            onChange={(e) => setSupplierFilter(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
+        <div className="min-w-[160px]">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-400 text-sm">🏭</span>
+            </div>
+            <select
+              id="supplierFilter"
+              value={supplierFilter}
+              onChange={(e) => setSupplierFilter(e.target.value)}
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+            >
             <option value="All">All Suppliers</option>
             <option value="Amazon">Amazon</option>
             <option value="Walmart">Walmart</option>
@@ -184,19 +189,19 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 ml-auto">
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {loading ? 'Loading...' : 'Apply Filter'}
+            {loading ? 'Loading...' : 'Apply'}
           </button>
           <button
             type="button"
             onClick={handleReset}
             disabled={loading}
-            className="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2.5 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Reset
           </button>

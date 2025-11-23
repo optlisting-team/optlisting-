@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react'
 import SourceBadge from './SourceBadge'
-import PlatformBadge from './PlatformBadge'
 
 function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChange }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -111,10 +110,10 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
         </div>
       </div>
 
-      <table className="table-fixed w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="table-fixed w-full">
+        <thead className="bg-slate-50 border-b border-slate-200">
           <tr>
-            <th className="w-10 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-10 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               <input
                 type="checkbox"
                 checked={allVisibleSelected}
@@ -126,43 +125,53 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                 title="Select all items on this page"
               />
             </th>
-            <th className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-24 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Platform
             </th>
-            <th className="w-32 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Item ID
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Title
             </th>
-            <th className="w-32 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Supplier
             </th>
-            <th className="w-32 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               SKU
             </th>
-            <th className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-24 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Price
             </th>
-            <th className="w-32 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Date Listed
             </th>
-            <th className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="w-24 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Watch Count
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-white">
           {visibleZombies.length === 0 ? (
             <tr>
-              <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
-                {searchQuery ? `No items found matching "${searchQuery}"` : 'No items to display'}
+              <td colSpan={9} className="px-4 py-16 text-center">
+                <div className="flex flex-col items-center justify-center">
+                  <svg className="w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                  </svg>
+                  <p className="text-slate-600 font-medium text-lg mb-1">
+                    {searchQuery ? `No items found matching "${searchQuery}"` : 'No listings found'}
+                  </p>
+                  <p className="text-slate-400 text-sm">
+                    {searchQuery ? 'Try adjusting your search query' : 'Try syncing data'}
+                  </p>
+                </div>
               </td>
             </tr>
           ) : (
             visibleZombies.map((zombie) => (
-            <tr key={zombie.id} className="hover:bg-gray-50 transition-colors">
-              <td className="w-10 px-4 py-5 whitespace-nowrap">
+            <tr key={zombie.id} className="bg-white hover:bg-slate-50 transition-colors border-b border-slate-100">
+              <td className="w-10 px-4 py-4 whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(zombie.id)}
@@ -170,8 +179,17 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </td>
-              <td className="w-24 px-4 py-5 whitespace-nowrap">
-                <PlatformBadge marketplace={zombie.marketplace || zombie.platform || 'eBay'} />
+              <td className="w-24 px-4 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-slate-600">
+                      {(zombie.marketplace || zombie.platform || 'eBay').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-slate-700">
+                    {zombie.marketplace || zombie.platform || 'eBay'}
+                  </span>
+                </div>
               </td>
               <td className="w-32 px-4 py-5 whitespace-nowrap text-sm font-mono text-gray-900 truncate" title={zombie.ebay_item_id || zombie.item_id}>
                 {zombie.ebay_item_id || zombie.item_id}

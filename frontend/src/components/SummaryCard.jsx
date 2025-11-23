@@ -6,32 +6,38 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 border-0">
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-8">
       {/* Pipeline: Single Flex Container */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-6">
         {/* Card 1: Total Listings */}
         <div 
           onClick={() => handleCardClick('all')}
-          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-white cursor-pointer ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer ${
             viewMode === 'all' 
-              ? 'ring-4 ring-slate-200 scale-105' 
-              : 'hover:scale-105'
+              ? 'ring-2 ring-offset-2 ring-indigo-500 border-indigo-300' 
+              : 'hover:border-slate-300'
           }`}
         >
-          <div className="text-4xl mb-3">📦</div>
-          <div className="text-5xl font-extrabold text-slate-700 mb-2">
-            {loading ? '...' : (totalListings || 0).toLocaleString()}
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">📦</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-slate-900 mb-1">
+                {loading ? '...' : (totalListings || 0).toLocaleString()}
+              </div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                Total Listings
+              </div>
+              <div className="text-xs text-green-600">↗ Updated just now</div>
+            </div>
           </div>
-          <div className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">
-            Total Listings
-          </div>
-          {/* Platform Breakdown (동적 표시 - 0개인 플랫폼은 필터링) */}
+          {/* Platform Breakdown */}
           {!loading && totalListings > 0 && platformBreakdown && (
-            <div className="flex gap-2 justify-center mt-2 flex-wrap">
+            <div className="flex gap-2 mt-2 flex-wrap">
               {Object.entries(platformBreakdown)
-                .filter(([platform, count]) => count > 0) // 0개인 플랫폼 필터링
+                .filter(([platform, count]) => count > 0)
                 .map(([platform, count]) => {
-                  // 플랫폼별 색상 매핑 (기본값: 회색)
                   const colorMap = {
                     'eBay': 'text-purple-600',
                     'Amazon': 'text-yellow-600',
@@ -43,7 +49,6 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
                     '11st': 'text-red-600',
                   }
                   const colorClass = colorMap[platform] || 'text-gray-600'
-                  
                   return (
                     <span key={platform} className={`text-xs font-medium ${colorClass}`}>
                       {platform}: {count}
@@ -54,75 +59,81 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
           )}
         </div>
 
-        {/* Arrow 1 */}
-        <div className="text-gray-300 text-3xl flex-shrink-0">
-          ›
-        </div>
-
         {/* Card 2: Low Interest Items Found */}
         <div 
           onClick={() => handleCardClick('zombies')}
-          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-rose-50 relative cursor-pointer ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer relative ${
             viewMode === 'zombies' 
-              ? 'ring-4 ring-rose-100 scale-105' 
-              : 'hover:scale-105'
+              ? 'ring-2 ring-offset-2 ring-rose-500 border-rose-300' 
+              : 'hover:border-slate-300'
           }`}
         >
           {totalZombies > 0 && !loading && (
-            <div className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full animate-pulse"></div>
+            <div className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
           )}
-          <div className="text-4xl mb-3">📉</div>
-          <div className="text-5xl font-extrabold text-rose-600 mb-2">
-            {loading ? '...' : totalZombies.toLocaleString()}
-          </div>
-          <div className="text-xs font-bold text-rose-400 tracking-wider uppercase">
-            Low Interest Detected
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">📉</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-slate-900 mb-1">
+                {loading ? '...' : totalZombies.toLocaleString()}
+              </div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                Low Interest Detected
+              </div>
+              <div className="text-xs text-rose-600">↗ Needs attention</div>
+            </div>
           </div>
         </div>
 
-        {/* Arrow 2 */}
-        <div className="text-gray-300 text-3xl flex-shrink-0">
-          ›
-        </div>
-
-        {/* Card 3: In Queue (The Solution) */}
+        {/* Card 3: In Queue */}
         <div 
           onClick={() => handleCardClick('queue')}
-          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-blue-50 cursor-pointer ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer ${
             viewMode === 'queue' 
-              ? 'ring-4 ring-blue-100 scale-105' 
-              : 'hover:scale-105'
+              ? 'ring-2 ring-offset-2 ring-blue-500 border-blue-300' 
+              : 'hover:border-slate-300'
           }`}
         >
-          <div className="text-4xl mb-3">🗑️</div>
-          <div className="text-5xl font-extrabold text-blue-600 mb-2">
-            {queueCount || 0}
-          </div>
-          <div className="text-xs font-bold text-blue-400 tracking-wider uppercase">
-            Ready to Delete
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">🗑️</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-slate-900 mb-1">
+                {queueCount || 0}
+              </div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                Ready to Delete
+              </div>
+              <div className="text-xs text-blue-600">↗ Ready for export</div>
+            </div>
           </div>
         </div>
 
-        {/* Arrow 3 */}
-        <div className="text-gray-300 text-3xl flex-shrink-0">
-          ›
-        </div>
-
-        {/* Card 4: History (Trophy / Graveyard) */}
+        {/* Card 4: History */}
         <div 
           onClick={() => handleCardClick('history')}
-          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-slate-800 cursor-pointer ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer ${
             viewMode === 'history' 
-              ? 'ring-4 ring-slate-300 scale-105' 
-              : 'hover:scale-105'
+              ? 'ring-2 ring-offset-2 ring-slate-500 border-slate-300' 
+              : 'hover:border-slate-300'
           }`}
         >
-          <div className="text-4xl mb-3">💀</div>
-          <div className="text-5xl font-extrabold text-white mb-2">
-            {loading ? '...' : (totalDeleted || 0).toLocaleString()}
-          </div>
-          <div className="text-xs font-bold text-slate-300 tracking-wider uppercase">
-            Total Items Removed
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">💀</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-slate-900 mb-1">
+                {loading ? '...' : (totalDeleted || 0).toLocaleString()}
+              </div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                Total Items Removed
+              </div>
+              <div className="text-xs text-slate-600">↗ All time</div>
+            </div>
           </div>
         </div>
       </div>
