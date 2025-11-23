@@ -493,6 +493,9 @@ def create_dummy_data(
     db: Session = Depends(get_db)
 ):
     """Generate dummy listings for testing with new hybrid schema"""
+    # Ensure tables exist before attempting to delete
+    Base.metadata.create_all(bind=engine)
+    
     # Clear all existing listings before generating new dummy data
     db.query(Listing).delete()
     db.commit()
