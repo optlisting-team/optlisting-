@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, TrendingDown, Ban, DollarSign, Check, Zap } from 'lucide-react'
+import { ArrowRight, TrendingDown, Ban, DollarSign, Check, Zap, TrendingUp, Clock, Puzzle } from 'lucide-react'
 
 function LandingPage() {
   const fadeInUp = {
@@ -218,10 +218,10 @@ function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              How It Works
+              Why It Works
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Three simple steps to optimize your inventory
+              Features that directly impact your bottom line
             </p>
           </motion.div>
 
@@ -237,11 +237,11 @@ function LandingPage() {
               className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-blue-600">1</span>
+                <TrendingUp className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Multi-Platform Sync</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Boost Your Store Rank</h3>
               <p className="text-gray-600 text-lg">
-                Connect eBay, Shopify, and Amazon in one click. We sync your listings automatically.
+                Unsold listings hurt your sell-through rate. We purge them so eBay's algorithm pushes your winners to the top.
               </p>
             </motion.div>
 
@@ -250,11 +250,11 @@ function LandingPage() {
               className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-blue-600">2</span>
+                <Clock className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Smart Detection</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">One-Click Cleanup</h3>
               <p className="text-gray-600 text-lg">
-                Our AI identifies 'Low Interest' items based on views, sales, and age. No manual work needed.
+                Stop checking listings one by one. Filter by '0 Sales' and delete thousands of bad items in seconds.
               </p>
             </motion.div>
 
@@ -263,11 +263,11 @@ function LandingPage() {
               className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-green-600">3</span>
+                <Puzzle className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Bulk Export</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Works with Your Tools</h3>
               <p className="text-gray-600 text-lg">
-                Download ready-to-upload CSVs for AutoDS, Yaballe, or File Exchange. One click, done.
+                Seamlessly compatible with AutoDS, Yaballe, Shopify, and more. We generate the perfect file for your workflow.
               </p>
             </motion.div>
           </motion.div>
