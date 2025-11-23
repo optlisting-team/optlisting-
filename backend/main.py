@@ -97,8 +97,16 @@ def get_listings(
     # If store_id is 'all' or None, DO NOT filter by store (return all for user)
     
     listings = query.offset(skip).limit(limit).all()
+    
+    # Get total count with store filter applied
+    total_query = db.query(Listing).filter(Listing.user_id == user_id)
+    if store_id and store_id != 'all':
+        if hasattr(Listing, 'store_id'):
+            total_query = total_query.filter(Listing.store_id == store_id)
+    total_count = total_query.count()
+    
     return {
-        "total": db.query(Listing).filter(Listing.user_id == user_id).count(),
+        "total": total_count,
         "listings": [
             {
                 "id": l.id,
@@ -111,13 +119,17 @@ def get_listings(
                 "upc": getattr(l, 'upc', None),
                 "platform": l.platform,
                 "marketplace": l.platform,  # Backward compatibility
-                "supplier_name": l.supplier_name,
-                "supplier": l.supplier_name,  # Backward compatibility
-                "supplier_id": l.supplier_id,
-                "price": l.price,
-                "date_listed": l.date_listed.isoformat() if l.date_listed else None,
-                "sold_qty": l.sold_qty,
-                "watch_count": l.watch_count
+                "supplier_name": getattr(l, 'supplier_name', None) or (l.metrics.get('supplier_name') if l.metrics and isinstance(l.metrics, dict) else None) or "Unknown",
+                "supplier": getattr(l, 'supplier_name', None) or (l.metrics.get('supplier_name') if l.metrics and isinstance(l.metrics, dict) else None) or "Unknown",  # Backward compatibility
+                "supplier_id": getattr(l, 'supplier_id', None) or (l.metrics.get('supplier_id') if l.metrics and isinstance(l.metrics, dict) else None),
+                "price": (l.metrics.get('price') if l.metrics and isinstance(l.metrics, dict) and 'price' in l.metrics else None) or getattr(l, 'price', None),
+                "date_listed": (
+                    l.date_listed.isoformat() if l.date_listed else (
+                        l.metrics.get('date_listed') if l.metrics and isinstance(l.metrics, dict) and 'date_listed' in l.metrics else None
+                    )
+                ),
+                "sold_qty": (l.metrics.get('sales') if l.metrics and isinstance(l.metrics, dict) and 'sales' in l.metrics else None) or getattr(l, 'sold_qty', 0) or 0,
+                "watch_count": (l.metrics.get('views') if l.metrics and isinstance(l.metrics, dict) and 'views' in l.metrics else None) or getattr(l, 'watch_count', 0) or 0
             }
             for l in listings
         ]
