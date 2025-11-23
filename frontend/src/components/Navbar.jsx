@@ -1,6 +1,21 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 
 function Navbar() {
+  const [currentPlan] = useState("PRO") // Default: PRO for demo
+
+  const getPlanStyles = (plan) => {
+    switch (plan) {
+      case "PRO":
+        return "bg-blue-100 text-blue-700 border-blue-200"
+      case "Enterprise":
+        return "bg-purple-100 text-purple-700 border-purple-200"
+      case "Starter":
+      default:
+        return "bg-gray-100 text-gray-600 border-gray-200"
+    }
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-gray-200">
       <div className="container mx-auto px-4">
@@ -21,6 +36,11 @@ function Navbar() {
             <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-xs font-medium text-green-700">API Connected</span>
+            </div>
+
+            {/* License Plan Badge */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 border rounded-full ${getPlanStyles(currentPlan)}`}>
+              <span className="text-xs font-medium">PLAN: {currentPlan}</span>
             </div>
 
             {/* User Menu */}
