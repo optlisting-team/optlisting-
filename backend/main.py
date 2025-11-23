@@ -213,12 +213,12 @@ def analyze_zombies(
             detail=f"Invalid marketplace. Must be one of: {', '.join(valid_marketplaces)}"
         )
     
-    # Validate source_filter
-    valid_sources = ["All", "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
-    if source_filter not in valid_sources:
+    # Validate supplier_filter
+    valid_suppliers = ["All", "Amazon", "Walmart", "Wholesale2B", "Doba", "DSers", "Spocket", "CJ Dropshipping", "Unverified"]
+    if supplier_filter not in valid_suppliers:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid source_filter. Must be one of: {', '.join(valid_sources)}"
+            detail=f"Invalid supplier_filter. Must be one of: {', '.join(valid_suppliers)}"
         )
     
     # Ensure min_days, max_sales, and max_watch_count are non-negative
