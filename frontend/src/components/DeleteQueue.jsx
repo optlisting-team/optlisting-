@@ -178,7 +178,7 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
           'bg-gray-600'
         )}
       </div>
-    </div>
+    </Card>
   )
 }
 
