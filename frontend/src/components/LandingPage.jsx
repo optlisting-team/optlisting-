@@ -57,26 +57,25 @@ function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-600">
-              'Zero Sale' Cleaner.
+            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-tight font-sans">
+              <span className="text-slate-900">'Zero Sale' </span>
+              <span className="text-blue-600">Cleaner.</span>
             </h1>
-            <h2 className="text-xl text-slate-500 font-medium mb-8 max-w-3xl mx-auto">
+            <h2 className="text-xl md:text-2xl text-slate-600 font-normal mb-10 max-w-3xl mx-auto leading-relaxed font-sans">
               Instantly generate a CSV of dead listings—so you can delete them fast and clean.
             </h2>
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <motion.a
-                  href="/dashboard"
-                  whileHover={{ scale: 1.05, y: -4 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-500/30 transition-transform hover:-translate-y-1 flex items-center gap-2"
-                >
-                  Start Your 30-Day Free Trial
-                  <ArrowRight className="h-5 w-5" />
-                </motion.a>
-              </div>
+            <div className="flex flex-col items-center mt-8">
+              <motion.a
+                href="/dashboard"
+                whileHover={{ scale: 1.05, y: -4 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-12 py-5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 flex items-center gap-2 font-sans"
+              >
+                Start Your 30-Day Free Trial
+                <ArrowRight className="h-5 w-5" />
+              </motion.a>
               {/* Microcopy */}
-              <p className="text-sm text-gray-500 mt-3 text-center">
+              <p className="text-xs text-slate-500 mt-4 text-center font-sans">
                 Credit card required. Cancel anytime.
               </p>
             </div>
@@ -196,19 +195,19 @@ function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-4 bg-slate-50" id="features">
+      <section className="py-24 px-4 bg-slate-50" id="features">
         <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 font-sans">
               How It Works
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto font-sans">
               Three simple steps to clean up your inventory
             </p>
           </motion.div>
@@ -218,43 +217,43 @@ function LandingPage() {
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-10"
           >
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-white p-10 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-blue-600">1</span>
+                <span className="text-3xl font-bold text-blue-600 font-sans">1</span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Connect Your Store</h3>
-              <p className="text-gray-600 text-lg">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Connect Your Store</h3>
+              <p className="text-slate-600 text-lg leading-relaxed font-sans">
                 Securely link your marketplace account.
               </p>
             </motion.div>
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-white p-10 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-blue-600">2</span>
+                <span className="text-3xl font-bold text-blue-600 font-sans">2</span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Detect Low-Interest Items</h3>
-              <p className="text-gray-600 text-lg">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Detect Low-Interest Items</h3>
+              <p className="text-slate-600 text-lg leading-relaxed font-sans">
                 We analyze your listings and flag dead stock, low impressions, and non-performers.
               </p>
             </motion.div>
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-white p-10 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <span className="text-3xl font-bold text-green-600">3</span>
+                <span className="text-3xl font-bold text-green-600 font-sans">3</span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Download & Delete via CSV</h3>
-              <p className="text-gray-600 text-lg">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Download & Delete via CSV</h3>
+              <p className="text-slate-600 text-lg leading-relaxed font-sans">
                 Export a ready-to-upload CSV, then bulk-delete inside your marketplace.
               </p>
             </motion.div>
@@ -263,16 +262,16 @@ function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white" id="features-benefits">
+      <section className="py-24 px-4 bg-white" id="features-benefits">
         <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 font-sans">
               Features
             </h2>
           </motion.div>
@@ -282,43 +281,43 @@ function LandingPage() {
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-10"
           >
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-white p-10 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
                 <TrendingUp className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Boost Your Store Rank</h3>
-              <p className="text-gray-600 text-lg">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Boost Your Store Rank</h3>
+              <p className="text-slate-600 text-lg leading-relaxed font-sans">
                 Improve eBay Best Match and search visibility by removing dead listings.
               </p>
             </motion.div>
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-white p-10 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
                 <Clock className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">CSV-Ready Cleanup</h3>
-              <p className="text-gray-600 text-lg">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">CSV-Ready Cleanup</h3>
+              <p className="text-slate-600 text-lg leading-relaxed font-sans">
                 Stay fully in control. We generate a clean deletion-ready CSV for safe bulk removal.
               </p>
             </motion.div>
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-white p-10 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
                 <Puzzle className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Works with Any Seller Workflow</h3>
-              <p className="text-gray-600 text-lg">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Works with Any Seller Workflow</h3>
+              <p className="text-slate-600 text-lg leading-relaxed font-sans">
                 Compatible with AutoDS, Zik, DSM, and all major seller tools.
               </p>
             </motion.div>
