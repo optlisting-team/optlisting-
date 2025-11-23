@@ -58,26 +58,12 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
   }, [isOpen])
 
   const getBadgeColor = (source) => {
+    // Monochrome badges for Vercel style - only use color for critical status
     switch (source) {
-      case 'Amazon':
-        return 'bg-yellow-50 text-yellow-700'
-      case 'Walmart':
-        return 'bg-cyan-50 text-cyan-700'
-      // Pro Dropshipping Aggregators - High-Volume Sellers
-      case 'Wholesale2B':
-        return 'bg-blue-700 text-white'
-      case 'Doba':
-        return 'bg-teal-500 text-white'
-      case 'DSers':
-        return 'bg-rose-500 text-white'
-      case 'Spocket':
-        return 'bg-purple-600 text-white'
-      case 'CJ Dropshipping':
-        return 'bg-gray-800 text-white'
       case 'Unverified':
-        return 'bg-amber-100 text-amber-800 border border-amber-300'
+        return 'bg-red-50 text-red-700 border border-red-200' // Critical status - use red
       default:
-        return 'bg-gray-100 text-gray-500'
+        return 'bg-gray-100 text-gray-800 border border-gray-200' // Monochrome for all others
     }
   }
 

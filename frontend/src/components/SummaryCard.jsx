@@ -43,20 +43,20 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 1: Total Listings */}
         <div 
           onClick={() => handleCardClick('all')}
-          className={`bg-white rounded-2xl shadow-sm ring-1 ring-slate-900/5 p-8 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 ${
             viewMode === 'all' 
-              ? 'ring-2 ring-blue-500 bg-blue-50/30' 
+              ? 'border-gray-400' 
               : ''
           }`}
         >
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+            <div className="text-gray-900 mb-2">
               <span className="text-xl">📦</span>
             </div>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2">
               Total Listings
             </div>
-            <div className="text-4xl font-medium text-slate-900 tracking-tight">
+            <div className="text-4xl font-semibold text-black mt-2">
               {loading ? '...' : (totalListings || 0).toLocaleString()}
             </div>
           </div>
@@ -66,14 +66,14 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
             <div className="mt-6 space-y-1.5">
               {topPlatforms.map(([platform, count]) => (
                 <div key={platform} className="flex items-center gap-2">
-                  <div className={`w-1.5 h-1.5 rounded-full ${getPlatformColor(platform)}`}></div>
-                  <span className="text-xs text-slate-600 font-medium">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                  <span className="text-xs text-gray-600 font-medium">
                     {platform}: {count.toLocaleString()}
                   </span>
                 </div>
               ))}
               {remainingCount > 0 && (
-                <div className="text-xs text-slate-500 font-medium pt-1">
+                <div className="text-xs text-gray-500 font-medium pt-1">
                   ...and {remainingCount} more
                 </div>
               )}
@@ -84,30 +84,30 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 2: Low Interest Items Found */}
         <div 
           onClick={() => handleCardClick('zombies')}
-          className={`bg-white rounded-2xl shadow-sm ring-1 ring-slate-900/5 p-8 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md relative ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 relative ${
             viewMode === 'zombies' 
-              ? 'ring-2 ring-rose-500 bg-rose-50/30' 
+              ? 'border-gray-400' 
               : ''
           }`}
         >
           {totalZombies > 0 && !loading && (
-            <div className="absolute top-4 right-4 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
+            <div className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
           )}
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4">
+            <div className="text-gray-900 mb-2">
               <span className="text-xl">📉</span>
             </div>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2">
               Low Interest Detected
             </div>
-            <div className="text-4xl font-medium text-slate-900 tracking-tight">
+            <div className="text-4xl font-semibold text-black mt-2">
               {loading ? '...' : totalZombies.toLocaleString()}
             </div>
           </div>
           
           {/* Trend Indicator */}
           {!loading && totalZombies > 0 && (
-            <div className="mt-6 flex items-center gap-1 text-xs text-slate-600">
+            <div className="mt-6 flex items-center gap-1 text-xs text-gray-600">
               <span>↗</span>
               <span>Action required</span>
             </div>
@@ -117,20 +117,20 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 3: In Queue */}
         <div 
           onClick={() => handleCardClick('queue')}
-          className={`bg-white rounded-2xl shadow-sm ring-1 ring-slate-900/5 p-8 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 ${
             viewMode === 'queue' 
-              ? 'ring-2 ring-indigo-500 bg-indigo-50/30' 
+              ? 'border-gray-400' 
               : ''
           }`}
         >
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+            <div className="text-gray-900 mb-2">
               <span className="text-xl">🗑️</span>
             </div>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2">
               Ready to Delete
             </div>
-            <div className="text-4xl font-medium text-slate-900 tracking-tight">
+            <div className="text-4xl font-semibold text-black mt-2">
               {queueCount || 0}
             </div>
           </div>
@@ -139,20 +139,20 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 4: History */}
         <div 
           onClick={() => handleCardClick('history')}
-          className={`bg-white rounded-2xl shadow-sm ring-1 ring-slate-900/5 p-8 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 ${
             viewMode === 'history' 
-              ? 'ring-2 ring-slate-500 bg-slate-50/30' 
+              ? 'border-gray-400' 
               : ''
           }`}
         >
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center mb-4">
+            <div className="text-gray-900 mb-2">
               <span className="text-xl">💀</span>
             </div>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2">
               Total Items Removed
             </div>
-            <div className="text-4xl font-medium text-slate-900 tracking-tight">
+            <div className="text-4xl font-semibold text-black mt-2">
               {loading ? '...' : (totalDeleted || 0).toLocaleString()}
             </div>
           </div>

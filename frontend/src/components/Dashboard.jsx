@@ -334,7 +334,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="font-sans bg-slate-50 min-h-screen">
+    <div className="font-sans bg-[#fafafa] min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Summary Card */}
         <div className="mb-8">
