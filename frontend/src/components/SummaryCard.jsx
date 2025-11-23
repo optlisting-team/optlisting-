@@ -12,26 +12,26 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 1: Total Listings */}
         <div 
           onClick={() => handleCardClick('all')}
-          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 flex-1 p-6 cursor-pointer ${
             viewMode === 'all' 
-              ? 'ring-2 ring-offset-2 ring-blue-500 border-blue-300' 
+              ? 'bg-blue-50 ring-2 ring-blue-500 border-transparent' 
               : 'hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">📦</span>
-            </div>
-            <div className="flex-1">
-              <div className="text-3xl font-bold text-slate-900 mb-1">
-                {loading ? '...' : (totalListings || 0).toLocaleString()}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-xl text-blue-600">📦</span>
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Total Listings
+              <div className="flex-1">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Total Listings
+                </div>
+                <div className="text-4xl font-extrabold text-slate-800 mt-2">
+                  {loading ? '...' : (totalListings || 0).toLocaleString()}
+                </div>
               </div>
-              <div className="text-xs text-green-600">↗ Updated just now</div>
             </div>
-          </div>
           {/* Platform Breakdown */}
           {!loading && totalListings > 0 && platformBreakdown && (
             <div className="flex gap-2 mt-2 flex-wrap">
@@ -62,27 +62,28 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 2: Low Interest Items Found */}
         <div 
           onClick={() => handleCardClick('zombies')}
-          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer relative ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 flex-1 p-6 cursor-pointer relative ${
             viewMode === 'zombies' 
-              ? 'ring-2 ring-offset-2 ring-rose-500 border-rose-300' 
+              ? 'bg-rose-50 ring-2 ring-rose-500 border-transparent' 
               : 'hover:border-slate-300'
           }`}
         >
           {totalZombies > 0 && !loading && (
             <div className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
           )}
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">📉</span>
-            </div>
-            <div className="flex-1">
-              <div className="text-3xl font-bold text-slate-900 mb-1">
-                {loading ? '...' : totalZombies.toLocaleString()}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-xl text-rose-600">📉</span>
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Low Interest Detected
+              <div className="flex-1">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Low Interest Detected
+                </div>
+                <div className="text-4xl font-extrabold text-slate-800 mt-2">
+                  {loading ? '...' : totalZombies.toLocaleString()}
+                </div>
               </div>
-              <div className="text-xs text-rose-600">↗ Needs attention</div>
             </div>
           </div>
         </div>
@@ -90,24 +91,25 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 3: In Queue */}
         <div 
           onClick={() => handleCardClick('queue')}
-          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 flex-1 p-6 cursor-pointer ${
             viewMode === 'queue' 
-              ? 'ring-2 ring-offset-2 ring-blue-500 border-blue-300' 
+              ? 'bg-blue-50 ring-2 ring-blue-500 border-transparent' 
               : 'hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">🗑️</span>
-            </div>
-            <div className="flex-1">
-              <div className="text-3xl font-bold text-slate-900 mb-1">
-                {queueCount || 0}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-xl text-blue-600">🗑️</span>
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Ready to Delete
+              <div className="flex-1">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Ready to Delete
+                </div>
+                <div className="text-4xl font-extrabold text-slate-800 mt-2">
+                  {queueCount || 0}
+                </div>
               </div>
-              <div className="text-xs text-blue-600">↗ Ready for export</div>
             </div>
           </div>
         </div>
@@ -115,24 +117,25 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 4: History */}
         <div 
           onClick={() => handleCardClick('history')}
-          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer ${
+          className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 flex-1 p-6 cursor-pointer ${
             viewMode === 'history' 
-              ? 'ring-2 ring-offset-2 ring-slate-500 border-slate-300' 
+              ? 'bg-slate-50 ring-2 ring-slate-500 border-transparent' 
               : 'hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">💀</span>
-            </div>
-            <div className="flex-1">
-              <div className="text-3xl font-bold text-slate-900 mb-1">
-                {loading ? '...' : (totalDeleted || 0).toLocaleString()}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-xl text-slate-600">💀</span>
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Total Items Removed
+              <div className="flex-1">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Total Items Removed
+                </div>
+                <div className="text-4xl font-extrabold text-slate-800 mt-2">
+                  {loading ? '...' : (totalDeleted || 0).toLocaleString()}
+                </div>
               </div>
-              <div className="text-xs text-slate-600">↗ All time</div>
             </div>
           </div>
         </div>

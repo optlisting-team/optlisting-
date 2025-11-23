@@ -80,7 +80,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm mb-8">
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-8">
       <form onSubmit={handleSubmit} className="flex items-center gap-4 flex-wrap">
         {/* Platform Filter */}
         <div className="flex-1 min-w-[200px]">
@@ -92,7 +92,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               id="marketplaceFilter"
               value={marketplaceFilter}
               onChange={(e) => setMarketplaceFilter(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
             >
             <option value="All">All Platforms</option>
             
@@ -153,7 +153,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             id="cutoffDate"
             value={cutoffDate}
             onChange={(e) => setCutoffDate(e.target.value)}
-            className="cursor-pointer bg-white border border-slate-300 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="cursor-pointer bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none block w-full p-2.5"
           />
         </div>
 
@@ -169,7 +169,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               min="0"
               value={maxSales}
               onChange={(e) => setMaxSales(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
               placeholder="0"
             />
           </div>
@@ -187,7 +187,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               min="0"
               value={maxWatchCount}
               onChange={(e) => setMaxWatchCount(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
               placeholder="10"
             />
           </div>
@@ -203,7 +203,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               id="supplierFilter"
               value={supplierFilter}
               onChange={(e) => setSupplierFilter(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
             >
             <option value="All">All Suppliers</option>
             <option value="Amazon">Amazon</option>
@@ -223,7 +223,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {loading ? 'Loading...' : 'Apply'}
           </button>

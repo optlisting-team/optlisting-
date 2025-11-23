@@ -334,7 +334,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-slate-100/80 font-sans">
       <div className="container mx-auto px-4 py-8">
 
         {/* Summary Card */}
