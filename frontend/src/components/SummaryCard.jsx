@@ -43,20 +43,20 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 1: Total Listings */}
         <div 
           onClick={() => handleCardClick('all')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-all duration-200 ${
+          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
             viewMode === 'all' 
               ? 'ring-2 ring-blue-500 bg-blue-50/30 border-transparent' 
-              : 'hover:shadow-md hover:border-slate-200'
+              : 'hover:border-slate-200'
           }`}
         >
           <div className="flex flex-col">
             <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-4">
               <span className="text-2xl">📦</span>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Total Listings
             </div>
-            <div className="text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight mb-4">
               {loading ? '...' : (totalListings || 0).toLocaleString()}
             </div>
           </div>
@@ -84,10 +84,10 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 2: Low Interest Items Found */}
         <div 
           onClick={() => handleCardClick('zombies')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-all duration-200 relative ${
+          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md relative ${
             viewMode === 'zombies' 
               ? 'ring-2 ring-rose-500 bg-rose-50/30 border-transparent' 
-              : 'hover:shadow-md hover:border-slate-200'
+              : 'hover:border-slate-200'
           }`}
         >
           {totalZombies > 0 && !loading && (
@@ -97,10 +97,10 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
             <div className="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center mb-4">
               <span className="text-2xl">📉</span>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Low Interest Detected
             </div>
-            <div className="text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight mb-4">
               {loading ? '...' : totalZombies.toLocaleString()}
             </div>
           </div>
@@ -117,20 +117,20 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 3: In Queue */}
         <div 
           onClick={() => handleCardClick('queue')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-all duration-200 ${
+          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
             viewMode === 'queue' 
               ? 'ring-2 ring-indigo-500 bg-indigo-50/30 border-transparent' 
-              : 'hover:shadow-md hover:border-slate-200'
+              : 'hover:border-slate-200'
           }`}
         >
           <div className="flex flex-col">
             <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
               <span className="text-2xl">🗑️</span>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Ready to Delete
             </div>
-            <div className="text-5xl font-extrabold text-slate-900 tracking-tight">
+            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight">
               {queueCount || 0}
             </div>
           </div>
@@ -139,20 +139,20 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 4: History */}
         <div 
           onClick={() => handleCardClick('history')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-all duration-200 ${
+          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
             viewMode === 'history' 
               ? 'ring-2 ring-slate-500 bg-slate-50/30 border-transparent' 
-              : 'hover:shadow-md hover:border-slate-200'
+              : 'hover:border-slate-200'
           }`}
         >
           <div className="flex flex-col">
             <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-4">
               <span className="text-2xl">💀</span>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Total Items Removed
             </div>
-            <div className="text-5xl font-extrabold text-slate-900 tracking-tight">
+            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight">
               {loading ? '...' : (totalDeleted || 0).toLocaleString()}
             </div>
           </div>

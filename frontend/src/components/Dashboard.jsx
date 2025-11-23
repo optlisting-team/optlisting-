@@ -334,10 +334,10 @@ function Dashboard() {
   }
 
   return (
-    <div className="font-sans">
-      <div className="container mx-auto">
+    <div className="font-sans bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Summary Card */}
-        <div className="mb-12">
+        <div className="mb-8">
           <SummaryCard 
             totalListings={totalListings}
             totalBreakdown={totalBreakdown}
@@ -357,7 +357,7 @@ function Dashboard() {
           viewMode === 'all' ? '' : ''
         }`}>
           {/* Left Column - Dynamic Width */}
-          <div className={`space-y-4 transition-all duration-300 ${
+          <div className={`space-y-8 transition-all duration-300 ${
             (viewMode === 'all' || viewMode === 'history' || viewMode === 'queue')
               ? 'w-full' 
               : 'flex-1 min-w-0'
