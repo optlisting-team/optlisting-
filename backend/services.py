@@ -319,43 +319,49 @@ def analyze_zombie_listings(
     
     query = query.filter(or_(*date_filters))
     
-    # Sales filter: use metrics['sales'] (JSONB only - no legacy fallback)
-    query = query.filter(
-        or_(
-            # Use metrics JSONB if available
+    # Sales filter: use metrics['sales'] (JSONB only)
+    # If metrics doesn't have sales, assume 0 (which satisfies <= max_sales when max_sales >= 0)
+    sales_filters = []
+    if max_sales >= 0:
+        # Items with metrics['sales'] <= max_sales
+        sales_filters.append(
             and_(
                 Listing.metrics != None,
                 Listing.metrics.has_key('sales'),
                 cast(Listing.metrics['sales'].astext, Integer) <= max_sales
-            ),
-            # If metrics doesn't have sales, assume 0 (default for new schema)
-            and_(
-                or_(
-                    Listing.metrics == None,
-                    ~Listing.metrics.has_key('sales')
-                )
             )
         )
-    )
+        # Items without metrics or without sales key (assume 0, which satisfies <= max_sales)
+        sales_filters.append(
+            or_(
+                Listing.metrics == None,
+                ~Listing.metrics.has_key('sales')
+            )
+        )
+    if sales_filters:
+        query = query.filter(or_(*sales_filters))
     
-    # Watch count filter: use metrics['views'] (JSONB only - no legacy fallback)
-    query = query.filter(
-        or_(
-            # Use metrics JSONB if available
+    # Watch count filter: use metrics['views'] (JSONB only)
+    # If metrics doesn't have views, assume 0 (which satisfies <= max_watch_count when max_watch_count >= 0)
+    views_filters = []
+    if max_watch_count >= 0:
+        # Items with metrics['views'] <= max_watch_count
+        views_filters.append(
             and_(
                 Listing.metrics != None,
                 Listing.metrics.has_key('views'),
                 cast(Listing.metrics['views'].astext, Integer) <= max_watch_count
-            ),
-            # If metrics doesn't have views, assume 0 (default for new schema)
-            and_(
-                or_(
-                    Listing.metrics == None,
-                    ~Listing.metrics.has_key('views')
-                )
             )
         )
-    )
+        # Items without metrics or without views key (assume 0, which satisfies <= max_watch_count)
+        views_filters.append(
+            or_(
+                Listing.metrics == None,
+                ~Listing.metrics.has_key('views')
+            )
+        )
+    if views_filters:
+        query = query.filter(or_(*views_filters))
     
     # Apply platform filter if not "All"
     if platform_filter and platform_filter != "All":
