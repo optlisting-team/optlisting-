@@ -60,12 +60,9 @@ function LandingPage() {
             <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-600">
               'Zero Sale' Cleaner.
             </h1>
-            <h2 className="text-xl text-slate-500 font-medium mb-6 max-w-3xl mx-auto">
-              Stop Wasting Time on Dead Stock. Start Finding Winners.
+            <h2 className="text-xl text-slate-500 font-medium mb-8 max-w-3xl mx-auto">
+              Instantly generate a CSV of dead listings—so you can delete them fast and clean.
             </h2>
-            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Automated cleanup for your eBay inventory. We remove the non-performers so you can focus 100% of your energy on sourcing the next big winner.
-            </p>
             <div className="flex flex-col items-center">
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <motion.a
@@ -74,22 +71,13 @@ function LandingPage() {
                   whileTap={{ scale: 0.95 }}
                   className="px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-500/30 transition-transform hover:-translate-y-1 flex items-center gap-2"
                 >
-                  Start Cleaning for Free
+                  Start Your 30-Day Free Trial
                   <ArrowRight className="h-5 w-5" />
-                </motion.a>
-                <motion.a
-                  href="#demo"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold text-lg rounded-lg hover:border-gray-400 transition-all"
-                >
-                  View Demo
                 </motion.a>
               </div>
               {/* Microcopy */}
-              <p className="text-sm text-gray-500 mt-3 flex items-center justify-center gap-1">
-                <Check className="h-4 w-4 text-green-600" />
-                <span>30-day free trial. Cancel anytime.</span>
+              <p className="text-sm text-gray-500 mt-3 text-center">
+                Credit card required. Cancel anytime.
               </p>
             </div>
           </motion.div>
@@ -207,7 +195,7 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* Key Features Section */}
+      {/* How It Works Section */}
       <section className="py-20 px-4 bg-slate-50" id="features">
         <div className="container mx-auto max-w-6xl">
           <motion.div
@@ -218,11 +206,75 @@ function LandingPage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              Why It Works
+              How It Works
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Features that directly impact your bottom line
+              Three simple steps to clean up your inventory
             </p>
+          </motion.div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-3 gap-8"
+          >
+            <motion.div
+              variants={fadeInUp}
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <span className="text-3xl font-bold text-blue-600">1</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Connect Your Store</h3>
+              <p className="text-gray-600 text-lg">
+                Securely link your marketplace account.
+              </p>
+            </motion.div>
+
+            <motion.div
+              variants={fadeInUp}
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <span className="text-3xl font-bold text-blue-600">2</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Detect Low-Interest Items</h3>
+              <p className="text-gray-600 text-lg">
+                We analyze your listings and flag dead stock, low impressions, and non-performers.
+              </p>
+            </motion.div>
+
+            <motion.div
+              variants={fadeInUp}
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <span className="text-3xl font-bold text-green-600">3</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Download & Delete via CSV</h3>
+              <p className="text-gray-600 text-lg">
+                Export a ready-to-upload CSV, then bulk-delete inside your marketplace.
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4 bg-white" id="features-benefits">
+        <div className="container mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Features
+            </h2>
           </motion.div>
 
           <motion.div
@@ -241,7 +293,7 @@ function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-slate-900 mb-3">Boost Your Store Rank</h3>
               <p className="text-gray-600 text-lg">
-                Unsold listings hurt your sell-through rate. We purge them so eBay's algorithm pushes your winners to the top.
+                Improve eBay Best Match and search visibility by removing dead listings.
               </p>
             </motion.div>
 
@@ -252,9 +304,9 @@ function LandingPage() {
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
                 <Clock className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">One-Click Cleanup</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">CSV-Ready Cleanup</h3>
               <p className="text-gray-600 text-lg">
-                Stop checking listings one by one. Filter by '0 Sales' and delete thousands of bad items in seconds.
+                Stay fully in control. We generate a clean deletion-ready CSV for safe bulk removal.
               </p>
             </motion.div>
 
@@ -265,9 +317,9 @@ function LandingPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
                 <Puzzle className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Works with Your Tools</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Works with Any Seller Workflow</h3>
               <p className="text-gray-600 text-lg">
-                Seamlessly compatible with AutoDS, Yaballe, Shopify, and more. We generate the perfect file for your workflow.
+                Compatible with AutoDS, Zik, DSM, and all major seller tools.
               </p>
             </motion.div>
           </motion.div>
