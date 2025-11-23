@@ -43,31 +43,33 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 1: Total Listings */}
         <div 
           onClick={() => handleCardClick('all')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
+          className={`bg-white rounded-xl shadow-sm border border-slate-200 p-5 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
             viewMode === 'all' 
               ? 'ring-2 ring-blue-500 bg-blue-50/30 border-transparent' 
-              : 'hover:border-slate-200'
+              : 'hover:border-slate-300'
           }`}
         >
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-              <span className="text-2xl">📦</span>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">📦</span>
+              </div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Total Listings
+              </div>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Total Listings
-            </div>
-            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight mb-4">
+            <div className="text-3xl font-extrabold text-slate-900 mt-2 mb-3">
               {loading ? '...' : (totalListings || 0).toLocaleString()}
             </div>
           </div>
           
           {/* Platform Breakdown - Top 3 Only */}
           {!loading && totalListings > 0 && topPlatforms.length > 0 && (
-            <div className="mt-auto space-y-1.5">
+            <div className="mt-auto space-y-1">
               {topPlatforms.map(([platform, count]) => (
                 <div key={platform} className="flex items-center gap-2">
                   <div className={`w-1.5 h-1.5 rounded-full ${getPlatformColor(platform)}`}></div>
-                  <span className="text-xs text-slate-600 font-medium">
+                  <span className="text-xs text-slate-500 font-medium">
                     {platform}: {count.toLocaleString()}
                   </span>
                 </div>
@@ -84,30 +86,32 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 2: Low Interest Items Found */}
         <div 
           onClick={() => handleCardClick('zombies')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md relative ${
+          className={`bg-white rounded-xl shadow-sm border border-slate-200 p-5 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md relative ${
             viewMode === 'zombies' 
               ? 'ring-2 ring-rose-500 bg-rose-50/30 border-transparent' 
-              : 'hover:border-slate-200'
+              : 'hover:border-slate-300'
           }`}
         >
           {totalZombies > 0 && !loading && (
-            <div className="absolute top-4 right-4 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
+            <div className="absolute top-3 right-3 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
           )}
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center mb-4">
-              <span className="text-2xl">📉</span>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">📉</span>
+              </div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Low Interest Detected
+              </div>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Low Interest Detected
-            </div>
-            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight mb-4">
+            <div className="text-3xl font-extrabold text-slate-900 mt-2 mb-3">
               {loading ? '...' : totalZombies.toLocaleString()}
             </div>
           </div>
           
           {/* Trend Indicator */}
           {!loading && totalZombies > 0 && (
-            <div className="mt-auto flex items-center gap-1 text-xs text-green-600 font-medium">
+            <div className="mt-auto flex items-center gap-1 text-xs text-slate-500 mt-1">
               <span>↗</span>
               <span>Action required</span>
             </div>
@@ -117,20 +121,22 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 3: In Queue */}
         <div 
           onClick={() => handleCardClick('queue')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
+          className={`bg-white rounded-xl shadow-sm border border-slate-200 p-5 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
             viewMode === 'queue' 
               ? 'ring-2 ring-indigo-500 bg-indigo-50/30 border-transparent' 
-              : 'hover:border-slate-200'
+              : 'hover:border-slate-300'
           }`}
         >
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
-              <span className="text-2xl">🗑️</span>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">🗑️</span>
+              </div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Ready to Delete
+              </div>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Ready to Delete
-            </div>
-            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight">
+            <div className="text-3xl font-extrabold text-slate-900 mt-2">
               {queueCount || 0}
             </div>
           </div>
@@ -139,20 +145,22 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 4: History */}
         <div 
           onClick={() => handleCardClick('history')}
-          className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
+          className={`bg-white rounded-xl shadow-sm border border-slate-200 p-5 h-auto flex flex-col justify-between cursor-pointer transition-shadow hover:shadow-md ${
             viewMode === 'history' 
               ? 'ring-2 ring-slate-500 bg-slate-50/30 border-transparent' 
-              : 'hover:border-slate-200'
+              : 'hover:border-slate-300'
           }`}
         >
           <div className="flex flex-col">
-            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-4">
-              <span className="text-2xl">💀</span>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">💀</span>
+              </div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Total Items Removed
+              </div>
             </div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Total Items Removed
-            </div>
-            <div className="text-5xl font-extrabold text-slate-900 mt-1 tracking-tight">
+            <div className="text-3xl font-extrabold text-slate-900 mt-2">
               {loading ? '...' : (totalDeleted || 0).toLocaleString()}
             </div>
           </div>
