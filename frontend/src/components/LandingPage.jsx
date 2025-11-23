@@ -290,9 +290,9 @@ function LandingPage() {
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
                 <TrendingUp className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Boost Your Store Rank</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Boost Your Store Performance</h3>
               <p className="text-slate-600 text-lg leading-relaxed font-sans">
-                Improve eBay Best Match and search visibility by removing dead listings.
+                Removing dead inventory improves search visibility across all major marketplaces.
               </p>
             </motion.div>
 
@@ -305,7 +305,7 @@ function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">CSV-Ready Cleanup</h3>
               <p className="text-slate-600 text-lg leading-relaxed font-sans">
-                Stay fully in control. We generate a clean deletion-ready CSV for safe bulk removal.
+                Stay fully in control. We generate a clean, deletion-ready CSV for safe bulk removal.
               </p>
             </motion.div>
 
@@ -316,9 +316,9 @@ function LandingPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
                 <Puzzle className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Works with Any Seller Workflow</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Seamless Across Markets & Suppliers</h3>
               <p className="text-slate-600 text-lg leading-relaxed font-sans">
-                Compatible with AutoDS, Zik, DSM, and all major seller tools.
+                Built to fit any seller workflow. Supports multiple marketplaces and suppliers, with more added regularly.
               </p>
             </motion.div>
           </motion.div>
