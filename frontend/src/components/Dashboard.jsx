@@ -334,14 +334,8 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      <div className="container mx-auto px-4 py-8">
-        {/* Dashboard Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-slate-800 mb-2">Dashboard</h1>
-          <p className="text-slate-500">Monitor and optimize your inventory performance</p>
-        </div>
-
+    <div className="font-sans">
+      <div className="container mx-auto">
         {/* Summary Card */}
         <div className="mb-12">
           <SummaryCard 
