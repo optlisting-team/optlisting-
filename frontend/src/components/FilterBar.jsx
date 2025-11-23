@@ -80,7 +80,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   }
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-8">
+    <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-slate-900/5 mb-8">
       <form onSubmit={handleSubmit} className="flex items-center gap-4 flex-wrap">
         {/* Platform Filter */}
         <div className="flex-1 min-w-[200px]">
@@ -223,7 +223,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
           <button
             type="submit"
             disabled={loading}
-            className="px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg shadow-blue-500/20 font-medium transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
             {loading ? 'Loading...' : 'Apply'}
           </button>
@@ -231,7 +231,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             type="button"
             onClick={handleReset}
             disabled={loading}
-            className="px-4 py-2.5 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2.5 bg-white border border-slate-200 text-slate-600 font-medium rounded-full hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Reset
           </button>
