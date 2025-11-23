@@ -60,7 +60,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               id="marketplaceFilter"
               value={marketplaceFilter}
               onChange={(e) => setMarketplaceFilter(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
             >
             <option value="All">All Platforms</option>
             
@@ -122,7 +122,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               min="0"
               value={minDays}
               onChange={(e) => setMinDays(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
               placeholder="3"
             />
           </div>
@@ -140,7 +140,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               min="0"
               value={maxSales}
               onChange={(e) => setMaxSales(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
               placeholder="0"
             />
           </div>
@@ -158,7 +158,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               min="0"
               value={maxWatchCount}
               onChange={(e) => setMaxWatchCount(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
               placeholder="10"
             />
           </div>
@@ -174,7 +174,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               id="supplierFilter"
               value={supplierFilter}
               onChange={(e) => setSupplierFilter(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
             >
             <option value="All">All Suppliers</option>
             <option value="Amazon">Amazon</option>
@@ -193,7 +193,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {loading ? 'Loading...' : 'Apply'}
           </button>

@@ -29,14 +29,14 @@ function Navbar() {
   const getPlanStyles = (plan) => {
     switch (plan) {
       case "PRO":
-        return "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm"
+        return "bg-slate-900 text-white border-slate-800 shadow-sm"
       case "MASTER":
-        return "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm"
+        return "bg-slate-900 text-white border-slate-800 shadow-sm"
       case "Enterprise":
-        return "bg-purple-100 text-purple-700 border-purple-200 shadow-sm"
+        return "bg-slate-900 text-white border-slate-800 shadow-sm"
       case "Starter":
       default:
-        return "bg-gray-100 text-gray-600 border-gray-200"
+        return "bg-slate-100 text-slate-600 border-slate-200"
     }
   }
 
@@ -54,7 +54,7 @@ function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo & Brand */}
           <Link to="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -76,9 +76,9 @@ function Navbar() {
             </Link>
 
             {/* Status Badge */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium text-green-700">API Connected</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-100 border border-emerald-200 rounded-full">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span className="text-xs font-medium text-emerald-700">API Connected</span>
             </div>
 
             {/* User Menu */}

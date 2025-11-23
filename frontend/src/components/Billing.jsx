@@ -28,14 +28,14 @@ function Billing() {
   const getPlanStyles = (plan) => {
     switch (plan) {
       case "PRO":
-        return "bg-indigo-50 text-indigo-700 border-indigo-200"
+        return "bg-slate-900 text-white border-slate-800"
       case "MASTER":
-        return "bg-indigo-50 text-indigo-700 border-indigo-200"
+        return "bg-slate-900 text-white border-slate-800"
       case "Enterprise":
-        return "bg-purple-100 text-purple-700 border-purple-200"
+        return "bg-slate-900 text-white border-slate-800"
       case "Starter":
       default:
-        return "bg-gray-100 text-gray-600 border-gray-200"
+        return "bg-slate-100 text-slate-600 border-slate-200"
     }
   }
 
@@ -105,7 +105,7 @@ function Billing() {
             </p>
             <button
               onClick={handleOpenPortal}
-              className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl"
+              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
             >
               Open Customer Portal
             </button>

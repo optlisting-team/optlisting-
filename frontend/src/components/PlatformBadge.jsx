@@ -12,7 +12,7 @@ function PlatformBadge({ marketplace }) {
         return 'bg-red-500 text-white border-red-600'
       // North America
       case 'eBay':
-        return 'bg-purple-100 text-purple-800 border-purple-200'
+        return 'bg-slate-100 text-slate-800 border-slate-200'
       case 'Amazon':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       case 'Shopify':
@@ -54,7 +54,7 @@ function PlatformBadge({ marketplace }) {
       case 'Mercado Libre':
         return 'bg-yellow-400 text-yellow-900 border-yellow-500'
       case 'Wildberries':
-        return 'bg-purple-600 text-white border-purple-700'
+        return 'bg-slate-700 text-white border-slate-800'
       case 'Flipkart':
         return 'bg-blue-600 text-white border-blue-700'
       case 'Ozon':

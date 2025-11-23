@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 
 export const MY_STORES = [
   { id: 'all', name: '🌍 All Stores', platform: 'Global', color: 'bg-gray-100 text-gray-800' },
-  { id: 'store_ebay_1', name: 'eBay Main Store', platform: 'eBay', color: 'bg-purple-100 text-purple-700' },
+  { id: 'store_ebay_1', name: 'eBay Main Store', platform: 'eBay', color: 'bg-slate-100 text-slate-700' },
   { id: 'store_amazon_1', name: 'Amazon US', platform: 'Amazon', color: 'bg-yellow-100 text-yellow-800' },
   { id: 'store_coupang_1', name: 'Coupang KR', platform: 'Coupang', color: 'bg-red-100 text-red-700' }
 ]
@@ -70,7 +70,7 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
                 key={store.id}
                 onClick={() => handleStoreSelect(store)}
                 className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                  currentStoreData.id === store.id ? 'bg-indigo-50' : ''
+                  currentStoreData.id === store.id ? 'bg-blue-50' : ''
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
                   <span className="text-sm font-medium text-gray-700">{store.name}</span>
                 </div>
                 {currentStoreData.id === store.id && (
-                  <svg className="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}

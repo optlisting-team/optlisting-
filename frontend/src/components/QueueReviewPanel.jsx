@@ -184,12 +184,12 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
         }
       case 'Wayfair':
         return {
-          headerBg: 'bg-violet-600',
+          headerBg: 'bg-blue-600',
           headerText: 'text-white',
-          border: 'border-violet-300',
-          bg: 'bg-violet-50',
-          buttonBg: 'bg-violet-600',
-          buttonHover: 'hover:bg-violet-700'
+          border: 'border-blue-300',
+          bg: 'bg-blue-50',
+          buttonBg: 'bg-blue-600',
+          buttonHover: 'hover:bg-blue-700'
         }
       case 'Costco':
         return {
@@ -212,12 +212,12 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
         }
       case 'Spocket':
         return {
-          headerBg: 'bg-purple-600',
+          headerBg: 'bg-slate-700',
           headerText: 'text-white',
-          border: 'border-purple-400',
-          bg: 'bg-purple-50',
-          buttonBg: 'bg-purple-600',
-          buttonHover: 'hover:bg-purple-700'
+          border: 'border-slate-400',
+          bg: 'bg-slate-50',
+          buttonBg: 'bg-slate-700',
+          buttonHover: 'hover:bg-slate-800'
         }
       case 'SaleHoo':
         return {

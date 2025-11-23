@@ -14,12 +14,12 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
           onClick={() => handleCardClick('all')}
           className={`bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex-1 p-6 cursor-pointer ${
             viewMode === 'all' 
-              ? 'ring-2 ring-offset-2 ring-indigo-500 border-indigo-300' 
+              ? 'ring-2 ring-offset-2 ring-blue-500 border-blue-300' 
               : 'hover:border-slate-300'
           }`}
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-2xl">📦</span>
             </div>
             <div className="flex-1">
@@ -39,7 +39,7 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
                 .filter(([platform, count]) => count > 0)
                 .map(([platform, count]) => {
                   const colorMap = {
-                    'eBay': 'text-purple-600',
+                    'eBay': 'text-slate-600',
                     'Amazon': 'text-yellow-600',
                     'Shopify': 'text-green-600',
                     'Walmart': 'text-blue-600',

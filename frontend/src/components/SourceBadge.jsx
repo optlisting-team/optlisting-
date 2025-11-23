@@ -71,7 +71,7 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
       case 'Home Depot':
         return 'bg-orange-100 text-orange-800'
       case 'Wayfair':
-        return 'bg-violet-100 text-violet-800'
+        return 'bg-blue-100 text-blue-800'
       case 'Costco':
         return 'bg-blue-50 text-blue-700'
       case 'Amazon':
@@ -82,7 +82,7 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
       case 'Wholesale2B':
         return 'bg-blue-900 text-white'
       case 'Spocket':
-        return 'bg-purple-600 text-white'
+        return 'bg-slate-700 text-white'
       case 'SaleHoo':
         return 'bg-sky-500 text-white'
       case 'Inventory Source':
