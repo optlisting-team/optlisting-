@@ -1,8 +1,36 @@
 import { useState, useEffect } from 'react'
 
 function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
+  // Calculate default cutoff date (3 days ago)
+  const getDefaultCutoffDate = () => {
+    const defaultDate = new Date()
+    defaultDate.setDate(defaultDate.getDate() - 3)
+    return defaultDate.toISOString().split('T')[0] // Format: YYYY-MM-DD
+  }
+
+  // Convert days to cutoff date string
+  const daysToCutoffDate = (days) => {
+    const date = new Date()
+    date.setDate(date.getDate() - days)
+    return date.toISOString().split('T')[0]
+  }
+
+  // Convert cutoff date to days (difference from today)
+  const cutoffDateToDays = (dateString) => {
+    if (!dateString) return 3
+    const selectedDate = new Date(dateString)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    selectedDate.setHours(0, 0, 0, 0)
+    const diffTime = today - selectedDate
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    return Math.max(0, diffDays)
+  }
+
   const [marketplaceFilter, setMarketplaceFilter] = useState(initialFilters.marketplace_filter || 'All')
-  const [minDays, setMinDays] = useState(initialFilters.min_days || 3)
+  const [cutoffDate, setCutoffDate] = useState(
+    initialFilters.cutoff_date || (initialFilters.min_days ? daysToCutoffDate(initialFilters.min_days) : getDefaultCutoffDate())
+  )
   const [maxSales, setMaxSales] = useState(initialFilters.max_sales || 0)
   const [maxWatchCount, setMaxWatchCount] = useState(initialFilters.max_watch_count || 10)
   const [supplierFilter, setSupplierFilter] = useState(initialFilters.supplier_filter || initialFilters.source_filter || 'All')
@@ -10,7 +38,9 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   // Update state when initialFilters change
   useEffect(() => {
     setMarketplaceFilter(initialFilters.marketplace_filter || 'All')
-    setMinDays(initialFilters.min_days || 3)
+    setCutoffDate(
+      initialFilters.cutoff_date || (initialFilters.min_days ? daysToCutoffDate(initialFilters.min_days) : getDefaultCutoffDate())
+    )
     setMaxSales(initialFilters.max_sales || 0)
     setMaxWatchCount(initialFilters.max_watch_count || 10)
     setSupplierFilter(initialFilters.supplier_filter || initialFilters.source_filter || 'All')
@@ -18,8 +48,9 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Ensure values are non-negative
-    const safeMinDays = Math.max(0, parseInt(minDays) || 0)
+    // Convert cutoff date to days
+    const calculatedDays = cutoffDateToDays(cutoffDate)
+    const safeMinDays = Math.max(0, calculatedDays)
     const safeMaxSales = Math.max(0, parseInt(maxSales) || 0)
     const safeMaxWatchCount = Math.max(0, parseInt(maxWatchCount) || 0)
     
@@ -34,13 +65,14 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
   const handleReset = () => {
     setMarketplaceFilter('All')
-    setMinDays(3)
+    setCutoffDate(getDefaultCutoffDate())
     setMaxSales(0)
     setMaxWatchCount(10)
     setSupplierFilter('All')
+    const defaultDays = cutoffDateToDays(getDefaultCutoffDate())
     onApplyFilter({
       marketplace_filter: 'All',
-      min_days: 3,
+      min_days: defaultDays,
       max_sales: 0,
       max_watch_count: 10,
       supplier_filter: 'All'
@@ -111,22 +143,18 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
           </div>
         </div>
 
-        {/* Days Older Than */}
-        <div className="min-w-[140px]">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400 text-sm">📅</span>
-            </div>
-            <input
-              type="number"
-              id="minDays"
-              min="0"
-              value={minDays}
-              onChange={(e) => setMinDays(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border-0 rounded-lg bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
-              placeholder="3"
-            />
-          </div>
+        {/* Listed Before - Date Picker */}
+        <div className="min-w-[180px]">
+          <label htmlFor="cutoffDate" className="block text-xs font-medium text-slate-700 mb-1">
+            Listed Before
+          </label>
+          <input
+            type="date"
+            id="cutoffDate"
+            value={cutoffDate}
+            onChange={(e) => setCutoffDate(e.target.value)}
+            className="cursor-pointer bg-white border border-slate-300 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          />
         </div>
 
         {/* Max Sales */}
