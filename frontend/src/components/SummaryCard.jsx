@@ -1,3 +1,6 @@
+import { Card, CardContent } from "./ui/card"
+import { cn } from "@/lib/utils"
+
 function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {}, totalZombies, queueCount, totalDeleted, loading, filters = {}, viewMode = 'zombies', onViewModeChange }) {
   const handleCardClick = (mode) => {
     if (onViewModeChange) {
@@ -41,15 +44,14 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
       {/* Pipeline: Single Flex Container */}
       <div className="flex items-stretch justify-between gap-6">
         {/* Card 1: Total Listings */}
-        <div 
+        <Card 
           onClick={() => handleCardClick('all')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm ${
-            viewMode === 'all' 
-              ? 'border-gray-300 shadow-sm' 
-              : ''
-          }`}
+          className={cn(
+            "h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm",
+            viewMode === 'all' && 'border-gray-300 shadow-sm'
+          )}
         >
-          <div className="flex flex-col">
+          <CardContent className="flex flex-col">
             <div className="text-gray-900 mb-2">
               <span className="text-xl">📦</span>
             </div>
@@ -59,11 +61,10 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
             <div className="text-4xl font-semibold text-black mt-2">
               {loading ? '...' : (totalListings || 0).toLocaleString()}
             </div>
-          </div>
-          
-          {/* Platform Breakdown - Top 3 Only */}
-          {!loading && totalListings > 0 && topPlatforms.length > 0 && (
-            <div className="mt-6 space-y-1.5">
+            
+            {/* Platform Breakdown - Top 3 Only */}
+            {!loading && totalListings > 0 && topPlatforms.length > 0 && (
+              <div className="mt-6 space-y-1.5">
               {topPlatforms.map(([platform, count]) => (
                 <div key={platform} className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
@@ -77,18 +78,18 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
                   ...and {remainingCount} more
                 </div>
               )}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Card 2: Low Interest Items Found */}
-        <div 
+        <Card 
           onClick={() => handleCardClick('zombies')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm relative ${
-            viewMode === 'zombies' 
-              ? 'border-gray-300 shadow-sm' 
-              : ''
-          }`}
+          className={cn(
+            "h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm relative",
+            viewMode === 'zombies' && 'border-gray-300 shadow-sm'
+          )}
         >
           {totalZombies > 0 && !loading && (
             <div className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -112,18 +113,17 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
               <span>Action required</span>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Card 3: In Queue */}
-        <div 
+        <Card 
           onClick={() => handleCardClick('queue')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm ${
-            viewMode === 'queue' 
-              ? 'border-gray-300 shadow-sm' 
-              : ''
-          }`}
+          className={cn(
+            "h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm",
+            viewMode === 'queue' && 'border-gray-300 shadow-sm'
+          )}
         >
-          <div className="flex flex-col">
+          <CardContent className="flex flex-col">
             <div className="text-gray-900 mb-2">
               <span className="text-xl">🗑️</span>
             </div>
@@ -133,19 +133,18 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
             <div className="text-4xl font-semibold text-black mt-2">
               {queueCount || 0}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Card 4: History */}
-        <div 
+        <Card 
           onClick={() => handleCardClick('history')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm ${
-            viewMode === 'history' 
-              ? 'border-gray-300 shadow-sm' 
-              : ''
-          }`}
+          className={cn(
+            "h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm",
+            viewMode === 'history' && 'border-gray-300 shadow-sm'
+          )}
         >
-          <div className="flex flex-col">
+          <CardContent className="flex flex-col">
             <div className="text-gray-900 mb-2">
               <span className="text-xl">💀</span>
             </div>
@@ -155,8 +154,8 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
             <div className="text-4xl font-semibold text-black mt-2">
               {loading ? '...' : (totalDeleted || 0).toLocaleString()}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

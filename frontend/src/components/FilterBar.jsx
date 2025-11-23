@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Button } from './ui/button'
 
 function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   // Calculate default cutoff date (3 days ago)
@@ -220,21 +221,23 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
         {/* Buttons */}
         <div className="flex gap-2 ml-auto">
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="default"
+            size="default"
           >
             {loading ? 'Loading...' : 'Apply'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={handleReset}
             disabled={loading}
-            className="px-4 py-2 bg-white border border-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            variant="outline"
+            size="default"
           >
             Reset
-          </button>
+          </Button>
         </div>
       </form>
     </div>

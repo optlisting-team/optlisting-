@@ -1,5 +1,8 @@
 import { useState, useMemo } from 'react'
 import SourceBadge from './SourceBadge'
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from './ui/table'
+import { Button } from './ui/button'
+import { Card } from './ui/card'
 
 function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChange }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -76,7 +79,7 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
   }
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <Card className="w-full overflow-hidden">
       {/* Search Bar & Rows Selector */}
       <div className="bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between">
         {/* Left: Rows per page selector */}
@@ -110,10 +113,10 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
         </div>
       </div>
 
-      <table className="table-fixed w-full">
-        <thead className="bg-white border-b border-gray-200">
-          <tr>
-            <th className="w-10 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
+      <Table className="table-fixed w-full">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10">
               <input
                 type="checkbox"
                 checked={allVisibleSelected}
@@ -124,37 +127,21 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 title="Select all items on this page"
               />
-            </th>
-            <th className="w-24 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              Platform
-            </th>
-            <th className="w-32 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              Item ID
-            </th>
-            <th className="px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              Title
-            </th>
-            <th className="w-32 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              Supplier
-            </th>
-            <th className="w-32 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              SKU
-            </th>
-            <th className="w-24 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              Price
-            </th>
-            <th className="w-32 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              Date Listed
-            </th>
-            <th className="w-24 px-6 py-4 text-left text-xs text-gray-500 font-medium uppercase">
-              Watch Count
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white">
+            </TableHead>
+            <TableHead className="w-24">Platform</TableHead>
+            <TableHead className="w-32">Item ID</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead className="w-32">Supplier</TableHead>
+            <TableHead className="w-32">SKU</TableHead>
+            <TableHead className="w-24">Price</TableHead>
+            <TableHead className="w-32">Date Listed</TableHead>
+            <TableHead className="w-24">Watch Count</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {visibleZombies.length === 0 ? (
-            <tr>
-              <td colSpan={9} className="px-4 py-16 text-center">
+            <TableRow>
+              <TableCell colSpan={9} className="px-4 py-16 text-center">
                 <div className="flex flex-col items-center justify-center">
                   <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -166,23 +153,20 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                     {searchQuery ? 'Try adjusting your search query' : 'Try syncing data'}
                   </p>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ) : (
             visibleZombies.map((zombie) => (
-            <tr 
-              key={zombie.id} 
-              className="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors"
-            >
-              <td className="w-10 px-6 py-4 whitespace-nowrap">
+            <TableRow key={zombie.id}>
+              <TableCell className="w-10 whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(zombie.id)}
                   onChange={(e) => onSelect(zombie.id, e.target.checked)}
                   className="rounded border-gray-300 text-black focus:ring-black"
                 />
-              </td>
-              <td className="w-24 px-6 py-4 whitespace-nowrap">
+              </TableCell>
+              <TableCell className="w-24 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-xs font-bold text-gray-700">
@@ -193,14 +177,14 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                     {zombie.marketplace || zombie.platform || 'eBay'}
                   </span>
                 </div>
-              </td>
-              <td className="w-32 px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-700 truncate" title={zombie.ebay_item_id || zombie.item_id}>
+              </TableCell>
+              <TableCell className="w-32 whitespace-nowrap text-sm font-mono text-gray-700 truncate" title={zombie.ebay_item_id || zombie.item_id}>
                 {zombie.ebay_item_id || zombie.item_id}
-              </td>
-              <td className="px-6 py-4 text-sm font-medium text-gray-900 truncate max-w-0" title={zombie.title}>
+              </TableCell>
+              <TableCell className="text-sm font-medium text-gray-900 truncate max-w-0" title={zombie.title}>
                 {zombie.title}
-              </td>
-              <td className="w-32 px-6 py-4 whitespace-nowrap">
+              </TableCell>
+              <TableCell className="w-32 whitespace-nowrap">
                 <div className="flex items-center">
                   <SourceBadge 
                     source={zombie.supplier || zombie.supplier_name || zombie.source || zombie.source_name} 
@@ -209,24 +193,24 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                     itemId={zombie.id}
                   />
                 </div>
-              </td>
-              <td className="w-32 px-6 py-4 whitespace-nowrap text-sm text-gray-600 truncate" title={zombie.sku}>
+              </TableCell>
+              <TableCell className="w-32 whitespace-nowrap text-sm text-gray-600 truncate" title={zombie.sku}>
                 {zombie.sku}
-              </td>
-              <td className="w-24 px-6 py-4 whitespace-nowrap text-sm font-semibold text-black">
+              </TableCell>
+              <TableCell className="w-24 whitespace-nowrap text-sm font-semibold text-black">
                 {zombie.price ? formatPrice(zombie.price) : 'N/A'}
-              </td>
-              <td className="w-32 px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+              </TableCell>
+              <TableCell className="w-32 whitespace-nowrap text-xs text-gray-500">
                 {formatDate(zombie.date_listed)}
-              </td>
-              <td className="w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              </TableCell>
+              <TableCell className="w-24 whitespace-nowrap text-sm text-gray-600">
                 {zombie.watch_count || 0}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
             ))
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       {/* Pagination Footer */}
       {filteredZombies.length > 0 && (
@@ -263,32 +247,30 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                 }
                 
                 return (
-                  <button
+                  <Button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-black transition-colors ${
-                      currentPage === pageNum
-                        ? 'bg-black text-white hover:bg-gray-800'
-                        : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-50'
-                    }`}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 )
               })}
             </div>
 
-            <button
+            <Button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              variant="outline"
+              size="sm"
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 
