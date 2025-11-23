@@ -1,9 +1,28 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import StoreSwitcher from './StoreSwitcher'
+import StoreSwitcher, { getConnectedStoreCount } from './StoreSwitcher'
 
 function Navbar({ currentStore, onStoreChange }) {
   const [currentPlan] = useState("PRO") // Default: PRO for demo
+  const connectedStoreCount = getConnectedStoreCount()
+
+  // Get max store limit based on plan
+  const getMaxStoreLimit = (plan) => {
+    switch (plan) {
+      case "Starter":
+        return 1
+      case "PRO":
+        return 10
+      case "MASTER":
+        return 25
+      case "Enterprise":
+        return Infinity
+      default:
+        return 10
+    }
+  }
+
+  const maxStoreLimit = getMaxStoreLimit(currentPlan)
 
   const getPlanStyles = (plan) => {
     switch (plan) {
@@ -17,6 +36,14 @@ function Navbar({ currentStore, onStoreChange }) {
       default:
         return "bg-gray-100 text-gray-600 border-gray-200"
     }
+  }
+
+  // Format store utilization text
+  const formatStoreUtilization = () => {
+    if (maxStoreLimit === Infinity) {
+      return `💎 ${currentPlan}: ${connectedStoreCount} / ∞ Stores`
+    }
+    return `💎 ${currentPlan}: ${connectedStoreCount} / ${maxStoreLimit} Stores`
   }
 
   return (
@@ -40,9 +67,9 @@ function Navbar({ currentStore, onStoreChange }) {
               <StoreSwitcher currentStore={currentStore} onStoreChange={onStoreChange} />
             )}
 
-            {/* Plan Badge */}
-            <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
-              PLAN: {currentPlan}
+            {/* Plan Badge with Store Utilization */}
+            <div className={`px-3 py-1 rounded-full text-xs font-bold ${getPlanStyles(currentPlan)}`}>
+              {formatStoreUtilization()}
             </div>
 
             {/* Status Badge */}

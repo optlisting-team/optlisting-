@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
 
-const MY_STORES = [
+export const MY_STORES = [
   { id: 'all', name: '🌍 All Stores', platform: 'Global', color: 'bg-gray-100 text-gray-800' },
   { id: 'store_ebay_1', name: 'eBay Main Store', platform: 'eBay', color: 'bg-purple-100 text-purple-700' },
   { id: 'store_amazon_1', name: 'Amazon US', platform: 'Amazon', color: 'bg-yellow-100 text-yellow-800' },
   { id: 'store_coupang_1', name: 'Coupang KR', platform: 'Coupang', color: 'bg-red-100 text-red-700' }
 ]
+
+// Get connected stores count (excluding 'all')
+export const getConnectedStoreCount = () => {
+  return MY_STORES.filter(store => store.id !== 'all').length
+}
 
 function StoreSwitcher({ currentStore, onStoreChange }) {
   const [isOpen, setIsOpen] = useState(false)
