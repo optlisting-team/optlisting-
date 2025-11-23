@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import StoreSwitcher from './StoreSwitcher'
 
-function Navbar() {
+function Navbar({ currentStore, onStoreChange }) {
   const [currentPlan] = useState("PRO") // Default: PRO for demo
 
   const getPlanStyles = (plan) => {
@@ -34,6 +35,11 @@ function Navbar() {
 
           {/* Right: Status & User Menu */}
           <div className="flex items-center gap-4">
+            {/* Store Switcher */}
+            {currentStore && onStoreChange && (
+              <StoreSwitcher currentStore={currentStore} onStoreChange={onStoreChange} />
+            )}
+
             {/* Plan Badge */}
             <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
               PLAN: {currentPlan}

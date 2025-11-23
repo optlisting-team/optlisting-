@@ -10,7 +10,7 @@ import QueueReviewPanel from './QueueReviewPanel'
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
 
-function Dashboard() {
+function Dashboard({ selectedStore }) {
   const [zombies, setZombies] = useState([])
   const [allListings, setAllListings] = useState([]) // All listings for 'all' view mode
   const [totalZombies, setTotalZombies] = useState(0)
@@ -38,6 +38,7 @@ function Dashboard() {
       const response = await axios.get(`${API_BASE_URL}/api/analyze`, {
         params: {
           user_id: CURRENT_USER_ID,
+          store_id: selectedStore.id,
           marketplace: filterParams.marketplace_filter || 'All',
           min_days: filterParams.min_days,
           max_sales: filterParams.max_sales,
@@ -74,6 +75,7 @@ function Dashboard() {
         const listingsResponse = await axios.get(`${API_BASE_URL}/api/listings`, {
           params: {
             user_id: CURRENT_USER_ID,
+            store_id: selectedStore?.id,
             skip: 0,
             limit: 10000 // Get all listings
           }
@@ -242,6 +244,14 @@ function Dashboard() {
       // Optionally: revert the change in UI if backend update fails
     }
   }
+
+  // Fetch data when store changes
+  useEffect(() => {
+    if (selectedStore) {
+      fetchZombies()
+      fetchAllListings()
+    }
+  }, [selectedStore])
 
   useEffect(() => {
     // Default to 'all' view on initial load
