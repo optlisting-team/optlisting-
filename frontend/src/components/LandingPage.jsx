@@ -58,11 +58,8 @@ function LandingPage() {
             className="text-center mb-12"
           >
             <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-4 leading-tight text-slate-900">
-              The Ultimate 'Zero Sale' Cleaner.
+              'Zero Sale' Cleaner.
             </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-slate-500 mb-6 max-w-3xl mx-auto">
-              Save hours of manual work. Focus 100% on finding your next winner.
-            </h2>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Automated cleanup for your eBay inventory. We remove the non-performers so you can focus 100% of your energy on sourcing the next big winner.
             </p>
