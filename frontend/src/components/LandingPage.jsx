@@ -357,7 +357,7 @@ function LandingPage() {
             >
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-6 font-sans">Starter</h3>
               <div className="mb-8">
-                <span className="text-5xl font-extrabold text-slate-900 font-sans">$29</span>
+                <span className="text-5xl font-extrabold text-slate-900 font-sans">$12.9</span>
                 <span className="text-slate-500 text-lg ml-1">/mo</span>
               </div>
               <ul className="space-y-4 mb-8">
@@ -365,7 +365,13 @@ function LandingPage() {
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">Up to 3k listings</span>
+                  <span className="text-slate-600 font-sans">1 Store</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
+                    <CheckCircle className="h-5 w-5" />
+                  </div>
+                  <span className="text-slate-600 font-sans">Up to 2,000 listings</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
@@ -377,7 +383,7 @@ function LandingPage() {
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">CSV export</span>
+                  <span className="text-slate-600 font-sans">Daily CSV export</span>
                 </li>
               </ul>
               <a
@@ -404,7 +410,7 @@ function LandingPage() {
               </div>
               <h3 className="text-sm font-bold uppercase tracking-wider text-blue-600 mb-6 font-sans">Pro</h3>
               <div className="mb-8">
-                <span className="text-5xl font-extrabold text-slate-900 font-sans">$49</span>
+                <span className="text-5xl font-extrabold text-slate-900 font-sans">$24.9</span>
                 <span className="text-slate-500 text-lg ml-1">/mo</span>
               </div>
               <ul className="space-y-4 mb-8">
@@ -412,25 +418,31 @@ function LandingPage() {
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">Up to 10k listings</span>
+                  <span className="text-slate-600 font-sans">2 Stores</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">Smart detection</span>
+                  <span className="text-slate-600 font-sans">Up to 7,500 listings</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">Smart Export</span>
+                  <span className="text-slate-600 font-sans">Advanced detection</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">Priority support</span>
+                  <span className="text-slate-600 font-sans">Unlimited CSV export</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
+                    <CheckCircle className="h-5 w-5" />
+                  </div>
+                  <span className="text-slate-600 font-sans">Fast scan speed</span>
                 </li>
               </ul>
               <a
@@ -448,7 +460,7 @@ function LandingPage() {
             >
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-6 font-sans">Enterprise</h3>
               <div className="mb-8">
-                <span className="text-5xl font-extrabold text-slate-900 font-sans">$99</span>
+                <span className="text-5xl font-extrabold text-slate-900 font-sans">From $99</span>
                 <span className="text-slate-500 text-lg ml-1">/mo</span>
               </div>
               <ul className="space-y-4 mb-8">
@@ -456,19 +468,25 @@ function LandingPage() {
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">Unlimited listings</span>
+                  <span className="text-slate-600 font-sans">10+ Stores</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">Advanced analytics</span>
+                  <span className="text-slate-600 font-sans">Up to 50,000 listings</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
                     <CheckCircle className="h-5 w-5" />
                   </div>
-                  <span className="text-slate-600 font-sans">API access</span>
+                  <span className="text-slate-600 font-sans">5 team seats</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
+                    <CheckCircle className="h-5 w-5" />
+                  </div>
+                  <span className="text-slate-600 font-sans">Priority scan speed</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="bg-green-100 text-green-600 rounded-full p-1 flex-shrink-0">
