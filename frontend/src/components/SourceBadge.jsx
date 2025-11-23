@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 
+// Pro Dropshipping Aggregators Only - High-Volume Sellers using Automation Tools
 const AVAILABLE_SOURCES = [
   'Amazon',
   'Walmart',
@@ -8,8 +9,7 @@ const AVAILABLE_SOURCES = [
   'DSers',
   'Spocket',
   'CJ Dropshipping',
-  'Unverified',
-  'Unknown'
+  'Unverified'  // Edge case only - supplier detection failed, still automation tool compatible
 ]
 
 function SourceBadge({ source, editable = false, onSourceChange = null, itemId = null }) {

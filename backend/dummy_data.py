@@ -77,7 +77,7 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
                 # Latin America & Others
                 marketplace = random.choice(["Mercado Libre", "Wildberries", "Flipkart", "Ozon"])
             
-            # Determine source (Pro Dropshipping Aggregators - High-Volume Sellers)
+            # Determine source (Pro Dropshipping Aggregators - High-Volume Sellers Only)
             # Weighted distribution targeting automation tools users:
             # Amazon: 25% (Most common entry point)
             # DSers: 25% (AliExpress automation standard)
@@ -86,7 +86,7 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
             # Spocket: 6% (US/EU high quality)
             # CJ Dropshipping: 6% (China fulfillment)
             # Walmart: 5% (Still high volume)
-            # Unverified: 3% (Requires manual verification)
+            # Unverified: 3% (Edge case - supplier detection failed, still automation tool compatible)
             source_rand = random.random()
             brand = None
             upc = None

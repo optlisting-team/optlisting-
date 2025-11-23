@@ -498,22 +498,27 @@ def generate_export_csv(
     target_tool: str
 ) -> str:
     """
-    Advanced CSV Export with Tool-Specific Formats
+    CSV Export for Dropshipping Automation Tools Only
     
-    Supports multiple export formats:
-    1. AutoDS: Headers: "Source ID", "File Action" | Data: source_id, "delete"
+    MVP Focus: High-Volume Dropshippers using automation tools.
+    All exports are tool-specific formats - no generic/fallback formats.
+    
+    Supported export formats:
+    1. AutoDS: Headers: "Source ID", "File Action" | Data: supplier_id, "delete"
     2. Wholesale2B: Headers: "SKU", "Action" | Data: sku, "Delete"
     3. Shopify (Matrixify/Excelify): Headers: "ID", "Command" | Data: item_id, "DELETE"
     4. Shopify (Tagging Method): Headers: "Handle", "Tags" | Data: handle/sku, "OptListing_Delete"
     5. eBay File Exchange: Headers: "Action", "ItemID" | Data: "End", item_id
-    6. Yaballe: Headers: "Monitor ID", "Action" | Data: source_id, "DELETE"
+    6. Yaballe: Headers: "Monitor ID", "Action" | Data: supplier_id, "DELETE"
     
     Args:
-        listings: List of Listing objects or dictionaries
+        listings: List of Listing objects or dictionaries (from Pro Dropshipping Aggregators)
         target_tool: Tool name (e.g., "autods", "wholesale2b", "shopify_matrixify", "shopify_tagging", "ebay", "yaballe")
     
     Returns:
-        CSV string
+        CSV string in tool-specific format
+    
+    Note: Assumes 100% of items are from supported Dropshipping Tools (no manual/direct listings).
     """
     if not listings:
         return ""
@@ -551,7 +556,7 @@ def generate_export_csv(
                     raw_data = {}
             handle = raw_data.get("handle") if raw_data else sku
         
-        # Use supplier_id if available, otherwise fallback to SKU
+        # Use supplier_id if available, otherwise use SKU (both work with automation tools)
         effective_supplier_id = supplier_id if supplier_id else sku
         
         if target_tool == "autods":
