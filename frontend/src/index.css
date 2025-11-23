@@ -11,3 +11,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Custom radial gradient utility */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+

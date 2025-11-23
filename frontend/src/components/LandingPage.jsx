@@ -38,18 +38,29 @@ function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto max-w-6xl">
+      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+        {/* Background Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        
+        {/* Radial Gradient Glow - Spotlight Effect */}
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-3xl pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(147, 51, 234, 0.1) 30%, transparent 70%)'
+          }}
+        ></div>
+        
+        <div className="container mx-auto max-w-6xl relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600">
               Bulk Delete 'Zero Sale' Items.
             </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6 max-w-3xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-semibold text-slate-500 mb-6 max-w-3xl mx-auto">
               Save hours of manual work. Focus 100% on finding your next winner.
             </h2>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -59,9 +70,9 @@ function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <motion.a
                   href="/dashboard"
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 animate-pulse"
+                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-lg shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all flex items-center gap-2 transform hover:-translate-y-1"
                 >
                   Start Cleaning for Free
                   <ArrowRight className="h-5 w-5" />
@@ -83,19 +94,21 @@ function LandingPage() {
             </div>
           </motion.div>
 
-          {/* Dashboard Screenshot Placeholder */}
+          {/* Dashboard Screenshot Placeholder - 3D Effect */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="mt-16"
+            className="mt-16 perspective-1000"
           >
-            <div className="bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-8 shadow-2xl transform rotate-x-3">
-              <div className="bg-white rounded-lg p-12 border border-gray-200 min-h-[400px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">📊</div>
-                  <p className="text-gray-500 text-lg">Dashboard Screenshot</p>
-                  <p className="text-gray-400 text-sm mt-2">(Image will be added here)</p>
+            <div className="relative transform-gpu" style={{ transform: 'perspective(1000px) rotateX(12deg)' }}>
+              <div className="bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-8 border-8 border-slate-200/50 shadow-2xl shadow-indigo-500/20">
+                <div className="bg-white rounded-lg p-12 border border-gray-200 min-h-[400px] flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">📊</div>
+                    <p className="text-gray-500 text-lg">Dashboard Screenshot</p>
+                    <p className="text-gray-400 text-sm mt-2">(Image will be added here)</p>
+                  </div>
                 </div>
               </div>
             </div>
