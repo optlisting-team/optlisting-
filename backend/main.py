@@ -367,8 +367,8 @@ def export_csv(
     if not zombies:
         raise HTTPException(status_code=404, detail="No zombie listings found")
     
-    # Generate CSV
-    csv_content = generate_export_csv(zombies, export_mode)
+    # Generate CSV (with snapshot logging)
+    csv_content = generate_export_csv(zombies, export_mode, db=db, user_id="default-user")
     
     # Determine filename
     filename_map = {
@@ -416,8 +416,8 @@ def export_queue_csv(
     if not items:
         raise HTTPException(status_code=400, detail="No items in queue to export")
     
-    # Generate CSV directly from items (dictionaries) with target_tool
-    csv_content = generate_export_csv(items, target_tool)
+    # Generate CSV directly from items (dictionaries) with target_tool (with snapshot logging)
+    csv_content = generate_export_csv(items, target_tool, db=db, user_id="default-user")
     
     # Determine filename
     filename_map = {

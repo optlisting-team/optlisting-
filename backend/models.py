@@ -70,6 +70,7 @@ class DeletionLog(Base):
     platform = Column(String, nullable=True)  # marketplace: "eBay", "Amazon", "Shopify", "Walmart"
     supplier = Column(String, nullable=False)  # "Amazon", "Walmart", etc.
     deleted_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    snapshot = Column(JSONB, nullable=True, default={})  # Snapshot of item data at deletion time for analytics
 
     def __repr__(self):
         return f"<DeletionLog(item_id={self.item_id}, title={self.title}, deleted_at={self.deleted_at})>"

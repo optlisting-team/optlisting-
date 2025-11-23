@@ -76,23 +76,23 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
   }
 
   return (
-    <div className="w-full border border-gray-200 rounded-lg overflow-hidden">
+    <div className="w-full border border-slate-200 rounded-lg overflow-hidden bg-white">
       {/* Search Bar & Rows Selector */}
-      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+      <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
         {/* Left: Rows per page selector */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-700">Show</span>
+          <span className="text-sm text-slate-700">Show</span>
           <select
             value={rowsPerPage}
             onChange={(e) => handleRowsPerPageChange(Number(e.target.value))}
-            className="border border-gray-300 rounded-md px-2 py-1 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className="border-0 ring-1 ring-slate-200 rounded-md px-2 py-1 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
           </select>
-          <span className="text-sm text-gray-700">items</span>
+          <span className="text-sm text-slate-700">items</span>
         </div>
 
         {/* Right: Search Bar */}
@@ -105,15 +105,15 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
             placeholder="Search in results..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-10 pr-3 py-2 border-0 ring-1 ring-slate-200 rounded-md leading-5 bg-slate-50 placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm"
           />
         </div>
       </div>
 
       <table className="table-fixed w-full">
-        <thead className="bg-slate-50 border-b border-slate-200">
+        <thead className="bg-slate-50/50 border-b border-slate-200">
           <tr>
-            <th className="w-10 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-10 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               <input
                 type="checkbox"
                 checked={allVisibleSelected}
@@ -125,28 +125,28 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                 title="Select all items on this page"
               />
             </th>
-            <th className="w-24 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-24 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               Platform
             </th>
-            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               Item ID
             </th>
-            <th className="px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               Title
             </th>
-            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               Supplier
             </th>
-            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               SKU
             </th>
-            <th className="w-24 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-24 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               Price
             </th>
-            <th className="w-32 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-32 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               Date Listed
             </th>
-            <th className="w-24 px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th className="w-24 px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
               Watch Count
             </th>
           </tr>
@@ -176,7 +176,7 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                   type="checkbox"
                   checked={selectedIds.includes(zombie.id)}
                   onChange={(e) => onSelect(zombie.id, e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
               </td>
               <td className="w-24 px-4 py-4 whitespace-nowrap">
@@ -191,13 +191,13 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                   </span>
                 </div>
               </td>
-              <td className="w-32 px-4 py-5 whitespace-nowrap text-sm font-mono text-gray-900 truncate" title={zombie.ebay_item_id || zombie.item_id}>
+              <td className="w-32 px-4 py-4 whitespace-nowrap text-sm font-mono text-slate-900 truncate" title={zombie.ebay_item_id || zombie.item_id}>
                 {zombie.ebay_item_id || zombie.item_id}
               </td>
-              <td className="px-4 py-5 text-sm font-semibold text-gray-900 truncate max-w-0" title={zombie.title}>
+              <td className="px-4 py-4 text-sm font-semibold text-slate-900 truncate max-w-0" title={zombie.title}>
                 {zombie.title}
               </td>
-              <td className="w-32 px-4 py-5 whitespace-nowrap">
+              <td className="w-32 px-4 py-4 whitespace-nowrap">
                 <SourceBadge 
                   source={zombie.supplier || zombie.supplier_name || zombie.source || zombie.source_name} 
                   editable={!!onSourceChange}
@@ -205,16 +205,16 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                   itemId={zombie.id}
                 />
               </td>
-              <td className="w-32 px-4 py-5 whitespace-nowrap text-sm text-gray-500 truncate" title={zombie.sku}>
+              <td className="w-32 px-4 py-4 whitespace-nowrap text-sm text-slate-500 truncate" title={zombie.sku}>
                 {zombie.sku}
               </td>
-              <td className="w-24 px-4 py-5 whitespace-nowrap text-sm text-gray-900">
+              <td className="w-24 px-4 py-4 whitespace-nowrap text-sm text-slate-900">
                 {zombie.price ? formatPrice(zombie.price) : 'N/A'}
               </td>
-              <td className="w-32 px-4 py-5 whitespace-nowrap text-sm text-gray-500">
+              <td className="w-32 px-4 py-4 whitespace-nowrap text-sm text-slate-500">
                 {formatDate(zombie.date_listed)}
               </td>
-              <td className="w-24 px-4 py-5 whitespace-nowrap text-sm text-gray-500">
+              <td className="w-24 px-4 py-4 whitespace-nowrap text-sm text-slate-500">
                 {zombie.watch_count || 0}
               </td>
             </tr>

@@ -3,7 +3,7 @@ from typing import List, Optional, Dict, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, cast, Integer, String, Date
 from sqlalchemy.dialects.postgresql import insert
-from backend.models import Listing
+from backend.models import Listing, DeletionLog
 import pandas as pd
 from io import StringIO
 import re
@@ -505,7 +505,9 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
 
 def generate_export_csv(
     listings,
-    target_tool: str
+    target_tool: str,
+    db: Optional[Session] = None,
+    user_id: str = "default-user"
 ) -> str:
     """
     CSV Export for Dropshipping Automation Tools Only
@@ -524,6 +526,8 @@ def generate_export_csv(
     Args:
         listings: List of Listing objects or dictionaries (from Pro Dropshipping Aggregators)
         target_tool: Tool name (e.g., "autods", "wholesale2b", "shopify_matrixify", "shopify_tagging", "ebay", "yaballe")
+        db: Optional database session for logging deletions with snapshots
+        user_id: User ID for deletion logging
     
     Returns:
         CSV string in tool-specific format
@@ -532,6 +536,56 @@ def generate_export_csv(
     """
     if not listings:
         return ""
+    
+    # Log deletions with snapshots BEFORE generating CSV (if DB session provided)
+    if db:
+        deletion_logs = []
+        for listing in listings:
+            # Extract data for snapshot
+            if isinstance(listing, dict):
+                item_id = listing.get("item_id") or listing.get("ebay_item_id", "")
+                title = listing.get("title", "Unknown")
+                platform = listing.get("platform") or listing.get("marketplace", "eBay")
+                supplier = listing.get("supplier") or listing.get("supplier_name") or listing.get("source", "Unknown")
+                price = listing.get("price") or (listing.get("metrics", {}).get("price") if isinstance(listing.get("metrics"), dict) else None)
+                views = listing.get("watch_count") or listing.get("views") or (listing.get("metrics", {}).get("views") if isinstance(listing.get("metrics"), dict) else None)
+                sales = listing.get("sold_qty") or listing.get("sales") or (listing.get("metrics", {}).get("sales") if isinstance(listing.get("metrics"), dict) else None)
+                metrics = listing.get("metrics", {}) if isinstance(listing.get("metrics"), dict) else {}
+            else:
+                item_id = listing.item_id if hasattr(listing, 'item_id') else (listing.ebay_item_id if hasattr(listing, 'ebay_item_id') else "")
+                title = listing.title if hasattr(listing, 'title') else "Unknown"
+                platform = listing.platform if hasattr(listing, 'platform') else (listing.marketplace if hasattr(listing, 'marketplace') else "eBay")
+                supplier = listing.supplier_name if hasattr(listing, 'supplier_name') else (listing.source_name if hasattr(listing, 'source_name') else (listing.source if hasattr(listing, 'source') else "Unknown"))
+                price = getattr(listing, 'price', None) or (listing.metrics.get('price') if listing.metrics and isinstance(listing.metrics, dict) else None)
+                views = getattr(listing, 'watch_count', None) or (listing.metrics.get('views') if listing.metrics and isinstance(listing.metrics, dict) else None)
+                sales = getattr(listing, 'sold_qty', None) or (listing.metrics.get('sales') if listing.metrics and isinstance(listing.metrics, dict) else None)
+                metrics = listing.metrics if listing.metrics and isinstance(listing.metrics, dict) else {}
+            
+            # Create snapshot with current item state
+            snapshot = {
+                "price": price,
+                "views": views,
+                "sales": sales,
+                "title": title,
+                "supplier": supplier,
+                "platform": platform,
+                "metrics": metrics
+            }
+            
+            # Create DeletionLog entry with snapshot
+            log_entry = DeletionLog(
+                item_id=item_id,
+                title=title,
+                platform=platform,
+                supplier=supplier,
+                snapshot=snapshot
+            )
+            deletion_logs.append(log_entry)
+        
+        # Bulk insert deletion logs
+        if deletion_logs:
+            db.add_all(deletion_logs)
+            db.commit()
     
     data = []
     
