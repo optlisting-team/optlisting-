@@ -230,9 +230,9 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
 
       {/* Pagination Footer */}
       {filteredZombies.length > 0 && (
-        <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+        <div className="bg-white px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           {/* Left: Page info (moved from center) */}
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-gray-600">
             Showing {startIndex + 1} to {Math.min(endIndex, filteredZombies.length)} of {filteredZombies.length} listings
             {searchQuery && ` (filtered from ${zombies.length} total)`}
           </div>
