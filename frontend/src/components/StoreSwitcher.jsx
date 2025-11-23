@@ -76,10 +76,10 @@ function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
                 className={`w-full px-4 py-3 text-left transition-colors flex items-center justify-between ${
                   isInSidebar
                     ? currentStoreData.id === store.id
-                      ? 'bg-blue-600/20 text-white'
-                      : 'hover:bg-slate-700/50 text-slate-200'
+                      ? 'bg-gray-800 text-white'
+                      : 'hover:bg-gray-800 text-gray-300'
                     : currentStoreData.id === store.id
-                      ? 'bg-blue-50'
+                      ? 'bg-gray-50'
                       : 'hover:bg-gray-50'
                 }`}
               >
@@ -87,10 +87,10 @@ function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
                   <div className={`px-2 py-1 rounded text-xs font-bold ${store.color}`}>
                     {store.platform}
                   </div>
-                  <span className={`text-sm font-medium ${isInSidebar ? 'text-slate-200' : 'text-gray-700'}`}>{store.name}</span>
+                  <span className={`text-sm font-medium ${isInSidebar ? 'text-gray-300' : 'text-gray-700'}`}>{store.name}</span>
                 </div>
                 {currentStoreData.id === store.id && (
-                  <svg className={`w-4 h-4 ${isInSidebar ? 'text-blue-400' : 'text-blue-600'}`} fill="currentColor" viewBox="0 0 20 20">
+                  <svg className={`w-4 h-4 ${isInSidebar ? 'text-white' : 'text-gray-900'}`} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}
