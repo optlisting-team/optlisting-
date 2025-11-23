@@ -67,10 +67,13 @@ function Navbar({ currentStore, onStoreChange }) {
               <StoreSwitcher currentStore={currentStore} onStoreChange={onStoreChange} />
             )}
 
-            {/* Plan Badge with Store Utilization */}
-            <div className={`px-3 py-1 rounded-full text-xs font-bold ${getPlanStyles(currentPlan)}`}>
+            {/* Plan Badge with Store Utilization - Clickable */}
+            <Link 
+              to="/billing" 
+              className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getPlanStyles(currentPlan)}`}
+            >
               {formatStoreUtilization()}
-            </div>
+            </Link>
 
             {/* Status Badge */}
             <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full">
