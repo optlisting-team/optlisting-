@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import SourceBadge from './SourceBadge'
 import PlatformBadge from './PlatformBadge'
 import axios from 'axios'
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from './ui/table'
+import { Button } from './ui/button'
+import { Card } from './ui/card'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -243,13 +246,13 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
 
   if (queue.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
+      <Card className="p-8 text-center">
         <div className="text-4xl mb-4">🗑️</div>
-        <p className="text-lg font-semibold text-gray-700 mb-2">No Items in Queue</p>
-        <p className="text-sm text-gray-500">
+        <p className="text-lg font-semibold mb-2">No Items in Queue</p>
+        <p className="text-sm text-muted-foreground">
           Add items from the low interest items list to review them here.
         </p>
-      </div>
+      </Card>
     )
   }
 
@@ -259,9 +262,9 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
         const colors = getSourceColor(source)
         
         return (
-          <div
+          <Card
             key={source}
-            className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col"
+            className="rounded-xl shadow-lg overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className={`${colors.headerBg} ${colors.headerText} px-6 py-4 flex-shrink-0`}>
@@ -290,71 +293,73 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
             </div>
 
             {/* Table Area (Scrollable Body) */}
-            <div className="flex-1 overflow-x-auto overflow-y-auto max-h-96 bg-white">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50 sticky top-0 z-10">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div className="flex-1 overflow-x-auto overflow-y-auto max-h-96">
+              <Table>
+                <TableHeader className="sticky top-0 z-10 bg-muted/50">
+                  <TableRow>
+                    <TableHead className="text-xs font-medium uppercase tracking-wider">
                       Platform
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead className="text-xs font-medium uppercase tracking-wider">
                       Item ID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-xs">
+                    </TableHead>
+                    <TableHead className="text-xs font-medium uppercase tracking-wider max-w-xs">
                       Title
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead className="text-xs font-medium uppercase tracking-wider">
                       Supplier
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead className="text-xs font-medium uppercase tracking-wider">
                       SKU
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead className="text-xs font-medium uppercase tracking-wider">
                       Price
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead className="text-xs font-medium uppercase tracking-wider">
                       Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {items.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap">
+                    <TableRow key={item.id}>
+                      <TableCell className="whitespace-nowrap">
                         <PlatformBadge marketplace={item.platform || item.marketplace || 'eBay'} />
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm font-mono">
                         {item.item_id || item.ebay_item_id}
-                      </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-gray-900 max-w-xs truncate" title={item.title}>
+                      </TableCell>
+                      <TableCell className="text-sm font-semibold max-w-xs truncate" title={item.title}>
                         {item.title}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
                         <SourceBadge 
                           source={item.supplier_name || item.supplier || item.source_name || item.source} 
                           editable={!!onSourceChange}
                           onSourceChange={onSourceChange}
                           itemId={item.id}
                         />
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                         {item.sku}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">
                         {formatPrice(item.price)}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm">
-                        <button
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">
+                        <Button
                           onClick={() => onRemove(item.id)}
-                          className="text-red-600 hover:text-red-800 font-medium text-xs"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive font-medium"
                         >
                           Remove
-                        </button>
-                      </td>
-                    </tr>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
 
             {/* Footer (Download Button) */}
@@ -374,13 +379,14 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                       </div>
                     </div>
                   </div>
-                  <button
+                  <Button
                     disabled
-                    className="w-full bg-gray-400 text-gray-600 font-bold py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full font-bold"
+                    variant="secondary"
                   >
                     <span>🔒</span>
                     <span>Download Disabled - Verify Suppliers First</span>
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -409,9 +415,9 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                   </div>
                   
                   {/* Download Button */}
-                  <button
+                  <Button
                     onClick={() => handleSourceExport(source, items, getToolForSource(source))}
-                    className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md`}
+                    className={`w-full font-bold ${colors.buttonBg} ${colors.buttonHover} text-white`}
                   >
                     <span>📥</span>
                     <span>
@@ -420,11 +426,11 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                         : `Download CSV for [${TOOL_DISPLAY_NAMES[getToolForSource(source)] || 'Tool'}] (${items.length} items)`
                       }
                     </span>
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
-          </div>
+          </Card>
         )
       })}
     </div>

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getConnectedStoreCount } from './StoreSwitcher'
+import { Button } from './ui/button'
+import { Card } from './ui/card'
 
 function Billing() {
   const [currentPlan] = useState("PRO") // Default: PRO for demo
@@ -71,7 +73,7 @@ function Billing() {
       </div>
 
       {/* Current Plan Card */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+      <Card className="p-8 mb-8">
         <h2 className="text-2xl font-bold text-slate-800 mb-6">Current Plan</h2>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -88,21 +90,21 @@ function Billing() {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Customer Portal Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+      <Card className="p-8">
         <h2 className="text-2xl font-bold text-slate-800 mb-4">Customer Portal</h2>
         <p className="text-slate-600 mb-6">
           Access your customer portal to manage subscriptions, update payment methods, view invoices, and more.
         </p>
-        <button
+        <Button
           onClick={handleOpenPortal}
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg hover:shadow-xl"
         >
           Open Customer Portal
-        </button>
-      </div>
+        </Button>
+      </Card>
     </div>
   )
 }

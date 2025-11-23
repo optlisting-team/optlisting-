@@ -224,13 +224,14 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
 
           {/* Right: Navigation buttons */}
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              variant="outline"
+              size="sm"
             >
               Previous
-            </button>
+            </Button>
             
             {/* Page numbers */}
             <div className="flex items-center gap-1">

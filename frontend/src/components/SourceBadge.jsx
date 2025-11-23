@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { Button } from './ui/button'
 
 // Pro Dropshipping Aggregators Only - High-Volume Sellers using Automation Tools
 const AVAILABLE_SOURCES = [
@@ -107,18 +108,20 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
-      <button
+      <Button
         type="button"
         onClick={handleToggle}
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getBadgeColor(
+        variant="ghost"
+        size="sm"
+        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium h-auto ${getBadgeColor(
           currentSource
-        )} hover:opacity-80 transition-opacity cursor-pointer`}
+        )} hover:opacity-80 transition-opacity`}
         title={currentSource === 'Unverified' ? '⚠️ Source needs verification - Click to identify' : 'Click to change source'}
       >
         {currentSource === 'Unverified' && <span className="text-xs">⚠️</span>}
         <span>{currentSource === 'Unverified' ? 'Unverified' : currentSource}</span>
         <span className="text-[10px] opacity-70">✏️</span>
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="absolute top-full left-0 mt-2 w-64 bg-white shadow-xl rounded-lg border border-gray-200 z-50">
@@ -143,23 +146,24 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
               </div>
             ) : (
               filteredSources.map((src) => (
-                <button
+                <Button
                   key={src}
                   type="button"
                   onClick={() => handleSourceSelect(src)}
-                  className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-between ${
-                    src === currentSource ? 'bg-blue-50' : ''
+                  variant="ghost"
+                  className={`w-full justify-start px-4 py-2.5 ${
+                    src === currentSource ? 'bg-accent' : ''
                   }`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-1">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getBadgeColor(src)}`}>
                       {src}
                     </span>
                   </div>
                   {src === currentSource && (
-                    <span className="text-blue-600 font-semibold">✓</span>
+                    <span className="text-primary font-semibold">✓</span>
                   )}
-                </button>
+                </Button>
               ))
             )}
           </div>

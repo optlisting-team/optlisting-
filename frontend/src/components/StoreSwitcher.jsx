@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { Button } from './ui/button'
 
 export const MY_STORES = [
   { id: 'all', name: '🌍 All Stores', platform: 'Global', color: 'bg-gray-100 text-gray-800' },
@@ -46,8 +47,9 @@ function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
   return (
     <div className="relative w-full" ref={dropdownRef}>
       {/* Current Store Button */}
-      <button
+      <Button
         onClick={() => setIsOpen(!isOpen)}
+        variant={isInSidebar ? "secondary" : "outline"}
         className={sidebarButtonClass}
       >
         <span className="font-bold">{currentStoreData.platform}</span>
@@ -60,7 +62,7 @@ function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
-      </button>
+      </Button>
 
       {/* Dropdown Menu */}
       {isOpen && (
@@ -70,31 +72,32 @@ function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
           </div>
           <div className="max-h-64 overflow-y-auto">
             {MY_STORES.map((store) => (
-              <button
+              <Button
                 key={store.id}
                 onClick={() => handleStoreSelect(store)}
-                className={`w-full px-4 py-3 text-left transition-colors flex items-center justify-between ${
+                variant="ghost"
+                className={`w-full justify-start px-4 py-3 ${
                   isInSidebar
                     ? currentStoreData.id === store.id
                       ? 'bg-gray-800 text-white'
                       : 'hover:bg-gray-800 text-gray-300'
                     : currentStoreData.id === store.id
-                      ? 'bg-gray-50'
-                      : 'hover:bg-gray-50'
+                      ? 'bg-accent'
+                      : ''
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1">
                   <div className={`px-2 py-1 rounded text-xs font-bold ${store.color}`}>
                     {store.platform}
                   </div>
-                  <span className={`text-sm font-medium ${isInSidebar ? 'text-gray-300' : 'text-gray-700'}`}>{store.name}</span>
+                  <span className={`text-sm font-medium ${isInSidebar ? 'text-gray-300' : ''}`}>{store.name}</span>
                 </div>
                 {currentStoreData.id === store.id && (
-                  <svg className={`w-4 h-4 ${isInSidebar ? 'text-white' : 'text-gray-900'}`} fill="currentColor" viewBox="0 0 20 20">
+                  <svg className={`w-4 h-4 ${isInSidebar ? 'text-white' : 'text-primary'}`} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

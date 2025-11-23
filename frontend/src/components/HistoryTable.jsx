@@ -1,6 +1,8 @@
 import React from 'react'
 import SourceBadge from './SourceBadge'
 import PlatformBadge from './PlatformBadge'
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from './ui/table'
+import { Card } from './ui/card'
 
 function HistoryTable({ logs, loading }) {
   const formatDateTime = (dateString) => {
@@ -36,50 +38,50 @@ function HistoryTable({ logs, loading }) {
   }
 
   return (
-    <div className="w-full border border-gray-200 rounded-lg overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    <Card className="w-full overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-xs font-medium uppercase tracking-wider">
               Deleted On
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            </TableHead>
+            <TableHead className="text-xs font-medium uppercase tracking-wider">
               Platform
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            </TableHead>
+            <TableHead className="text-xs font-medium uppercase tracking-wider">
               Item ID
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-xs">
+            </TableHead>
+            <TableHead className="text-xs font-medium uppercase tracking-wider max-w-xs">
               Title
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            </TableHead>
+            <TableHead className="text-xs font-medium uppercase tracking-wider">
               Supplier
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {logs.map((log) => (
-            <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
+            <TableRow key={log.id}>
+              <TableCell className="whitespace-nowrap text-sm">
                 {formatDateTime(log.deleted_at)}
-              </td>
-              <td className="px-6 py-5 whitespace-nowrap">
+              </TableCell>
+              <TableCell className="whitespace-nowrap">
                 <PlatformBadge marketplace={log.platform || 'eBay'} />
-              </td>
-              <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-gray-900">
+              </TableCell>
+              <TableCell className="whitespace-nowrap text-sm font-mono">
                 {log.item_id}
-              </td>
-              <td className="px-6 py-5 text-sm font-semibold text-gray-900 max-w-xs truncate" title={log.title}>
+              </TableCell>
+              <TableCell className="text-sm font-semibold max-w-xs truncate" title={log.title}>
                 {log.title}
-              </td>
-              <td className="px-6 py-5 whitespace-nowrap">
+              </TableCell>
+              <TableCell className="whitespace-nowrap">
                 <SourceBadge source={log.source} />
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </Card>
   )
 }
 

@@ -7,6 +7,7 @@ import FilterBar from './FilterBar'
 import DeleteQueue from './DeleteQueue'
 import HistoryTable from './HistoryTable'
 import QueueReviewPanel from './QueueReviewPanel'
+import { Button } from './ui/button'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
@@ -436,10 +437,10 @@ function Dashboard() {
                   </div>
 
                   {/* Right Side: Action Button */}
-                  <button
+                  <Button
                     onClick={handleAddToQueue}
                     disabled={selectedIds.length === 0}
-                    className="px-6 py-2.5 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:bg-gray-400"
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold"
                   >
                     <span>Add Selected to Queue</span>
                     <span className="text-lg">➡️</span>
@@ -448,7 +449,7 @@ function Dashboard() {
                         {selectedIds.length}
                       </span>
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
