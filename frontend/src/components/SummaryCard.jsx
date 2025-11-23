@@ -32,31 +32,32 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
                 </div>
               </div>
             </div>
-          {/* Platform Breakdown */}
-          {!loading && totalListings > 0 && platformBreakdown && (
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {Object.entries(platformBreakdown)
-                .filter(([platform, count]) => count > 0)
-                .map(([platform, count]) => {
-                  const colorMap = {
-                    'eBay': 'text-slate-600',
-                    'Amazon': 'text-yellow-600',
-                    'Shopify': 'text-green-600',
-                    'Walmart': 'text-blue-600',
-                    'Coupang': 'text-rose-600',
-                    'Naver Smart Store': 'text-green-600',
-                    'Gmarket': 'text-orange-600',
-                    '11st': 'text-red-600',
-                  }
-                  const colorClass = colorMap[platform] || 'text-gray-600'
-                  return (
-                    <span key={platform} className={`text-xs font-medium ${colorClass}`}>
-                      {platform}: {count}
-                    </span>
-                  )
-                })}
-            </div>
-          )}
+            {/* Platform Breakdown */}
+            {!loading && totalListings > 0 && platformBreakdown && (
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {Object.entries(platformBreakdown)
+                  .filter(([platform, count]) => count > 0)
+                  .map(([platform, count]) => {
+                    const colorMap = {
+                      'eBay': 'text-slate-600',
+                      'Amazon': 'text-yellow-600',
+                      'Shopify': 'text-green-600',
+                      'Walmart': 'text-blue-600',
+                      'Coupang': 'text-rose-600',
+                      'Naver Smart Store': 'text-green-600',
+                      'Gmarket': 'text-orange-600',
+                      '11st': 'text-red-600',
+                    }
+                    const colorClass = colorMap[platform] || 'text-gray-600'
+                    return (
+                      <span key={platform} className={`text-xs font-medium ${colorClass}`}>
+                        {platform}: {count}
+                      </span>
+                    )
+                  })}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Card 2: Low Interest Items Found */}
