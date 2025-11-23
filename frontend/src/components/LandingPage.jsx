@@ -39,14 +39,14 @@ function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden bg-white">
-        {/* Background Grid Pattern - Subtle Slate */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f90a_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f90a_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+        {/* Background Grid Pattern - Enhanced */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f00a_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f00a_1px,transparent_1px)] bg-[size:32px_32px]"></div>
         
-        {/* Radial Gradient Glow - Electric Blue Central Glow */}
+        {/* Radial Gradient Glow - Soft Blue/Purple Glow */}
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full blur-3xl pointer-events-none opacity-40"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full blur-3xl pointer-events-none opacity-50"
           style={{
-            background: 'radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(59, 130, 246, 0.1) 25%, rgba(30, 64, 175, 0.08) 50%, transparent 70%)'
+            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.15) 25%, rgba(37, 99, 235, 0.1) 50%, transparent 70%)'
           }}
         ></div>
         
@@ -57,9 +57,12 @@ function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-4 leading-tight text-slate-900">
+            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-600">
               'Zero Sale' Cleaner.
             </h1>
+            <h2 className="text-xl text-slate-500 font-medium mb-6 max-w-3xl mx-auto">
+              Stop Wasting Time on Dead Stock. Start Finding Winners.
+            </h2>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Automated cleanup for your eBay inventory. We remove the non-performers so you can focus 100% of your energy on sourcing the next big winner.
             </p>
@@ -69,7 +72,7 @@ function LandingPage() {
                   href="/dashboard"
                   whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all flex items-center gap-2 transform hover:-translate-y-1"
+                  className="px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-500/30 transition-transform hover:-translate-y-1 flex items-center gap-2"
                 >
                   Start Cleaning for Free
                   <ArrowRight className="h-5 w-5" />
@@ -97,15 +100,16 @@ function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
             className="mt-20"
+            style={{ perspective: '1000px' }}
           >
             <div 
               className="relative transform-gpu" 
               style={{ 
-                transform: 'perspective(1200px) rotateX(6deg)',
+                transform: 'perspective(1000px) rotateX(12deg) scale(0.95)',
                 transformStyle: 'preserve-3d'
               }}
             >
-              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl p-10 border-[12px] border-white/60 shadow-[0_40px_80px_-20px_rgba(37,99,235,0.2),0_0_0_1px_rgba(255,255,255,0.1)]">
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-10 border-8 border-slate-200/50 shadow-2xl shadow-indigo-500/20">
                 <div className="bg-white rounded-xl p-16 border border-slate-200/50 min-h-[450px] flex items-center justify-center shadow-inner">
                   <div className="text-center">
                     <div className="text-7xl mb-6">📊</div>
@@ -169,10 +173,10 @@ function LandingPage() {
           >
             <motion.div
               variants={fadeInUp}
-              className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-rose-300 hover:shadow-lg transition-all"
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="text-5xl mb-4">📉</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Low Sell-Through Rate</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">eBay Hates Dead Stores</h3>
               <p className="text-gray-600 text-lg">
                 Unsold items hurt your SEO ranking. We fix that by identifying and removing dead inventory.
               </p>
@@ -180,10 +184,10 @@ function LandingPage() {
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-rose-300 hover:shadow-lg transition-all"
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="text-5xl mb-4">🚫</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Selling Limits</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Stop Blocking Winners</h3>
               <p className="text-gray-600 text-lg">
                 Maxed out your limit? Delete dead stock to make room for winners that actually sell.
               </p>
@@ -191,10 +195,10 @@ function LandingPage() {
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-rose-300 hover:shadow-lg transition-all"
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="text-5xl mb-4">💸</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Wasted Fees</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Slash Software Bill</h3>
               <p className="text-gray-600 text-lg">
                 Stop paying listing fees for items that never sell. Optimize your inventory costs.
               </p>
@@ -230,7 +234,7 @@ function LandingPage() {
           >
             <motion.div
               variants={fadeInUp}
-              className="bg-white rounded-xl p-8 shadow-lg"
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
                 <span className="text-3xl font-bold text-blue-600">1</span>
@@ -243,7 +247,7 @@ function LandingPage() {
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white rounded-xl p-8 shadow-lg"
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
                 <span className="text-3xl font-bold text-blue-600">2</span>
@@ -256,7 +260,7 @@ function LandingPage() {
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white rounded-xl p-8 shadow-lg"
+              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
                 <span className="text-3xl font-bold text-green-600">3</span>
