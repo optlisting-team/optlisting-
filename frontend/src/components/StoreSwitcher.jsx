@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 
 const MY_STORES = [
+  { id: 'all', name: '🌍 All Stores', platform: 'Global', color: 'bg-gray-100 text-gray-800' },
   { id: 'store_ebay_1', name: 'eBay Main Store', platform: 'eBay', color: 'bg-purple-100 text-purple-700' },
   { id: 'store_amazon_1', name: 'Amazon US', platform: 'Amazon', color: 'bg-yellow-100 text-yellow-800' },
   { id: 'store_coupang_1', name: 'Coupang KR', platform: 'Coupang', color: 'bg-red-100 text-red-700' }
@@ -31,7 +32,7 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
     setIsOpen(false)
   }
 
-  const currentStoreData = currentStore || MY_STORES[0]
+  const currentStoreData = currentStore || MY_STORES[0] // Default to "All Stores"
 
   return (
     <div className="relative" ref={dropdownRef}>

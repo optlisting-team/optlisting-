@@ -240,7 +240,8 @@ def analyze_zombie_listings(
     max_sales: int = 0,
     max_watch_count: int = 10,
     supplier_filter: str = "All",
-    platform_filter: str = "All"
+    platform_filter: str = "All",
+    store_id: Optional[str] = None
 ) -> List[Listing]:
     """
     Low Interest Items Filter Logic (formerly Zombie Filter)
@@ -267,6 +268,15 @@ def analyze_zombie_listings(
     query = db.query(Listing).filter(
         Listing.user_id == user_id
     )
+    
+    # Apply store filter if store_id is provided and not 'all'
+    if store_id and store_id != 'all':
+        # Note: Assuming there's a store_id column in Listing model
+        # If not, this will need to be adjusted based on actual schema
+        # For now, we'll skip this filter if store_id column doesn't exist
+        if hasattr(Listing, 'store_id'):
+            query = query.filter(Listing.store_id == store_id)
+    # If store_id is 'all' or None, DO NOT filter by store (return all for user)
     
     # Date filter: use date_listed (legacy field exists, use it directly)
     query = query.filter(

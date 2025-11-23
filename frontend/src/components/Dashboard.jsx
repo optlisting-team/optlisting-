@@ -35,17 +35,22 @@ function Dashboard({ selectedStore }) {
   const fetchZombies = async (filterParams = filters) => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/api/analyze`, {
-        params: {
-          user_id: CURRENT_USER_ID,
-          store_id: selectedStore.id,
-          marketplace: filterParams.marketplace_filter || 'All',
-          min_days: filterParams.min_days,
-          max_sales: filterParams.max_sales,
-          max_watch_count: filterParams.max_watch_count,
-          supplier_filter: filterParams.supplier_filter || filterParams.source_filter
-        }
-      })
+      // Build params object - only include store_id if not 'all'
+      const params = {
+        user_id: CURRENT_USER_ID,
+        marketplace: filterParams.marketplace_filter || 'All',
+        min_days: filterParams.min_days,
+        max_sales: filterParams.max_sales,
+        max_watch_count: filterParams.max_watch_count,
+        supplier_filter: filterParams.supplier_filter || filterParams.source_filter
+      }
+      
+      // Only add store_id if not 'all' (for aggregated view)
+      if (selectedStore?.id && selectedStore.id !== 'all') {
+        params.store_id = selectedStore.id
+      }
+      
+      const response = await axios.get(`${API_BASE_URL}/api/analyze`, { params })
       setZombies(response.data.zombies)
       setTotalZombies(response.data.zombie_count)
       // Update total stats from API response
@@ -72,13 +77,20 @@ function Dashboard({ selectedStore }) {
       
       // Fetch listings
       try {
+        // Build params object - only include store_id if not 'all'
+        const listingsParams = {
+          user_id: CURRENT_USER_ID,
+          skip: 0,
+          limit: 10000 // Get all listings
+        }
+        
+        // Only add store_id if not 'all' (for aggregated view)
+        if (selectedStore?.id && selectedStore.id !== 'all') {
+          listingsParams.store_id = selectedStore.id
+        }
+        
         const listingsResponse = await axios.get(`${API_BASE_URL}/api/listings`, {
-          params: {
-            user_id: CURRENT_USER_ID,
-            store_id: selectedStore?.id,
-            skip: 0,
-            limit: 10000 // Get all listings
-          }
+          params: listingsParams
         })
         setAllListings(listingsResponse.data.listings || [])
       } catch (listingsErr) {

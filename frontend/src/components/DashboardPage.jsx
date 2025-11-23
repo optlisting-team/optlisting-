@@ -3,8 +3,8 @@ import Navbar from './Navbar'
 import PageHeader from './PageHeader'
 import Dashboard from './Dashboard'
 
-// Default store (eBay Main Store)
-const DEFAULT_STORE = { id: 'store_ebay_1', name: 'eBay Main Store', platform: 'eBay', color: 'bg-purple-100 text-purple-700' }
+// Default store (All Stores - aggregated view)
+const DEFAULT_STORE = { id: 'all', name: '🌍 All Stores', platform: 'Global', color: 'bg-gray-100 text-gray-800' }
 
 function DashboardPage() {
   const [selectedStore, setSelectedStore] = useState(DEFAULT_STORE)

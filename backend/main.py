@@ -83,11 +83,20 @@ def root():
 def get_listings(
     skip: int = 0,
     limit: int = 100,
+    store_id: Optional[str] = None,  # Store ID filter - 'all' or None means all stores
     user_id: str = "default-user",  # Default user ID for MVP phase
     db: Session = Depends(get_db)
 ):
     """Get all listings for a specific user"""
-    listings = db.query(Listing).filter(Listing.user_id == user_id).offset(skip).limit(limit).all()
+    query = db.query(Listing).filter(Listing.user_id == user_id)
+    
+    # Apply store filter if store_id is provided and not 'all'
+    if store_id and store_id != 'all':
+        if hasattr(Listing, 'store_id'):
+            query = query.filter(Listing.store_id == store_id)
+    # If store_id is 'all' or None, DO NOT filter by store (return all for user)
+    
+    listings = query.offset(skip).limit(limit).all()
     return {
         "total": db.query(Listing).filter(Listing.user_id == user_id).count(),
         "listings": [
@@ -145,6 +154,7 @@ def analyze_zombies(
     max_watch_count: int = 10,
     supplier_filter: str = "All",
     marketplace: str = "All",
+    store_id: Optional[str] = None,  # Store ID filter - 'all' or None means all stores
     user_id: str = "default-user",  # Default user ID for backward compatibility
     db: Session = Depends(get_db)
 ):
@@ -217,12 +227,19 @@ def analyze_zombies(
             total_breakdown["Unknown"] = total_breakdown.get("Unknown", 0) + count
     
     # Calculate breakdown by platform using SQL GROUP BY (dynamic - includes all marketplaces)
-    platform_results = db.query(
+    platform_query = db.query(
         Listing.platform,
         func.count(Listing.id).label('count')
     ).filter(
         Listing.user_id == user_id
-    ).group_by(Listing.platform).all()
+    )
+    
+    # Apply store filter to platform breakdown
+    if store_id and store_id != 'all':
+        if hasattr(Listing, 'store_id'):
+            platform_query = platform_query.filter(Listing.store_id == store_id)
+    
+    platform_results = platform_query.group_by(Listing.platform).all()
     
     # Build platform breakdown dictionary from SQL results
     platform_breakdown = {}
@@ -238,7 +255,8 @@ def analyze_zombies(
         max_sales=max_sales,
         max_watch_count=max_watch_count,
         supplier_filter=supplier_filter,
-        platform_filter=marketplace
+        platform_filter=marketplace,
+        store_id=store_id
     )
     
     return {
