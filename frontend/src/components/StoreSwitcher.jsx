@@ -12,7 +12,7 @@ export const getConnectedStoreCount = () => {
   return MY_STORES.filter(store => store.id !== 'all').length
 }
 
-function StoreSwitcher({ currentStore, onStoreChange }) {
+function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
 
@@ -38,16 +38,9 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
   }
 
   const currentStoreData = currentStore || MY_STORES[0] // Default to "All Stores"
-
-  // Check if we're in sidebar context (dark background)
-  const isInSidebar = window.location.pathname.startsWith('/dashboard') || 
-                      window.location.pathname.startsWith('/billing') ||
-                      window.location.pathname.startsWith('/listings') ||
-                      window.location.pathname.startsWith('/history') ||
-                      window.location.pathname.startsWith('/settings')
   
   const sidebarButtonClass = isInSidebar 
-    ? "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/50 text-slate-200 border border-slate-700/50 transition-all hover:bg-slate-800 hover:border-slate-600 w-full"
+    ? "flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-800 text-gray-300 transition-colors hover:bg-gray-700 w-full"
     : `flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all hover:shadow-md ${currentStoreData.color}`
 
   return (
@@ -71,8 +64,8 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className={`absolute ${isInSidebar ? 'left-0' : 'right-0'} mt-2 w-64 ${isInSidebar ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-gray-200'} rounded-lg shadow-xl z-50 overflow-hidden`}>
-          <div className={`px-3 py-2 text-xs font-semibold uppercase border-b ${isInSidebar ? 'text-slate-400 border-slate-700 bg-slate-800/50' : 'text-gray-500 border-gray-100 bg-gray-50'}`}>
+        <div className={`absolute ${isInSidebar ? 'left-0' : 'right-0'} mt-2 w-64 ${isInSidebar ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-lg shadow-xl z-50 overflow-hidden`}>
+          <div className={`px-3 py-2 text-xs font-semibold uppercase border-b ${isInSidebar ? 'text-gray-400 border-gray-800 bg-gray-900' : 'text-gray-500 border-gray-100 bg-gray-50'}`}>
             Switch Store
           </div>
           <div className="max-h-64 overflow-y-auto">

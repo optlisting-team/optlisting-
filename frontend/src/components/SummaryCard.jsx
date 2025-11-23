@@ -43,9 +43,9 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 1: Total Listings */}
         <div 
           onClick={() => handleCardClick('all')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm ${
             viewMode === 'all' 
-              ? 'border-gray-400' 
+              ? 'border-gray-300 shadow-sm' 
               : ''
           }`}
         >
@@ -84,9 +84,9 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 2: Low Interest Items Found */}
         <div 
           onClick={() => handleCardClick('zombies')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 relative ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm relative ${
             viewMode === 'zombies' 
-              ? 'border-gray-400' 
+              ? 'border-gray-300 shadow-sm' 
               : ''
           }`}
         >
@@ -117,9 +117,9 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 3: In Queue */}
         <div 
           onClick={() => handleCardClick('queue')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm ${
             viewMode === 'queue' 
-              ? 'border-gray-400' 
+              ? 'border-gray-300 shadow-sm' 
               : ''
           }`}
         >
@@ -139,9 +139,9 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
         {/* Card 4: History */}
         <div 
           onClick={() => handleCardClick('history')}
-          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-colors hover:border-gray-400 ${
+          className={`bg-white border border-gray-200 rounded-lg p-6 h-auto flex flex-col justify-between cursor-pointer transition-all hover:shadow-sm ${
             viewMode === 'history' 
-              ? 'border-gray-400' 
+              ? 'border-gray-300 shadow-sm' 
               : ''
           }`}
         >
