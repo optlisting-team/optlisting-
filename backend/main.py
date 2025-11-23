@@ -8,7 +8,7 @@ import json
 from pydantic import BaseModel
 
 from backend.models import init_db, get_db, Listing, DeletionLog, Base, engine
-from backend.services import detect_source, extract_source_info, analyze_zombie_listings, generate_export_csv
+from backend.services import detect_source, extract_supplier_info, analyze_zombie_listings, generate_export_csv
 from backend.dummy_data import generate_dummy_listings
 
 app = FastAPI(title="OptListing API", version="1.0.0")
@@ -99,7 +99,7 @@ def get_listings(
                 "brand": getattr(l, 'brand', None),
                 "upc": getattr(l, 'upc', None),
                 "marketplace": getattr(l, 'marketplace', 'eBay'),
-                "source": l.source,
+                "supplier": getattr(l, 'supplier_name', None) or getattr(l, 'supplier', 'Unknown'),
                 "price": l.price,
                 "date_listed": l.date_listed.isoformat() if l.date_listed else None,
                 "sold_qty": l.sold_qty,
@@ -138,7 +138,7 @@ def analyze_zombies(
     min_days: int = 3,
     max_sales: int = 0,
     max_watch_count: int = 10,
-    source_filter: str = "All",
+    supplier_filter: str = "All",
     marketplace: str = "All",
     user_id: str = "default-user",  # Default user ID for backward compatibility
     db: Session = Depends(get_db)
@@ -150,7 +150,7 @@ def analyze_zombies(
     - min_days: Minimum days old (default: 3)
     - max_sales: Maximum sales count (default: 0)
     - max_watch_count: Maximum watch count/views (default: 10)
-    - source_filter: Filter by source - "All", "Amazon", "Walmart", etc. (default: "All")
+    - supplier_filter: Filter by supplier - "All", "Amazon", "Walmart", etc. (default: "All")
     
     Returns:
     - total_count: Total number of ALL listings in the database
@@ -197,15 +197,15 @@ def analyze_zombies(
     all_listings = db.query(Listing).filter(Listing.user_id == user_id).all()
     total_count = len(all_listings)
     
-    # Calculate breakdown by source for ALL listings
+    # Calculate breakdown by supplier for ALL listings
     total_breakdown = {"Amazon": 0, "Walmart": 0, "AliExpress": 0, "CJ Dropshipping": 0, "Home Depot": 0, "Wayfair": 0, "Costco": 0, "Wholesale2B": 0, "Spocket": 0, "SaleHoo": 0, "Inventory Source": 0, "Dropified": 0, "Unverified": 0, "Unknown": 0}
     # Calculate breakdown by platform for ALL listings (dynamic - includes all marketplaces)
     platform_breakdown = {}
     for listing in all_listings:
-        # Use source_name if available, otherwise fallback to source (legacy)
-        source = getattr(listing, 'source_name', None) or getattr(listing, 'source', 'Unknown')
-        if source in total_breakdown:
-            total_breakdown[source] += 1
+        # Use supplier_name if available, otherwise fallback to supplier (legacy)
+        supplier = getattr(listing, 'supplier_name', None) or getattr(listing, 'supplier', 'Unknown')
+        if supplier in total_breakdown:
+            total_breakdown[supplier] += 1
         else:
             total_breakdown["Unknown"] += 1
         
@@ -228,7 +228,7 @@ def analyze_zombies(
         min_days=min_days, 
         max_sales=max_sales,
         max_watch_count=max_watch_count,
-        source_filter=source_filter,
+        supplier_filter=supplier_filter,
         platform_filter=marketplace
     )
     
@@ -247,9 +247,9 @@ def analyze_zombies(
                 "image_url": z.image_url,
                 "platform": getattr(z, 'platform', None) or getattr(z, 'marketplace', 'eBay'),
                 "marketplace": getattr(z, 'platform', None) or getattr(z, 'marketplace', 'eBay'),  # Backward compatibility
-                "source_name": getattr(z, 'source_name', None) or getattr(z, 'source', 'Unknown'),
-                "source": getattr(z, 'source_name', None) or getattr(z, 'source', 'Unknown'),  # Backward compatibility
-                "source_id": getattr(z, 'source_id', None),
+                "supplier_name": getattr(z, 'supplier_name', None) or getattr(z, 'source_name', None) or getattr(z, 'supplier', 'Unknown'),
+                "supplier": getattr(z, 'supplier_name', None) or getattr(z, 'source_name', None) or getattr(z, 'supplier', 'Unknown'),  # Backward compatibility
+                "supplier_id": getattr(z, 'supplier_id', None) or getattr(z, 'source_id', None),
                 "price": getattr(z, 'price', None) or (z.metrics.get('price') if hasattr(z, 'metrics') and z.metrics else None),
                 "date_listed": z.date_listed.isoformat() if z.date_listed else None,
                 "sold_qty": getattr(z, 'sold_qty', 0) or (z.metrics.get('sales') if hasattr(z, 'metrics') and z.metrics else 0),
@@ -266,7 +266,7 @@ def export_csv(
     min_days: int = 60,
     max_sales: int = 0,
     max_watch_count: int = 10,
-    source_filter: str = "All",
+    supplier_filter: str = "All",
     db: Session = Depends(get_db)
 ):
     """
@@ -280,12 +280,12 @@ def export_csv(
             detail="Invalid export_mode. Must be one of: autods, yaballe, ebay"
         )
     
-    # Validate source_filter
-    valid_sources = ["All", "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
-    if source_filter not in valid_sources:
+    # Validate supplier_filter
+    valid_suppliers = ["All", "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
+    if supplier_filter not in valid_suppliers:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid source_filter. Must be one of: {', '.join(valid_sources)}"
+            detail=f"Invalid supplier_filter. Must be one of: {', '.join(valid_suppliers)}"
         )
     
     # Ensure min_days, max_sales, and max_watch_count are non-negative
@@ -296,10 +296,11 @@ def export_csv(
     # Get zombie listings with filters
     zombies = analyze_zombie_listings(
         db, 
+        user_id="default-user",  # Default user ID
         min_days=min_days, 
         max_sales=max_sales,
         max_watch_count=max_watch_count,
-        source_filter=source_filter
+        supplier_filter=supplier_filter
     )
     
     if not zombies:
@@ -400,7 +401,7 @@ def log_deletion(
             item_id=item.get("ebay_item_id") or item.get("item_id") or str(item.get("id", "")),
             title=item.get("title", "Unknown"),
             platform=item.get("marketplace") or item.get("platform") or "eBay",
-            source=item.get("source", "Unknown")
+            supplier=item.get("supplier") or item.get("supplier_name") or item.get("source", "Unknown")
         )
         logs.append(log_entry)
     
@@ -438,7 +439,7 @@ def get_deletion_history(
                 "item_id": log.item_id,
                 "title": log.title,
                 "platform": log.platform,
-                "source": log.source,
+                "supplier": log.supplier,
                 "deleted_at": log.deleted_at.isoformat() if log.deleted_at else None
             }
             for log in logs
@@ -447,7 +448,7 @@ def get_deletion_history(
 
 
 class UpdateListingRequest(BaseModel):
-    source: Optional[str] = None
+    supplier: Optional[str] = None
 
 @app.patch("/api/listing/{listing_id}")
 def update_listing(
@@ -456,31 +457,31 @@ def update_listing(
     db: Session = Depends(get_db)
 ):
     """
-    Update a listing's source (manual override)
-    Allows users to correct auto-detected sources
+    Update a listing's supplier (manual override)
+    Allows users to correct auto-detected suppliers
     """
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
     
-    # Validate source if provided
-    if request.source is not None:
-        valid_sources = ["Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
-        if request.source not in valid_sources:
+    # Validate supplier if provided
+    if request.supplier is not None:
+        valid_suppliers = ["Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Wholesale2B", "Spocket", "SaleHoo", "Inventory Source", "Dropified", "Unverified", "Unknown"]
+        if request.supplier not in valid_suppliers:
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid source. Must be one of: {', '.join(valid_sources)}"
+                detail=f"Invalid supplier. Must be one of: {', '.join(valid_suppliers)}"
             )
-        listing.source = request.source
+        listing.supplier_name = request.supplier
     
     db.commit()
     db.refresh(listing)
     
     return {
         "id": listing.id,
-        "ebay_item_id": listing.ebay_item_id,
+        "ebay_item_id": listing.item_id,
         "title": listing.title,
-        "source": listing.source,
+        "supplier": listing.supplier_name,
         "message": "Listing updated successfully"
     }
 

@@ -3,7 +3,7 @@ import random
 import json
 from sqlalchemy.orm import Session
 from backend.models import Listing
-from backend.services import extract_source_info, upsert_listings
+from backend.services import extract_supplier_info, upsert_listings
 
 
 def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "default-user"):
@@ -187,8 +187,8 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
             if brand:
                 title = f"{brand} {title}"
             
-            # Extract source info using extract_source_info function
-            source_name, source_id = extract_source_info(
+            # Extract supplier info using extract_supplier_info function
+            supplier_name, supplier_id = extract_supplier_info(
                 sku=sku,
                 image_url=image_url,
                 title=title,
@@ -216,7 +216,7 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
                 "sold_qty": sold_qty,
                 "watch_count": watch_count,
                 "platform": marketplace,
-                "source": source,
+                "supplier": source,
                 "brand": brand,
                 "upc": upc
             }
@@ -228,8 +228,8 @@ def generate_dummy_listings(db: Session, count: int = 50, user_id: str = "defaul
                 title=title,
                 sku=sku,
                 image_url=image_url,
-                source_name=source_name,
-                source_id=source_id,
+                supplier_name=supplier_name,
+                supplier_id=supplier_id,
                 brand=brand,
                 upc=upc,
                 metrics=metrics,

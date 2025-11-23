@@ -164,7 +164,7 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
               </td>
               <td className="w-32 px-4 py-5 whitespace-nowrap">
                 <SourceBadge 
-                  source={zombie.source || zombie.source_name} 
+                  source={zombie.supplier || zombie.supplier_name || zombie.source || zombie.source_name} 
                   editable={!!onSourceChange}
                   onSourceChange={onSourceChange}
                   itemId={zombie.id}

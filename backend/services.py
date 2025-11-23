@@ -10,7 +10,7 @@ import re
 import json
 
 
-def extract_source_info(
+def extract_supplier_info(
     sku: str = "",
     image_url: str = "",
     title: str = "",
@@ -18,17 +18,17 @@ def extract_source_info(
     upc: str = ""
 ) -> Tuple[str, Optional[str]]:
     """
-    Extract Source Name and Source ID from SKU and other data.
+    Extract Supplier Name and Supplier ID from SKU and other data.
     
-    Returns: (source_name, source_id)
-    - source_name: Detected source name (e.g., "Amazon", "Walmart", "Unverified")
-    - source_id: Extracted source ID (e.g., ASIN "B08...", Walmart ID) or None
+    Returns: (supplier_name, supplier_id)
+    - supplier_name: Detected supplier name (e.g., "Amazon", "Walmart", "Unverified")
+    - supplier_id: Extracted supplier ID (e.g., ASIN "B08...", Walmart ID) or None
     
     Logic:
-    - Amazon: If SKU has "AMZ" or "B0..." pattern, extract ASIN -> save to source_id
-    - Walmart: If SKU has "WM", extract the ID -> save to source_id
+    - Amazon: If SKU has "AMZ" or "B0..." pattern, extract ASIN -> save to supplier_id
+    - Walmart: If SKU has "WM", extract the ID -> save to supplier_id
     - AliExpress/Others: Regex matching logic
-    - Fallback: If unknown, set source_name="Unverified"
+    - Fallback: If unknown, set supplier_name="Unverified"
     """
     sku_upper = sku.upper() if sku else ""
     image_url_lower = image_url.lower() if image_url else ""
@@ -42,39 +42,39 @@ def extract_source_info(
         # Extract ASIN
         asin_match = re.search(amazon_asin_pattern, sku_upper)
         if asin_match:
-            source_id = asin_match.group(0)
+            supplier_id = asin_match.group(0)
         elif sku_upper.startswith("AMZ"):
             # Try to extract ASIN from SKU (e.g., "AMZ-B08ABC1234")
             parts = sku_upper.split("-")
             for part in parts:
                 if re.match(amazon_asin_pattern, part):
-                    source_id = part
+                    supplier_id = part
                     break
             else:
-                source_id = sku_upper.replace("AMZ", "").strip("-")
+                supplier_id = sku_upper.replace("AMZ", "").strip("-")
         else:
-            source_id = None
-        return ("Amazon", source_id)
+            supplier_id = None
+        return ("Amazon", supplier_id)
     
     # Walmart Detection
     if sku_upper.startswith("WM") or "WALMART" in image_url_lower:
         # Extract Walmart ID (usually after "WM-" prefix)
         if sku_upper.startswith("WM"):
             walmart_id = sku_upper.replace("WM", "").strip("-").strip()
-            source_id = walmart_id if walmart_id else None
+            supplier_id = walmart_id if walmart_id else None
         else:
-            source_id = None
-        return ("Walmart", source_id)
+            supplier_id = None
+        return ("Walmart", supplier_id)
     
     # AliExpress Detection
     if sku_upper.startswith("AE") or sku_upper.startswith("ALI") or "aliexpress" in image_url_lower or "alicdn" in image_url_lower:
         # Extract AliExpress product ID
         if sku_upper.startswith("AE") or sku_upper.startswith("ALI"):
             ali_id = sku_upper.replace("AE", "").replace("ALI", "").strip("-").strip()
-            source_id = ali_id if ali_id else None
+            supplier_id = ali_id if ali_id else None
         else:
-            source_id = None
-        return ("AliExpress", source_id)
+            supplier_id = None
+        return ("AliExpress", supplier_id)
     
     # CJ Dropshipping
     if sku_upper.startswith("CJ") or "cjdropshipping" in image_url_lower:
@@ -130,12 +130,12 @@ def detect_source(
 ) -> tuple[str, str]:
     """
     Legacy function - kept for backward compatibility.
-    Now uses extract_source_info internally.
+    Now uses extract_supplier_info internally.
     """
-    source_name, _ = extract_source_info(sku, image_url, title, brand, upc)
+    supplier_name, _ = extract_supplier_info(sku, image_url, title, brand, upc)
     # Return with confidence level for backward compatibility
-    confidence = "High" if source_name != "Unverified" else "Low"
-    return (source_name, confidence)
+    confidence = "High" if supplier_name != "Unverified" else "Low"
+    return (supplier_name, confidence)
     """
     Advanced Source Detection with Forensic Analysis
     Uses multiple data points to identify source with confidence scoring.
@@ -239,7 +239,7 @@ def analyze_zombie_listings(
     min_days: int = 60,
     max_sales: int = 0,
     max_watch_count: int = 10,
-    source_filter: str = "All",
+    supplier_filter: str = "All",
     platform_filter: str = "All"
 ) -> List[Listing]:
     """
@@ -250,7 +250,7 @@ def analyze_zombie_listings(
     - date_listed > min_days days ago (from metrics or legacy date_listed)
     - sales <= max_sales (from metrics['sales'] or legacy sold_qty)
     - views <= max_watch_count (from metrics['views'] or legacy watch_count)
-    - source_name matches source_filter (if not "All")
+    - supplier_name matches supplier_filter (if not "All")
     - platform matches platform_filter (if not "All")
     """
     # Ensure min_days is at least 0
@@ -291,9 +291,9 @@ def analyze_zombie_listings(
     if platform_filter and platform_filter != "All":
         query = query.filter(Listing.platform == platform_filter)
     
-    # Apply source filter if not "All"
-    if source_filter and source_filter != "All":
-        query = query.filter(Listing.source_name == source_filter)
+    # Apply supplier filter if not "All"
+    if supplier_filter and supplier_filter != "All":
+        query = query.filter(Listing.supplier_name == supplier_filter)
     
     zombies = query.all()
     
@@ -343,8 +343,8 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
                 'title': listing.title,
                 'image_url': listing.image_url,
                 'sku': listing.sku,
-                'source_name': listing.source_name,
-                'source_id': listing.source_id,
+                'supplier_name': listing.supplier_name,
+                'supplier_id': listing.supplier_id,
                 'brand': listing.brand,
                 'upc': listing.upc,
                 'metrics': listing.metrics if listing.metrics else {},
@@ -371,8 +371,8 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
                 'title': excluded.title,
                 'image_url': excluded.image_url,
                 'sku': excluded.sku,
-                'source_name': excluded.source_name,
-                'source_id': excluded.source_id,
+                'supplier_name': excluded.supplier_name,
+                'supplier_id': excluded.supplier_id,
                 'brand': excluded.brand,
                 'upc': excluded.upc,
                 'metrics': excluded.metrics,
@@ -405,8 +405,8 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
                 existing.title = listing.title
                 existing.image_url = listing.image_url
                 existing.sku = listing.sku
-                existing.source_name = listing.source_name
-                existing.source_id = listing.source_id
+                existing.supplier_name = listing.supplier_name
+                existing.supplier_id = listing.supplier_id
                 existing.brand = listing.brand
                 existing.upc = listing.upc
                 existing.metrics = listing.metrics if listing.metrics else {}
@@ -459,8 +459,8 @@ def generate_export_csv(
         if isinstance(listing, dict):
             item_id = listing.get("item_id") or listing.get("ebay_item_id", "")
             sku = listing.get("sku", "")
-            source_id = listing.get("source_id", "")
-            source_name = listing.get("source_name") or listing.get("source", "")
+            supplier_id = listing.get("supplier_id", "") or listing.get("source_id", "")  # Backward compatibility
+            supplier_name = listing.get("supplier_name") or listing.get("source_name") or listing.get("source", "")
             platform = listing.get("platform", "")
             # Try to get handle from raw_data or use SKU as fallback
             raw_data = listing.get("raw_data", {})
@@ -473,8 +473,8 @@ def generate_export_csv(
         else:
             item_id = listing.item_id if hasattr(listing, 'item_id') else (listing.ebay_item_id if hasattr(listing, 'ebay_item_id') else "")
             sku = listing.sku
-            source_id = listing.source_id if hasattr(listing, 'source_id') else None
-            source_name = listing.source_name if hasattr(listing, 'source_name') else (listing.source if hasattr(listing, 'source') else "")
+            supplier_id = listing.supplier_id if hasattr(listing, 'supplier_id') else (listing.source_id if hasattr(listing, 'source_id') else None)
+            supplier_name = listing.supplier_name if hasattr(listing, 'supplier_name') else (listing.source_name if hasattr(listing, 'source_name') else (listing.source if hasattr(listing, 'source') else ""))
             platform = listing.platform if hasattr(listing, 'platform') else (listing.marketplace if hasattr(listing, 'marketplace') else "")
             # Try to get handle from raw_data
             raw_data = listing.raw_data if hasattr(listing, 'raw_data') else {}
@@ -485,12 +485,12 @@ def generate_export_csv(
                     raw_data = {}
             handle = raw_data.get("handle") if raw_data else sku
         
-        # Use source_id if available, otherwise fallback to SKU
-        effective_source_id = source_id if source_id else sku
+        # Use supplier_id if available, otherwise fallback to SKU
+        effective_supplier_id = supplier_id if supplier_id else sku
         
         if target_tool == "autods":
             data.append({
-                "Source ID": effective_source_id,
+                "Source ID": effective_supplier_id,
                 "File Action": "delete"
             })
         elif target_tool == "wholesale2b":
@@ -517,7 +517,7 @@ def generate_export_csv(
             })
         elif target_tool == "yaballe":
             data.append({
-                "Monitor ID": effective_source_id,
+                "Monitor ID": effective_supplier_id,
                 "Action": "DELETE"
             })
         else:

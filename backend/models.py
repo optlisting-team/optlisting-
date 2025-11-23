@@ -27,13 +27,13 @@ class Listing(Base):
     image_url = Column(String, nullable=False)
     sku = Column(String, nullable=False)
     
-    # Source Detection (CRITICAL)
-    source_name = Column(String, nullable=False)  # Detected Source: "Amazon", "Walmart", "Unverified", etc.
-    source_id = Column(String, nullable=True)  # Extracted Source ID: ASIN "B08...", Walmart ID, etc.
+    # Supplier Detection (CRITICAL)
+    supplier_name = Column(String, nullable=False)  # Detected Supplier: "Amazon", "Walmart", "Unverified", etc.
+    supplier_id = Column(String, nullable=True)  # Extracted Supplier ID: ASIN "B08...", Walmart ID, etc.
     
     # Metadata
-    brand = Column(String, nullable=True)  # Brand name for forensic source detection
-    upc = Column(String, nullable=True)  # UPC/EAN code for source identification
+    brand = Column(String, nullable=True)  # Brand name for forensic supplier detection
+    upc = Column(String, nullable=True)  # UPC/EAN code for supplier identification
     
     # Metrics (stored as JSONB for flexibility)
     metrics = Column(JSONB, nullable=True, default={})  # {"sales": 0, "views": 10, "price": 29.99, "currency": "USD"}
@@ -58,7 +58,7 @@ class Listing(Base):
     )
 
     def __repr__(self):
-        return f"<Listing(platform={self.platform}, item_id={self.item_id}, source_name={self.source_name}, source_id={self.source_id})>"
+        return f"<Listing(platform={self.platform}, item_id={self.item_id}, supplier_name={self.supplier_name}, supplier_id={self.supplier_id})>"
 
 
 class DeletionLog(Base):
@@ -68,7 +68,7 @@ class DeletionLog(Base):
     item_id = Column(String, nullable=False, index=True)  # ebay_item_id or similar
     title = Column(String, nullable=False)
     platform = Column(String, nullable=True)  # marketplace: "eBay", "Amazon", "Shopify", "Walmart"
-    source = Column(String, nullable=False)  # "Amazon", "Walmart", etc.
+    supplier = Column(String, nullable=False)  # "Amazon", "Walmart", etc.
     deleted_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     def __repr__(self):

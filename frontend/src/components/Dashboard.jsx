@@ -29,7 +29,7 @@ function Dashboard() {
     min_days: 3,
     max_sales: 0,
     max_watch_count: 10,
-    source_filter: 'All'
+    supplier_filter: 'All'
   })
 
   const fetchZombies = async (filterParams = filters) => {
@@ -42,7 +42,7 @@ function Dashboard() {
           min_days: filterParams.min_days,
           max_sales: filterParams.max_sales,
           max_watch_count: filterParams.max_watch_count,
-          source_filter: filterParams.source_filter
+          supplier_filter: filterParams.supplier_filter || filterParams.source_filter
         }
       })
       setZombies(response.data.zombies)
@@ -92,7 +92,7 @@ function Dashboard() {
             min_days: 0, // No filter
             max_sales: 999999, // No filter
             max_watch_count: 999999, // No filter
-            source_filter: 'All',
+            supplier_filter: 'All',
             marketplace: 'All'
           }
         })
@@ -208,17 +208,17 @@ function Dashboard() {
     setQueue(queue.filter(item => item.id !== id))
   }
 
-  const handleSourceChange = async (itemId, newSource) => {
+  const handleSourceChange = async (itemId, newSupplier) => {
     try {
       // Step 1: Update in backend database
       await axios.patch(`${API_BASE_URL}/api/listing/${itemId}`, {
-        source: newSource
+        supplier: newSupplier
       })
 
       // Step 2: Update in local state (candidates/zombies/allListings)
       const updateItemInList = (list) => {
         return list.map(item => 
-          item.id === itemId ? { ...item, source: newSource } : item
+          item.id === itemId ? { ...item, supplier: newSupplier, supplier_name: newSupplier } : item
         )
       }
 
@@ -228,14 +228,14 @@ function Dashboard() {
         setZombies(updateItemInList(zombies))
       }
 
-      // Step 3: If item is in queue, update it there too (will auto-regroup by source)
+      // Step 3: If item is in queue, update it there too (will auto-regroup by supplier)
       const itemInQueue = queue.find(item => item.id === itemId)
       if (itemInQueue) {
         setQueue(updateItemInList(queue))
-        // Note: QueueReviewPanel automatically regroups by source, so the item will move to the correct group
+        // Note: QueueReviewPanel automatically regroups by supplier, so the item will move to the correct group
       }
 
-      console.log(`Source updated for item ${itemId}: ${newSource}`)
+      console.log(`Supplier updated for item ${itemId}: ${newSupplier}`)
     } catch (err) {
       console.error('Failed to update source:', err)
       alert('Failed to update source. Please try again.')

@@ -5,7 +5,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   const [minDays, setMinDays] = useState(initialFilters.min_days || 3)
   const [maxSales, setMaxSales] = useState(initialFilters.max_sales || 0)
   const [maxWatchCount, setMaxWatchCount] = useState(initialFilters.max_watch_count || 10)
-  const [sourceFilter, setSourceFilter] = useState(initialFilters.source_filter || 'All')
+  const [supplierFilter, setSupplierFilter] = useState(initialFilters.supplier_filter || initialFilters.source_filter || 'All')
 
   // Update state when initialFilters change
   useEffect(() => {
@@ -13,7 +13,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
     setMinDays(initialFilters.min_days || 3)
     setMaxSales(initialFilters.max_sales || 0)
     setMaxWatchCount(initialFilters.max_watch_count || 10)
-    setSourceFilter(initialFilters.source_filter || 'All')
+    setSupplierFilter(initialFilters.supplier_filter || initialFilters.source_filter || 'All')
   }, [initialFilters])
 
   const handleSubmit = (e) => {
@@ -28,7 +28,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
       min_days: safeMinDays,
       max_sales: safeMaxSales,
       max_watch_count: safeMaxWatchCount,
-      source_filter: sourceFilter
+      supplier_filter: supplierFilter
     })
   }
 
@@ -37,13 +37,13 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
     setMinDays(3)
     setMaxSales(0)
     setMaxWatchCount(10)
-    setSourceFilter('All')
+    setSupplierFilter('All')
     onApplyFilter({
       marketplace_filter: 'All',
       min_days: 3,
       max_sales: 0,
       max_watch_count: 10,
-      source_filter: 'All'
+      supplier_filter: 'All'
     })
   }
 
@@ -160,15 +160,15 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
           />
         </div>
 
-        {/* Source Filter */}
+        {/* Supplier Filter */}
         <div>
-          <label htmlFor="sourceFilter" className="block text-sm font-medium text-gray-700 mb-2">
-            Source
+          <label htmlFor="supplierFilter" className="block text-sm font-medium text-gray-700 mb-2">
+            Supplier
           </label>
           <select
-            id="sourceFilter"
-            value={sourceFilter}
-            onChange={(e) => setSourceFilter(e.target.value)}
+            id="supplierFilter"
+            value={supplierFilter}
+            onChange={(e) => setSupplierFilter(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="All">All</option>

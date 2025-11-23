@@ -38,9 +38,9 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
     localStorage.setItem('optlisting_tool_mapping', JSON.stringify(toolMapping))
   }, [toolMapping])
 
-  // Group items by source
+  // Group items by supplier
   const groupedBySource = queue.reduce((acc, item) => {
-    const source = item.source_name || item.source || 'Unknown'
+    const source = item.supplier_name || item.supplier || item.source_name || item.source || 'Unknown'
     if (!acc[source]) {
       acc[source] = []
     }
@@ -357,7 +357,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <SourceBadge 
-                          source={item.source_name || item.source} 
+                          source={item.supplier_name || item.supplier || item.source_name || item.source} 
                           editable={!!onSourceChange}
                           onSourceChange={onSourceChange}
                           itemId={item.id}
