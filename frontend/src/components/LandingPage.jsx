@@ -19,18 +19,18 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+      <nav className="fixed top-0 left-0 right-0 bg-white/60 backdrop-blur-xl border-b border-gray-200/50 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-md">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-lg shadow-purple-500/20">
               <Zap className="h-6 w-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-slate-800">OptListing</span>
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">OptListing</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <a href="#features" className="text-gray-600 hover:text-gray-900 font-medium">Features</a>
-            <a href="#pricing" className="text-gray-600 hover:text-gray-900 font-medium">Pricing</a>
-            <a href="/dashboard" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">
+          <div className="flex items-center space-x-6">
+            <a href="#features" className="text-slate-700 hover:text-slate-900 font-medium transition-colors">Features</a>
+            <a href="#pricing" className="text-slate-700 hover:text-slate-900 font-medium transition-colors">Pricing</a>
+            <a href="/dashboard" className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md shadow-purple-500/20">
               Get Started
             </a>
           </div>
@@ -38,15 +38,15 @@ function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        {/* Background Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <section className="relative pt-32 pb-20 px-4 overflow-hidden bg-white">
+        {/* Background Grid Pattern - Subtle Light Gray */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb0a_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb0a_1px,transparent_1px)] bg-[size:32px_32px]"></div>
         
-        {/* Radial Gradient Glow - Spotlight Effect */}
+        {/* Radial Gradient Glow - Blue/Purple Central Glow */}
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-3xl pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full blur-3xl pointer-events-none opacity-60"
           style={{
-            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(147, 51, 234, 0.1) 30%, transparent 70%)'
+            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(147, 51, 234, 0.2) 25%, rgba(59, 130, 246, 0.15) 50%, transparent 70%)'
           }}
         ></div>
         
@@ -57,8 +57,8 @@ function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600">
-              Bulk Delete 'Zero Sale' Items.
+            <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-4 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600">
+              The Ultimate 'Zero Sale' Cleaner.
             </h1>
             <h2 className="text-2xl md:text-3xl font-semibold text-slate-500 mb-6 max-w-3xl mx-auto">
               Save hours of manual work. Focus 100% on finding your next winner.
@@ -72,7 +72,7 @@ function LandingPage() {
                   href="/dashboard"
                   whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-lg shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all flex items-center gap-2 transform hover:-translate-y-1"
+                  className="px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg rounded-xl shadow-lg shadow-purple-500/40 hover:shadow-purple-500/60 transition-all flex items-center gap-2 transform hover:-translate-y-1"
                 >
                   Start Cleaning for Free
                   <ArrowRight className="h-5 w-5" />
@@ -99,15 +99,21 @@ function LandingPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="mt-16 perspective-1000"
+            className="mt-20"
           >
-            <div className="relative transform-gpu" style={{ transform: 'perspective(1000px) rotateX(12deg)' }}>
-              <div className="bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-8 border-8 border-slate-200/50 shadow-2xl shadow-indigo-500/20">
-                <div className="bg-white rounded-lg p-12 border border-gray-200 min-h-[400px] flex items-center justify-center">
+            <div 
+              className="relative transform-gpu" 
+              style={{ 
+                transform: 'perspective(1200px) rotateX(6deg)',
+                transformStyle: 'preserve-3d'
+              }}
+            >
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl p-10 border-[12px] border-white/60 shadow-[0_40px_80px_-20px_rgba(99,102,241,0.3),0_0_0_1px_rgba(255,255,255,0.1)]">
+                <div className="bg-white rounded-xl p-16 border border-slate-200/50 min-h-[450px] flex items-center justify-center shadow-inner">
                   <div className="text-center">
-                    <div className="text-6xl mb-4">📊</div>
-                    <p className="text-gray-500 text-lg">Dashboard Screenshot</p>
-                    <p className="text-gray-400 text-sm mt-2">(Image will be added here)</p>
+                    <div className="text-7xl mb-6">📊</div>
+                    <p className="text-slate-600 text-xl font-semibold">Dashboard Screenshot</p>
+                    <p className="text-slate-400 text-sm mt-3">(Image will be added here)</p>
                   </div>
                 </div>
               </div>
