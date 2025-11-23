@@ -390,6 +390,8 @@ class ExportQueueRequest(BaseModel):
     items: List[Dict]
     target_tool: Optional[str] = None  # New parameter: "autods", "wholesale2b", "shopify_matrixify", etc.
     export_mode: Optional[str] = None  # Legacy parameter for backward compatibility
+    mode: Optional[str] = "delete_list"  # "delete_list" (default) or "full_sync_list"
+    store_id: Optional[str] = None  # Store ID for full_sync_list mode
 
 @app.post("/api/export-queue")
 def export_queue_csv(
@@ -416,8 +418,23 @@ def export_queue_csv(
     if not items:
         raise HTTPException(status_code=400, detail="No items in queue to export")
     
+    # Validate mode
+    mode = request.mode or "delete_list"
+    if mode not in ["delete_list", "full_sync_list"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid mode. Must be 'delete_list' or 'full_sync_list'"
+        )
+    
     # Generate CSV directly from items (dictionaries) with target_tool (with snapshot logging)
-    csv_content = generate_export_csv(items, target_tool, db=db, user_id="default-user")
+    csv_content = generate_export_csv(
+        items, 
+        target_tool, 
+        db=db, 
+        user_id="default-user",
+        mode=mode,
+        store_id=request.store_id
+    )
     
     # Determine filename
     filename_map = {

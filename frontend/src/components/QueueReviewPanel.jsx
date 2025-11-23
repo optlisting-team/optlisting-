@@ -32,11 +32,22 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
     const saved = localStorage.getItem('optlisting_tool_mapping')
     return saved ? JSON.parse(saved) : {}
   })
+  
+  // Full sync mode state: { "Amazon": false, "Walmart": true, ... }
+  const [fullSyncMode, setFullSyncMode] = useState(() => {
+    const saved = localStorage.getItem('optlisting_full_sync_mode')
+    return saved ? JSON.parse(saved) : {}
+  })
 
   // Save to localStorage whenever toolMapping changes
   useEffect(() => {
     localStorage.setItem('optlisting_tool_mapping', JSON.stringify(toolMapping))
   }, [toolMapping])
+  
+  // Save to localStorage whenever fullSyncMode changes
+  useEffect(() => {
+    localStorage.setItem('optlisting_full_sync_mode', JSON.stringify(fullSyncMode))
+  }, [fullSyncMode])
 
   // Group items by supplier
   const groupedBySource = queue.reduce((acc, item) => {
@@ -87,21 +98,28 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
     }
 
     try {
-      // Log deletion first
-      try {
-        await axios.post(`${API_BASE_URL}/api/log-deletion`, {
-          items: items
-        })
-      } catch (logErr) {
-        console.error('Failed to log deletion:', logErr)
+      // Determine export mode
+      const isFullSync = fullSyncMode[source] || false
+      const mode = isFullSync ? 'full_sync_list' : 'delete_list'
+      
+      // Log deletion only for delete_list mode
+      if (mode === 'delete_list') {
+        try {
+          await axios.post(`${API_BASE_URL}/api/log-deletion`, {
+            items: items
+          })
+        } catch (logErr) {
+          console.error('Failed to log deletion:', logErr)
+        }
       }
 
-      // Export CSV with target_tool parameter
+      // Export CSV with target_tool and mode parameters
       const response = await axios.post(
         `${API_BASE_URL}/api/export-queue`,
         {
           items: items,
-          target_tool: targetTool  // Changed from export_mode to target_tool
+          target_tool: targetTool,
+          mode: mode
         },
         {
           responseType: 'blob'
@@ -115,13 +133,14 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
       
       const sourceLower = source.toLowerCase().replace(/\s+/g, '_')
       const toolName = TOOL_DISPLAY_NAMES[targetTool] || targetTool
-      link.setAttribute('download', `${sourceLower}_${toolName}_delete.csv`)
+      const fileType = isFullSync ? 'survivors' : 'delete'
+      link.setAttribute('download', `${sourceLower}_${toolName}_${fileType}.csv`)
       document.body.appendChild(link)
       link.click()
       link.remove()
 
-      // Notify parent to remove exported items and update history
-      if (onExportComplete) {
+      // Notify parent to remove exported items and update history (only for delete_list mode)
+      if (onExportComplete && mode === 'delete_list') {
         onExportComplete(items.map(item => item.id))
       }
       
@@ -364,13 +383,45 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => handleSourceExport(source, items, getToolForSource(source))}
-                  className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md`}
-                >
-                  <span>📥</span>
-                  <span>Download CSV for [{TOOL_DISPLAY_NAMES[getToolForSource(source)] || 'Tool'}] ({items.length} items)</span>
-                </button>
+                <div className="space-y-3">
+                  {/* Full Sync Mode Toggle */}
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id={`full-sync-${source}`}
+                      checked={fullSyncMode[source] || false}
+                      onChange={(e) => {
+                        setFullSyncMode(prev => ({
+                          ...prev,
+                          [source]: e.target.checked
+                        }))
+                      }}
+                      className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                    />
+                    <label htmlFor={`full-sync-${source}`} className="flex-1 cursor-pointer">
+                      <div className="text-sm font-medium text-gray-700">
+                        Export as "Survivor List" (Full Sync Mode)
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        Check this if your tool requires re-uploading your full inventory to remove missing items (e.g., old Wholesale2B mode).
+                      </div>
+                    </label>
+                  </div>
+                  
+                  {/* Download Button */}
+                  <button
+                    onClick={() => handleSourceExport(source, items, getToolForSource(source))}
+                    className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md`}
+                  >
+                    <span>📥</span>
+                    <span>
+                      {fullSyncMode[source] 
+                        ? `Download Survivor List for [${TOOL_DISPLAY_NAMES[getToolForSource(source)] || 'Tool'}]`
+                        : `Download CSV for [${TOOL_DISPLAY_NAMES[getToolForSource(source)] || 'Tool'}] (${items.length} items)`
+                      }
+                    </span>
+                  </button>
+                </div>
               )}
             </div>
           </div>

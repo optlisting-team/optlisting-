@@ -507,7 +507,9 @@ def generate_export_csv(
     listings,
     target_tool: str,
     db: Optional[Session] = None,
-    user_id: str = "default-user"
+    user_id: str = "default-user",
+    mode: str = "delete_list",
+    store_id: Optional[str] = None
 ) -> str:
     """
     CSV Export for Dropshipping Automation Tools Only
@@ -524,21 +526,53 @@ def generate_export_csv(
     6. Yaballe: Headers: "Monitor ID", "Action" | Data: supplier_id, "DELETE"
     
     Args:
-        listings: List of Listing objects or dictionaries (from Pro Dropshipping Aggregators)
+        listings: List of Listing objects or dictionaries (items to delete OR items to exclude in full_sync mode)
         target_tool: Tool name (e.g., "autods", "wholesale2b", "shopify_matrixify", "shopify_tagging", "ebay", "yaballe")
-        db: Optional database session for logging deletions with snapshots
-        user_id: User ID for deletion logging
+        db: Optional database session for logging deletions with snapshots and fetching all listings
+        user_id: User ID for deletion logging and fetching listings
+        mode: Export mode - "delete_list" (default) exports items to delete, "full_sync_list" exports survivors (all items except provided list)
+        store_id: Optional store ID filter for full_sync_list mode
     
     Returns:
         CSV string in tool-specific format
     
     Note: Assumes 100% of items are from supported Dropshipping Tools (no manual/direct listings).
     """
-    if not listings:
+    # Full Sync Mode: Export all active listings EXCEPT the provided list
+    if mode == "full_sync_list" and db:
+        # Get all active listings for this user/store
+        query = db.query(Listing).filter(Listing.user_id == user_id)
+        
+        # Apply store filter if provided and not 'all'
+        if store_id and store_id != 'all':
+            if hasattr(Listing, 'store_id'):
+                query = query.filter(Listing.store_id == store_id)
+        
+        all_listings = query.all()
+        
+        # Extract item IDs from the exclusion list (zombies to remove)
+        exclusion_item_ids = set()
+        for listing in listings:
+            if isinstance(listing, dict):
+                item_id = listing.get("item_id") or listing.get("ebay_item_id", "")
+            else:
+                item_id = listing.item_id if hasattr(listing, 'item_id') else (listing.ebay_item_id if hasattr(listing, 'ebay_item_id') else "")
+            if item_id:
+                exclusion_item_ids.add(item_id)
+        
+        # Filter out excluded items (survivors only)
+        survivor_listings = [
+            listing for listing in all_listings
+            if listing.item_id not in exclusion_item_ids
+        ]
+        
+        # Use survivors as the export list (no deletion logging for full sync mode)
+        listings = survivor_listings
+    elif not listings:
         return ""
     
-    # Log deletions with snapshots BEFORE generating CSV (if DB session provided)
-    if db:
+    # Log deletions with snapshots BEFORE generating CSV (only for delete_list mode)
+    if db and mode == "delete_list":
         deletion_logs = []
         for listing in listings:
             # Extract data for snapshot
