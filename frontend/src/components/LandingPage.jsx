@@ -55,24 +55,31 @@ function LandingPage() {
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Automated cleanup for your eBay inventory. We remove the non-performers so you can focus 100% of your energy on sourcing the next big winner.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <motion.a
-                href="/dashboard"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 animate-pulse"
-              >
-                Start Optimizing for Free
-                <ArrowRight className="h-5 w-5" />
-              </motion.a>
-              <motion.a
-                href="#demo"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold text-lg rounded-lg hover:border-gray-400 transition-all"
-              >
-                View Demo
-              </motion.a>
+            <div className="flex flex-col items-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <motion.a
+                  href="/dashboard"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 animate-pulse"
+                >
+                  Start Cleaning for Free
+                  <ArrowRight className="h-5 w-5" />
+                </motion.a>
+                <motion.a
+                  href="#demo"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold text-lg rounded-lg hover:border-gray-400 transition-all"
+                >
+                  View Demo
+                </motion.a>
+              </div>
+              {/* Microcopy */}
+              <p className="text-sm text-gray-500 mt-3 flex items-center justify-center gap-1">
+                <Check className="h-4 w-4 text-green-600" />
+                <span>30-day free trial. Cancel anytime.</span>
+              </p>
             </div>
           </motion.div>
 
