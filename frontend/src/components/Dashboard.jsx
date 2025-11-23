@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { useStore } from '../contexts/StoreContext'
 import SummaryCard from './SummaryCard'
 import ZombieTable from './ZombieTable'
 import FilterBar from './FilterBar'
@@ -10,7 +11,8 @@ import QueueReviewPanel from './QueueReviewPanel'
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
 
-function Dashboard({ selectedStore }) {
+function Dashboard() {
+  const { selectedStore } = useStore()
   const [zombies, setZombies] = useState([])
   const [allListings, setAllListings] = useState([]) // All listings for 'all' view mode
   const [totalZombies, setTotalZombies] = useState(0)
@@ -35,19 +37,15 @@ function Dashboard({ selectedStore }) {
   const fetchZombies = async (filterParams = filters) => {
     try {
       setLoading(true)
-      // Build params object - only include store_id if not 'all'
+      // Build params object - ALWAYS include store_id
       const params = {
         user_id: CURRENT_USER_ID,
+        store_id: selectedStore?.id || 'all', // Always include store_id (even if 'all')
         marketplace: filterParams.marketplace_filter || 'All',
         min_days: filterParams.min_days,
         max_sales: filterParams.max_sales,
         max_watch_count: filterParams.max_watch_count,
         supplier_filter: filterParams.supplier_filter || filterParams.source_filter
-      }
-      
-      // Only add store_id if not 'all' (for aggregated view)
-      if (selectedStore?.id && selectedStore.id !== 'all') {
-        params.store_id = selectedStore.id
       }
       
       const response = await axios.get(`${API_BASE_URL}/api/analyze`, { params })
@@ -77,16 +75,12 @@ function Dashboard({ selectedStore }) {
       
       // Fetch listings
       try {
-        // Build params object - only include store_id if not 'all'
+        // Build params object - ALWAYS include store_id
         const listingsParams = {
           user_id: CURRENT_USER_ID,
+          store_id: selectedStore?.id || 'all', // Always include store_id (even if 'all')
           skip: 0,
           limit: 10000 // Get all listings
-        }
-        
-        // Only add store_id if not 'all' (for aggregated view)
-        if (selectedStore?.id && selectedStore.id !== 'all') {
-          listingsParams.store_id = selectedStore.id
         }
         
         const listingsResponse = await axios.get(`${API_BASE_URL}/api/listings`, {
@@ -257,13 +251,14 @@ function Dashboard({ selectedStore }) {
     }
   }
 
-  // Fetch data when store changes
+  // Fetch data when store changes - CRITICAL: This ensures data updates when store is switched
   useEffect(() => {
     if (selectedStore) {
+      console.log('Store changed to:', selectedStore.id, '- Refetching data...')
       fetchZombies()
       fetchAllListings()
     }
-  }, [selectedStore])
+  }, [selectedStore?.id]) // Only depend on store ID to avoid unnecessary re-renders
 
   useEffect(() => {
     // Default to 'all' view on initial load

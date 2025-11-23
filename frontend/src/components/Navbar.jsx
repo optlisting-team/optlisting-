@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import { useStore } from '../contexts/StoreContext'
 import StoreSwitcher, { getConnectedStoreCount } from './StoreSwitcher'
 
-function Navbar({ currentStore, onStoreChange }) {
+function Navbar() {
+  const { selectedStore, setSelectedStore } = useStore()
   const [currentPlan] = useState("PRO") // Default: PRO for demo
   const connectedStoreCount = getConnectedStoreCount()
 
@@ -63,9 +65,7 @@ function Navbar({ currentStore, onStoreChange }) {
           {/* Right: Status & User Menu */}
           <div className="flex items-center gap-4">
             {/* Store Switcher */}
-            {currentStore && onStoreChange && (
-              <StoreSwitcher currentStore={currentStore} onStoreChange={onStoreChange} />
-            )}
+            <StoreSwitcher currentStore={selectedStore} onStoreChange={setSelectedStore} />
 
             {/* Plan Badge with Store Utilization - Clickable */}
             <Link 
