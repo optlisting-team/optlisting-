@@ -254,10 +254,10 @@ def analyze_zombies(
                 "supplier_name": z.supplier_name,
                 "supplier": z.supplier_name,  # Backward compatibility
                 "supplier_id": z.supplier_id,
-                "price": z.price or (z.metrics.get('price') if z.metrics else None),
+                "price": (z.metrics.get('price') if z.metrics and 'price' in z.metrics else None) or z.price,
                 "date_listed": z.date_listed.isoformat() if z.date_listed else None,
-                "sold_qty": z.sold_qty or (z.metrics.get('sales') if z.metrics else 0),
-                "watch_count": z.watch_count or (z.metrics.get('views') if z.metrics else 0)
+                "sold_qty": (z.metrics.get('sales') if z.metrics and 'sales' in z.metrics else None) or z.sold_qty or 0,
+                "watch_count": (z.metrics.get('views') if z.metrics and 'views' in z.metrics else None) or z.watch_count or 0
             }
             for z in zombies
         ]

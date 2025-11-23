@@ -1,7 +1,7 @@
 from datetime import date, timedelta, datetime
 from typing import List, Optional, Dict, Tuple
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, cast, Integer
 from sqlalchemy.dialects.postgresql import insert
 from backend.models import Listing
 import pandas as pd
@@ -268,23 +268,56 @@ def analyze_zombie_listings(
         Listing.user_id == user_id
     )
     
-    # Date filter: use date_listed (legacy) or metrics['date_listed']
+    # Date filter: use date_listed (legacy field exists, use it directly)
+    query = query.filter(
+        Listing.date_listed < cutoff_date
+    )
+    
+    # Sales filter: use metrics['sales'] (JSONB) or fallback to sold_qty (legacy)
+    # PostgreSQL JSONB query: cast metrics['sales'] to integer, or use sold_qty
     query = query.filter(
         or_(
-            Listing.date_listed < cutoff_date,
-            # For JSONB, we'd need to extract, but for now use legacy field
-            True  # Placeholder - in production, add JSONB extraction
+            # Use metrics JSONB if available
+            and_(
+                Listing.metrics != None,
+                Listing.metrics.has_key('sales'),
+                cast(Listing.metrics['sales'].astext, Integer) <= max_sales
+            ),
+            # Fallback to legacy sold_qty field
+            and_(
+                or_(
+                    Listing.metrics == None,
+                    ~Listing.metrics.has_key('sales')
+                ),
+                or_(
+                    Listing.sold_qty == None,
+                    Listing.sold_qty <= max_sales
+                )
+            )
         )
     )
     
-    # Sales filter: use sold_qty (legacy) or metrics['sales']
+    # Watch count filter: use metrics['views'] (JSONB) or fallback to watch_count (legacy)
     query = query.filter(
-        Listing.sold_qty <= max_sales
-    )
-    
-    # Watch count filter: use watch_count (legacy) or metrics['views']
-    query = query.filter(
-        Listing.watch_count <= max_watch_count
+        or_(
+            # Use metrics JSONB if available
+            and_(
+                Listing.metrics != None,
+                Listing.metrics.has_key('views'),
+                cast(Listing.metrics['views'].astext, Integer) <= max_watch_count
+            ),
+            # Fallback to legacy watch_count field
+            and_(
+                or_(
+                    Listing.metrics == None,
+                    ~Listing.metrics.has_key('views')
+                ),
+                or_(
+                    Listing.watch_count == None,
+                    Listing.watch_count <= max_watch_count
+                )
+            )
+        )
     )
     
     # Apply platform filter if not "All"
