@@ -278,34 +278,46 @@ def analyze_zombie_listings(
             query = query.filter(Listing.store_id == store_id)
     # If store_id is 'all' or None, DO NOT filter by store (return all for user)
     
-    # Date filter: use metrics['date_listed'] (JSONB) or fallback to date_listed (legacy)
-    query = query.filter(
-        or_(
-            # Use metrics JSONB if available
-            and_(
-                Listing.metrics != None,
-                Listing.metrics.has_key('date_listed'),
-                cast(Listing.metrics['date_listed'].astext, Date) < cutoff_date
-            ),
-            # Fallback to legacy date_listed field
+    # Date filter: use metrics['date_listed'] (JSONB) or fallback to date_listed/last_synced_at
+    # Safely handle cases where date_listed column may not exist
+    date_filters = [
+        # Use metrics JSONB if available
+        and_(
+            Listing.metrics != None,
+            Listing.metrics.has_key('date_listed'),
+            cast(Listing.metrics['date_listed'].astext, Date) < cutoff_date
+        )
+    ]
+    
+    # Add fallback to date_listed if column exists (legacy support)
+    if hasattr(Listing, 'date_listed'):
+        date_filters.append(
             and_(
                 or_(
                     Listing.metrics == None,
                     ~Listing.metrics.has_key('date_listed')
                 ),
+                Listing.date_listed != None,
                 Listing.date_listed < cutoff_date
-            ),
-            # If both are None, use last_synced_at as fallback
-            and_(
-                Listing.date_listed == None,
-                or_(
-                    Listing.metrics == None,
-                    ~Listing.metrics.has_key('date_listed')
-                ),
-                Listing.last_synced_at < cutoff_date
             )
         )
+    
+    # Always add last_synced_at as final fallback
+    date_filters.append(
+        and_(
+            or_(
+                Listing.metrics == None,
+                ~Listing.metrics.has_key('date_listed')
+            ),
+            or_(
+                not hasattr(Listing, 'date_listed'),
+                Listing.date_listed == None
+            ),
+            Listing.last_synced_at < cutoff_date
+        )
     )
+    
+    query = query.filter(or_(*date_filters))
     
     # Sales filter: use metrics['sales'] (JSONB only - no legacy fallback)
     query = query.filter(
