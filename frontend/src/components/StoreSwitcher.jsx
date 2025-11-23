@@ -39,15 +39,26 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
 
   const currentStoreData = currentStore || MY_STORES[0] // Default to "All Stores"
 
+  // Check if we're in sidebar context (dark background)
+  const isInSidebar = window.location.pathname.startsWith('/dashboard') || 
+                      window.location.pathname.startsWith('/billing') ||
+                      window.location.pathname.startsWith('/listings') ||
+                      window.location.pathname.startsWith('/history') ||
+                      window.location.pathname.startsWith('/settings')
+  
+  const sidebarButtonClass = isInSidebar 
+    ? "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/50 text-slate-200 border border-slate-700/50 transition-all hover:bg-slate-800 hover:border-slate-600 w-full"
+    : `flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all hover:shadow-md ${currentStoreData.color}`
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative w-full" ref={dropdownRef}>
       {/* Current Store Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all hover:shadow-md ${currentStoreData.color}`}
+        className={sidebarButtonClass}
       >
         <span className="font-bold">{currentStoreData.platform}</span>
-        <span className="opacity-80">{currentStoreData.name}</span>
+        <span className={isInSidebar ? "opacity-90" : "opacity-80"}>{currentStoreData.name}</span>
         <svg 
           className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none" 
@@ -60,8 +71,8 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
-          <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase border-b border-gray-100 bg-gray-50">
+        <div className={`absolute ${isInSidebar ? 'left-0' : 'right-0'} mt-2 w-64 ${isInSidebar ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-gray-200'} rounded-lg shadow-xl z-50 overflow-hidden`}>
+          <div className={`px-3 py-2 text-xs font-semibold uppercase border-b ${isInSidebar ? 'text-slate-400 border-slate-700 bg-slate-800/50' : 'text-gray-500 border-gray-100 bg-gray-50'}`}>
             Switch Store
           </div>
           <div className="max-h-64 overflow-y-auto">
@@ -69,18 +80,24 @@ function StoreSwitcher({ currentStore, onStoreChange }) {
               <button
                 key={store.id}
                 onClick={() => handleStoreSelect(store)}
-                className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between ${
-                  currentStoreData.id === store.id ? 'bg-blue-50' : ''
+                className={`w-full px-4 py-3 text-left transition-colors flex items-center justify-between ${
+                  isInSidebar
+                    ? currentStoreData.id === store.id
+                      ? 'bg-blue-600/20 text-white'
+                      : 'hover:bg-slate-700/50 text-slate-200'
+                    : currentStoreData.id === store.id
+                      ? 'bg-blue-50'
+                      : 'hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`px-2 py-1 rounded text-xs font-bold ${store.color}`}>
                     {store.platform}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{store.name}</span>
+                  <span className={`text-sm font-medium ${isInSidebar ? 'text-slate-200' : 'text-gray-700'}`}>{store.name}</span>
                 </div>
                 {currentStoreData.id === store.id && (
-                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className={`w-4 h-4 ${isInSidebar ? 'text-blue-400' : 'text-blue-600'}`} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}
