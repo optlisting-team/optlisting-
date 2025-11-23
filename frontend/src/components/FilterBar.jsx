@@ -81,7 +81,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   }
 
   return (
-    <div className="bg-white p-5 rounded-lg border border-gray-200 mb-8">
+    <div className="bg-white p-5 rounded-xl border border-gray-200 mb-8 shadow-sm">
       <form onSubmit={handleSubmit} className="flex items-center gap-4 flex-wrap">
         {/* Platform Filter */}
         <div className="flex-1 min-w-[200px]">

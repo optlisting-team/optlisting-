@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useStore } from '../contexts/StoreContext'
-import SummaryCard from './SummaryCard'
+import { StatsCards } from './StatsCards'
+import { OrdersTable } from './OrdersTable'
 import ZombieTable from './ZombieTable'
 import FilterBar from './FilterBar'
 import DeleteQueue from './DeleteQueue'
@@ -9,6 +10,7 @@ import HistoryTable from './HistoryTable'
 import QueueReviewPanel from './QueueReviewPanel'
 import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
+import { FileText } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
@@ -336,23 +338,32 @@ function Dashboard() {
   }
 
   return (
-    <div className="font-sans bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Summary Card */}
-        <div className="mb-8">
-          <SummaryCard 
-            totalListings={totalListings}
-            totalBreakdown={totalBreakdown}
-            platformBreakdown={platformBreakdown}
-            totalZombies={totalZombies} 
-            queueCount={queue.length}
-            totalDeleted={totalDeleted}
-            loading={loading}
-            filters={filters}
-            viewMode={viewMode}
-            onViewModeChange={handleViewModeChange}
-          />
+    <div className="font-sans">
+      {/* Stats Cards */}
+      <StatsCards 
+        totalListings={totalListings}
+        platformBreakdown={platformBreakdown}
+        totalZombies={totalZombies} 
+        queueCount={queue.length}
+        totalDeleted={totalDeleted}
+        loading={loading}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
+      />
+
+      {/* Info Message for All Listings View */}
+      {viewMode === 'all' && (
+        <div className="rounded-md border border-blue-500/20 bg-blue-500/10 p-4 flex items-start gap-3">
+          <FileText className="h-5 w-5 text-blue-400 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-blue-100">Viewing All Listings</p>
+            <p className="text-sm text-blue-200/80">
+              Click the <span className="font-semibold text-blue-100">"Low Interest Detected"</span> card above to
+              filter and optimize inventory effectively.
+            </p>
+          </div>
         </div>
+      )}
 
         {/* Dynamic Layout: Full Width for 'all', Split View for 'zombies' */}
         <div className={`flex gap-8 transition-all duration-300 ${
@@ -375,49 +386,43 @@ function Dashboard() {
 
             {/* View Mode Info */}
             {viewMode === 'all' && (
-              <Card className="mb-4">
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">
-                    📋 <strong className="text-foreground">Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+                <p className="text-sm text-gray-600">
+                  📋 <strong className="text-gray-900">Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
+                </p>
+              </div>
             )}
 
             {/* Briefing Text for Low Interest Items View */}
             {viewMode === 'zombies' && (
-              <Card className="mb-4">
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">
-                    🔍 <strong className="text-foreground">Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong className="text-foreground">All Platforms</strong> : <strong className="text-foreground">[{filters.marketplace_filter}]</strong>} listings older than <strong className="text-foreground">{filters.min_days} days</strong> with <strong className="text-foreground">{filters.max_sales} sales</strong> and <strong className="text-foreground">≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+                <p className="text-sm text-gray-600">
+                  🔍 <strong className="text-gray-900">Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong className="text-gray-900">All Platforms</strong> : <strong className="text-gray-900">[{filters.marketplace_filter}]</strong>} listings older than <strong className="text-gray-900">{filters.min_days} days</strong> with <strong className="text-gray-900">{filters.max_sales} sales</strong> and <strong className="text-gray-900">≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
+                </p>
+              </div>
             )}
 
             {/* Briefing Text for Queue View */}
             {viewMode === 'queue' && (
-              <Card className="mb-4">
-                <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">
-                    ✅ <strong className="text-foreground">Full-Screen Final Review Mode</strong> - Review all items grouped by source. Each section has its own download button.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+                <p className="text-sm text-gray-600">
+                  ✅ <strong className="text-gray-900">Full-Screen Final Review Mode</strong> - Review all items grouped by source. Each section has its own download button.
+                </p>
+              </div>
             )}
 
             {/* Briefing Text for History View */}
             {viewMode === 'history' && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
-                <p className="text-sm text-slate-700">
-                  💀 <strong>Deletion History</strong> - View all items that have been exported for deletion. This is your permanent record.
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+                <p className="text-sm text-gray-600">
+                  💀 <strong className="text-gray-900">Deletion History</strong> - View all items that have been exported for deletion. This is your permanent record.
                 </p>
               </div>
             )}
 
             {/* Bulk Action Bar - Show for zombies view only (queue uses QueueReviewPanel) */}
             {viewMode === 'zombies' && zombies.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
                 <div className="flex items-center justify-between gap-4">
                   {/* Left Side: Select All */}
                   <div className="flex items-center gap-3">
@@ -477,7 +482,7 @@ function Dashboard() {
                 }}
               />
             ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                 {viewMode === 'history' ? (
                   <div className="p-6">
                     <HistoryTable logs={historyLogs} loading={loading} />
@@ -496,7 +501,7 @@ function Dashboard() {
                   
                   if (isEmpty) {
                     return (
-                      <div className="p-8 text-center text-slate-500">
+                      <div className="p-8 text-center text-muted-foreground">
                         {viewMode === 'all' 
                           ? "No listings found."
                           : queue.length > 0 
@@ -508,15 +513,14 @@ function Dashboard() {
                   }
                   
                   return (
-                    <div className="p-6">
-                      <ZombieTable 
-                        zombies={currentData}
-                        selectedIds={selectedIds}
-                        onSelect={handleSelect}
-                        onSelectAll={handleSelectAll}
-                        onSourceChange={handleSourceChange}
-                      />
-                    </div>
+                    <OrdersTable 
+                      listings={currentData}
+                      selectedIds={selectedIds}
+                      onSelect={handleSelect}
+                      onSelectAll={handleSelectAll}
+                      onSourceChange={handleSourceChange}
+                      loading={loading}
+                    />
                   )
                 })()}
               </div>
@@ -537,7 +541,6 @@ function Dashboard() {
             </div>
           )}
         </div>
-      </div>
     </div>
   )
 }

@@ -79,7 +79,7 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
   }
 
   return (
-    <Card className="w-full overflow-hidden">
+    <Card className="w-full overflow-hidden border border-gray-200 rounded-xl shadow-sm">
       {/* Search Bar & Rows Selector */}
       <CardHeader className="px-6 py-4 flex items-center justify-between">
         {/* Left: Rows per page selector */}
