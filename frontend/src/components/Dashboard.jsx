@@ -379,8 +379,8 @@ function Dashboard() {
 
             {/* View Mode Info */}
             {viewMode === 'all' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
+                <p className="text-sm text-slate-700">
                   📋 <strong>Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
                 </p>
               </div>
@@ -388,8 +388,8 @@ function Dashboard() {
 
             {/* Briefing Text for Low Interest Items View */}
             {viewMode === 'zombies' && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <p className="text-sm text-gray-700">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
+                <p className="text-sm text-slate-700">
                   🔍 <strong>Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong>All Platforms</strong> : <strong>[{filters.marketplace_filter}]</strong>} listings older than <strong>{filters.min_days} days</strong> with <strong>{filters.max_sales} sales</strong> and <strong>≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
                 </p>
               </div>
@@ -397,8 +397,8 @@ function Dashboard() {
 
             {/* Briefing Text for Queue View */}
             {viewMode === 'queue' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
+                <p className="text-sm text-slate-700">
                   ✅ <strong>Full-Screen Final Review Mode</strong> - Review all items grouped by source. Each section has its own download button.
                 </p>
               </div>
@@ -406,8 +406,8 @@ function Dashboard() {
 
             {/* Briefing Text for History View */}
             {viewMode === 'history' && (
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                <p className="text-sm text-slate-800">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
+                <p className="text-sm text-slate-700">
                   💀 <strong>Deletion History</strong> - View all items that have been exported for deletion. This is your permanent record.
                 </p>
               </div>
@@ -415,7 +415,7 @@ function Dashboard() {
 
             {/* Bulk Action Bar - Show for zombies view only (queue uses QueueReviewPanel) */}
             {viewMode === 'zombies' && zombies.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
                 <div className="flex items-center justify-between gap-4">
                   {/* Left Side: Select All */}
                   <div className="flex items-center gap-3">
@@ -475,11 +475,13 @@ function Dashboard() {
                 }}
               />
             ) : (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                 {viewMode === 'history' ? (
-                  <HistoryTable logs={historyLogs} loading={loading} />
+                  <div className="p-6">
+                    <HistoryTable logs={historyLogs} loading={loading} />
+                  </div>
                 ) : loading ? (
-                  <div className="p-8 text-center text-gray-500">
+                  <div className="p-8 text-center text-slate-500">
                     Loading {viewMode === 'all' ? 'all' : 'low interest'} listings...
                   </div>
                 ) : error ? (
@@ -492,7 +494,7 @@ function Dashboard() {
                   
                   if (isEmpty) {
                     return (
-                      <div className="p-8 text-center text-gray-500">
+                      <div className="p-8 text-center text-slate-500">
                         {viewMode === 'all' 
                           ? "No listings found."
                           : queue.length > 0 
@@ -504,13 +506,15 @@ function Dashboard() {
                   }
                   
                   return (
-                    <ZombieTable 
-                      zombies={currentData}
-                      selectedIds={selectedIds}
-                      onSelect={handleSelect}
-                      onSelectAll={handleSelectAll}
-                      onSourceChange={handleSourceChange}
-                    />
+                    <div className="p-6">
+                      <ZombieTable 
+                        zombies={currentData}
+                        selectedIds={selectedIds}
+                        onSelect={handleSelect}
+                        onSelectAll={handleSelectAll}
+                        onSourceChange={handleSourceChange}
+                      />
+                    </div>
                   )
                 })()}
               </div>
