@@ -171,7 +171,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             onChange={(e) => setSupplierFilter(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="All">All</option>
+            <option value="All">All Suppliers</option>
             <option value="Amazon">Amazon</option>
             <option value="Walmart">Walmart</option>
             <option value="AliExpress">AliExpress</option>

@@ -330,7 +330,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                       Title
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Source
+                      Supplier
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       SKU
@@ -392,10 +392,10 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                       <span className="text-amber-600 text-lg">⚠️</span>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-amber-800 mb-1">
-                          Source Verification Required
+                          Supplier Verification Required
                         </p>
                         <p className="text-xs text-amber-700">
-                          Please identify the source manually to generate the correct CSV. Click on the source badges above to verify each item.
+                          Please identify the supplier manually to generate the correct CSV. Click on the supplier badges above to verify each item.
                         </p>
                       </div>
                     </div>
@@ -405,7 +405,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                     className="w-full bg-gray-400 text-gray-600 font-bold py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
                   >
                     <span>🔒</span>
-                    <span>Download Disabled - Verify Sources First</span>
+                    <span>Download Disabled - Verify Suppliers First</span>
                   </button>
                 </div>
               ) : (
