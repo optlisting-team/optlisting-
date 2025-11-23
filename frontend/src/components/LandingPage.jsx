@@ -163,9 +163,9 @@ function LandingPage() {
               className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="text-5xl mb-4">📉</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">eBay Hates Dead Stores</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Marketplace Algorithms Hate Dead Stock</h3>
               <p className="text-gray-600 text-lg">
-                Unsold items hurt your SEO ranking. We fix that by identifying and removing dead inventory.
+                Old, unsold items drag down your search ranking on every major platform. Clear your dead inventory before it hurts your visibility.
               </p>
             </motion.div>
 
@@ -174,9 +174,9 @@ function LandingPage() {
               className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="text-5xl mb-4">🚫</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Stop Blocking Winners</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Make Room for Winners</h3>
               <p className="text-gray-600 text-lg">
-                Maxed out your limit? Delete dead stock to make room for winners that actually sell.
+                Most marketplaces limit your listing slots. Remove dead stock so you can fill those slots with items that actually sell.
               </p>
             </motion.div>
 
@@ -185,9 +185,9 @@ function LandingPage() {
               className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
             >
               <div className="text-5xl mb-4">💸</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Slash Software Bill</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">Cut 80% of Your Cleanup Time</h3>
               <p className="text-gray-600 text-lg">
-                Stop paying listing fees for items that never sell. Optimize your inventory costs.
+                Stop deleting listings one by one. Automate the entire process instantly.
               </p>
             </motion.div>
           </motion.div>
