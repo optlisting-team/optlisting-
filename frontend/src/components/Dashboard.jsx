@@ -8,6 +8,7 @@ import DeleteQueue from './DeleteQueue'
 import HistoryTable from './HistoryTable'
 import QueueReviewPanel from './QueueReviewPanel'
 import { Button } from './ui/button'
+import { Card, CardContent } from './ui/card'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
@@ -374,29 +375,35 @@ function Dashboard() {
 
             {/* View Mode Info */}
             {viewMode === 'all' && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
-                <p className="text-sm text-slate-700">
-                  📋 <strong>Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
-                </p>
-              </div>
+              <Card className="mb-4">
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">
+                    📋 <strong className="text-foreground">Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
+                  </p>
+                </CardContent>
+              </Card>
             )}
 
             {/* Briefing Text for Low Interest Items View */}
             {viewMode === 'zombies' && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
-                <p className="text-sm text-slate-700">
-                  🔍 <strong>Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong>All Platforms</strong> : <strong>[{filters.marketplace_filter}]</strong>} listings older than <strong>{filters.min_days} days</strong> with <strong>{filters.max_sales} sales</strong> and <strong>≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
-                </p>
-              </div>
+              <Card className="mb-4">
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">
+                    🔍 <strong className="text-foreground">Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong className="text-foreground">All Platforms</strong> : <strong className="text-foreground">[{filters.marketplace_filter}]</strong>} listings older than <strong className="text-foreground">{filters.min_days} days</strong> with <strong className="text-foreground">{filters.max_sales} sales</strong> and <strong className="text-foreground">≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
+                  </p>
+                </CardContent>
+              </Card>
             )}
 
             {/* Briefing Text for Queue View */}
             {viewMode === 'queue' && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-4">
-                <p className="text-sm text-slate-700">
-                  ✅ <strong>Full-Screen Final Review Mode</strong> - Review all items grouped by source. Each section has its own download button.
-                </p>
-              </div>
+              <Card className="mb-4">
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">
+                    ✅ <strong className="text-foreground">Full-Screen Final Review Mode</strong> - Review all items grouped by source. Each section has its own download button.
+                  </p>
+                </CardContent>
+              </Card>
             )}
 
             {/* Briefing Text for History View */}

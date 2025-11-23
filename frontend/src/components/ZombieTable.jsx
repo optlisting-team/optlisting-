@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import SourceBadge from './SourceBadge'
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from './ui/table'
 import { Button } from './ui/button'
-import { Card } from './ui/card'
+import { Card, CardContent, CardHeader, CardFooter } from './ui/card'
 
 function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChange }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -81,14 +81,14 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
   return (
     <Card className="w-full overflow-hidden">
       {/* Search Bar & Rows Selector */}
-      <div className="bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <CardHeader className="px-6 py-4 flex items-center justify-between">
         {/* Left: Rows per page selector */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Show</span>
           <select
             value={rowsPerPage}
             onChange={(e) => handleRowsPerPageChange(Number(e.target.value))}
-            className="h-9 text-sm px-3 rounded-md border border-gray-300 focus:ring-1 focus:ring-black focus:border-black bg-white"
+            className="h-9 text-sm px-3 rounded-md border border-input focus:ring-1 focus:ring-ring focus:border-ring bg-background"
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -108,12 +108,13 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
             placeholder="Search in results..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 h-9 text-sm rounded-md border border-gray-300 focus:ring-1 focus:ring-black focus:border-black bg-white placeholder-gray-400"
+            className="block w-full pl-10 pr-3 h-9 text-sm rounded-md border border-input focus:ring-1 focus:ring-ring focus:border-ring bg-background placeholder:text-muted-foreground"
           />
         </div>
-      </div>
+      </CardHeader>
 
-      <Table className="table-fixed w-full">
+      <CardContent className="p-0">
+        <Table className="table-fixed w-full">
         <TableHeader>
           <TableRow>
             <TableHead className="w-10">
@@ -211,10 +212,11 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
           )}
         </TableBody>
       </Table>
+      </CardContent>
 
       {/* Pagination Footer */}
       {filteredZombies.length > 0 && (
-        <div className="bg-white px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+        <CardFooter className="px-6 py-4 flex items-center justify-between">
           {/* Left: Page info (moved from center) */}
           <div className="text-sm text-gray-600">
             Showing {startIndex + 1} to {Math.min(endIndex, filteredZombies.length)} of {filteredZombies.length} listings
@@ -269,7 +271,7 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
               Next
             </Button>
           </div>
-        </div>
+        </CardFooter>
       )}
     </Card>
   )

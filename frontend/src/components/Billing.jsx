@@ -59,30 +59,30 @@ function Billing() {
       <div className="mb-8">
         <Link 
           to="/dashboard" 
-          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-4 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to Dashboard
         </Link>
-        <h1 className="text-4xl font-bold text-slate-800 mb-2">Subscription Management</h1>
-        <p className="text-lg text-slate-600">
+        <h1 className="text-4xl font-bold mb-2">Subscription Management</h1>
+        <p className="text-lg text-muted-foreground">
           Manage your plan, update payment method, or download invoices.
         </p>
       </div>
 
       {/* Current Plan Card */}
       <Card className="p-8 mb-8">
-        <h2 className="text-2xl font-bold text-slate-800 mb-6">Current Plan</h2>
+        <h2 className="text-2xl font-bold mb-6">Current Plan</h2>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className={`px-6 py-3 rounded-full text-sm font-bold ${getPlanStyles(currentPlan)}`}>
               {formatStoreUtilization()}
             </div>
             <div>
-              <p className="text-sm text-slate-600 mb-1">Plan Details</p>
-              <p className="text-lg font-semibold text-slate-800">
+              <p className="text-sm text-muted-foreground mb-1">Plan Details</p>
+              <p className="text-lg font-semibold">
                 {currentPlan} Plan
                 {maxStoreLimit !== Infinity && ` • ${maxStoreLimit} Stores Max`}
                 {maxStoreLimit === Infinity && ` • Unlimited Stores`}
@@ -94,8 +94,8 @@ function Billing() {
 
       {/* Customer Portal Section */}
       <Card className="p-8">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Customer Portal</h2>
-        <p className="text-slate-600 mb-6">
+        <h2 className="text-2xl font-bold mb-4">Customer Portal</h2>
+        <p className="text-muted-foreground mb-6">
           Access your customer portal to manage subscriptions, update payment methods, view invoices, and more.
         </p>
         <Button

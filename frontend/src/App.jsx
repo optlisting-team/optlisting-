@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { StoreProvider } from './contexts/StoreContext'
 import LandingPage from './components/LandingPage'
@@ -12,40 +11,28 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={
-            <DashboardLayout>
-              <DashboardPage />
-            </DashboardLayout>
-          } />
-          <Route path="/billing" element={
-            <DashboardLayout>
-              <Billing />
-            </DashboardLayout>
-          } />
-          <Route path="/listings" element={
-            <DashboardLayout>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/billing" element={<Billing />} />
+            <Route path="/listings" element={
               <div className="p-8">
                 <h1 className="text-3xl font-extrabold text-slate-800 mb-4">Listings</h1>
                 <p className="text-slate-500">Listings page coming soon...</p>
               </div>
-            </DashboardLayout>
-          } />
-          <Route path="/history" element={
-            <DashboardLayout>
+            } />
+            <Route path="/history" element={
               <div className="p-8">
                 <h1 className="text-3xl font-extrabold text-slate-800 mb-4">History</h1>
                 <p className="text-slate-500">History page coming soon...</p>
               </div>
-            </DashboardLayout>
-          } />
-          <Route path="/settings" element={
-            <DashboardLayout>
+            } />
+            <Route path="/settings" element={
               <div className="p-8">
                 <h1 className="text-3xl font-extrabold text-slate-800 mb-4">Settings</h1>
                 <p className="text-slate-500">Settings page coming soon...</p>
               </div>
-            </DashboardLayout>
-          } />
+            } />
+          </Route>
         </Routes>
       </Router>
     </StoreProvider>
