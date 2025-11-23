@@ -108,6 +108,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
               <option value="Ozon">🇷🇺 Ozon</option>
             </optgroup>
           </select>
+          </div>
         </div>
 
         {/* Days Older Than */}
@@ -186,6 +187,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             <option value="Costco">Costco</option>
             <option value="Unknown">Unknown</option>
           </select>
+          </div>
         </div>
 
         {/* Buttons */}

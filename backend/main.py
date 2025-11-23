@@ -17,14 +17,19 @@ app = FastAPI(title="OptListing API", version="1.0.0")
 # CORS middleware for React frontend
 # Allow both local development and production frontend URLs
 import os
+import re
+
 cors_origins = [
-    # Production Vercel deployment
-    "https://optlisting.vercel.app",
-    
     # Local development environments
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
+    
+    # Production Vercel deployment - All variations
+    "https://optlisting.vercel.app",
+    "https://optlisting.vercel.app/",  # Trailing slash
+    "https://www.optlisting.vercel.app",  # www subdomain
+    "https://www.optlisting.vercel.app/",  # www subdomain with trailing slash
     
     # Environment variable for additional frontend URLs
     os.getenv("FRONTEND_URL", ""),  # Production frontend URL from environment
@@ -38,6 +43,7 @@ cors_origins = [origin for origin in cors_origins if origin]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins if cors_origins else ["*"],  # Fallback to all if no origins specified
+    allow_origin_regex="https://.*\\.vercel\\.app",  # Allow all Vercel subdomains
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
