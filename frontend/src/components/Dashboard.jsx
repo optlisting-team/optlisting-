@@ -25,7 +25,7 @@ function Dashboard() {
   const [error, setError] = useState(null)
   const [selectedIds, setSelectedIds] = useState([])
   const [queue, setQueue] = useState([])
-  const [viewMode, setViewMode] = useState('all') // 'all', 'zombies', 'queue', or 'history' - Default to 'all' for monitoring
+  const [viewMode, setViewMode] = useState('total') // 'total', 'all', 'zombies', 'queue', or 'history' - Default to 'total' for initial statistical view
   const [historyLogs, setHistoryLogs] = useState([])
   const [totalDeleted, setTotalDeleted] = useState(0)
   const [filters, setFilters] = useState({
@@ -152,7 +152,10 @@ function Dashboard() {
   const handleViewModeChange = (mode) => {
     setViewMode(mode)
     setSelectedIds([]) // Reset selection when switching views
-    if (mode === 'all') {
+    if (mode === 'total') {
+      // Statistical view - no data fetching needed
+      return
+    } else if (mode === 'all') {
       fetchAllListings()
     } else if (mode === 'zombies') {
       fetchZombies()
@@ -361,34 +364,50 @@ function Dashboard() {
                 onViewModeChange={handleViewModeChange}
               />
 
-        {/* Dynamic Layout: Full Width for 'all', Split View for 'zombies' */}
-        <div className={`flex gap-8 transition-all duration-300 ${
-          viewMode === 'all' ? '' : ''
-        }`}>
-          {/* Left Column - Dynamic Width */}
-          <div className={`space-y-8 transition-all duration-300 ${
-            (viewMode === 'all' || viewMode === 'history' || viewMode === 'queue')
-              ? 'w-full' 
-              : 'flex-1 min-w-0'
-          }`}>
-            {/* Filter Bar - Only show for zombies view */}
-            {viewMode === 'zombies' && (
-              <FilterBar 
-                onApplyFilter={handleApplyFilter}
-                onSync={handleSync}
-                loading={loading}
-                initialFilters={filters}
-              />
-            )}
+        {/* Initial Statistical View - Show when viewMode === 'total' */}
+        {viewMode === 'total' && (
+          <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-8 mt-8 text-center">
+            <p className="text-lg text-zinc-300 dark:text-zinc-300 mb-2">
+              📊 <strong className="text-white">Statistical Overview</strong>
+            </p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-400">
+              Click the <strong className="text-red-500">"Low Interest Detected"</strong> card above to start analyzing and cleaning your inventory.
+            </p>
+          </div>
+        )}
 
-            {/* View Mode Info */}
-            {viewMode === 'all' && (
-              <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-6 mb-4">
-                <p className="text-sm text-zinc-400 dark:text-zinc-400">
-                  📋 <strong className="text-gray-900">Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
-                </p>
-              </div>
-            )}
+        {/* Dynamic Layout: Full Width for 'all', Split View for 'zombies' */}
+        {/* Hide table and filters on initial load (viewMode === 'total') */}
+        {viewMode !== 'total' && (
+          <div className={`flex gap-8 transition-all duration-300 ${
+            viewMode === 'all' ? '' : ''
+          }`}>
+            {/* Left Column - Dynamic Width: Full width when queue is empty, flex-1 when queue has items */}
+            <div className={`space-y-8 transition-all duration-300 ${
+              (viewMode === 'all' || viewMode === 'history' || viewMode === 'queue')
+                ? 'w-full' 
+                : (viewMode === 'zombies' && queue.length === 0)
+                  ? 'w-full'
+                  : 'flex-1 min-w-0'
+            }`}>
+              {/* Filter Bar - Only show for zombies view */}
+              {viewMode === 'zombies' && (
+                <FilterBar 
+                  onApplyFilter={handleApplyFilter}
+                  onSync={handleSync}
+                  loading={loading}
+                  initialFilters={filters}
+                />
+              )}
+
+              {/* View Mode Info */}
+              {viewMode === 'all' && (
+                <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-6 mb-4">
+                  <p className="text-sm text-zinc-400 dark:text-zinc-400">
+                    📋 <strong className="text-gray-900">Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
+                  </p>
+                </div>
+              )}
 
             {/* Briefing Text for Low Interest Items View */}
             {viewMode === 'zombies' && (
@@ -523,22 +542,23 @@ function Dashboard() {
                 })()}
               </div>
             )}
-          </div>
-
-          {/* Right Column (Fixed Width) - Delete Queue - Show in zombies view only */}
-          {viewMode === 'zombies' && (
-            <div className="w-80 flex-shrink-0 transition-all duration-300">
-              <div className="sticky top-4">
-                <DeleteQueue
-                  queue={queue}
-                  onRemove={handleRemoveFromQueue}
-                  onExport={handleExport}
-                  loading={loading}
-                />
-              </div>
             </div>
-          )}
-        </div>
+
+            {/* Right Column (Fixed Width) - Delete Queue - Show only when queue has items */}
+            {viewMode === 'zombies' && queue.length > 0 && (
+              <div className="w-80 flex-shrink-0 transition-all duration-300">
+                <div className="sticky top-4">
+                  <DeleteQueue
+                    queue={queue}
+                    onRemove={handleRemoveFromQueue}
+                    onExport={handleExport}
+                    loading={loading}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
