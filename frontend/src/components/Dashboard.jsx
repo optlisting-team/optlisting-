@@ -29,7 +29,7 @@ function Dashboard() {
   const [historyLogs, setHistoryLogs] = useState([])
   const [totalDeleted, setTotalDeleted] = useState(0)
   const [filters, setFilters] = useState({
-    marketplace_filter: 'All',
+    marketplace_filter: 'eBay',  // MVP Scope: Default to eBay (only eBay and Shopify supported)
     min_days: 3,
     max_sales: 0,
     max_watch_count: 10,

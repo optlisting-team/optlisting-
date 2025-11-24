@@ -291,7 +291,7 @@ def analyze_zombie_listings(
     max_sales: int = 0,
     max_watch_count: int = 10,
     supplier_filter: str = "All",
-    platform_filter: str = "All",
+    platform_filter: str = "eBay",  # MVP Scope: Default to eBay (only eBay and Shopify supported)
     store_id: Optional[str] = None
 ) -> Tuple[List[Listing], Dict[str, int]]:
     """
@@ -303,7 +303,7 @@ def analyze_zombie_listings(
     - sales <= max_sales (from metrics['sales'] or legacy sold_qty)
     - views <= max_watch_count (from metrics['views'] or legacy watch_count)
     - supplier_name matches supplier_filter (if not "All")
-    - platform matches platform_filter (if not "All")
+    - platform matches platform_filter (MVP Scope: "eBay" or "Shopify" only)
     
     Returns:
         Tuple of (list of zombie listings, breakdown dictionary by platform)
@@ -418,8 +418,8 @@ def analyze_zombie_listings(
     if views_filters:
         query = query.filter(or_(*views_filters))
     
-    # Apply platform filter if not "All"
-    if platform_filter and platform_filter != "All":
+    # Apply platform filter (MVP Scope: Only eBay and Shopify)
+    if platform_filter and platform_filter in ["eBay", "Shopify"]:
         query = query.filter(Listing.platform == platform_filter)
     
     # Apply supplier filter if not "All"

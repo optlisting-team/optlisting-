@@ -4,9 +4,7 @@ import { ChevronDown } from 'lucide-react'
 
 export const MY_STORES = [
   { id: 'store-1', name: 'eBay Store', platform: 'eBay' },
-  { id: 'store-2', name: 'Amazon Store', platform: 'Amazon' },
-  { id: 'store-3', name: 'Shopify Store', platform: 'Shopify' },
-  { id: 'store-4', name: 'Walmart Store', platform: 'Walmart' }
+  { id: 'store-3', name: 'Shopify Store', platform: 'Shopify' }
 ]
 
 function StoreSwitcher() {

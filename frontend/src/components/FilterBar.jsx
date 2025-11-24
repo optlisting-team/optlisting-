@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
-  const [marketplaceFilter, setMarketplaceFilter] = useState(initialFilters.marketplace_filter || 'All')
+  const [marketplaceFilter, setMarketplaceFilter] = useState(initialFilters.marketplace_filter || 'eBay')
   const [minDays, setMinDays] = useState(initialFilters.min_days || 3)
   const [maxSales, setMaxSales] = useState(initialFilters.max_sales || 0)
   const [maxWatchCount, setMaxWatchCount] = useState(initialFilters.max_watch_count || 10)
@@ -9,7 +9,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
   // Update state when initialFilters change
   useEffect(() => {
-    setMarketplaceFilter(initialFilters.marketplace_filter || 'All')
+    setMarketplaceFilter(initialFilters.marketplace_filter || 'eBay')
     setMinDays(initialFilters.min_days || 3)
     setMaxSales(initialFilters.max_sales || 0)
     setMaxWatchCount(initialFilters.max_watch_count || 10)
@@ -33,13 +33,13 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   }
 
   const handleReset = () => {
-    setMarketplaceFilter('All')
+    setMarketplaceFilter('eBay')
     setMinDays(3)
     setMaxSales(0)
     setMaxWatchCount(10)
     setSourceFilter('All')
     onApplyFilter({
-      marketplace_filter: 'All',
+      marketplace_filter: 'eBay',
       min_days: 3,
       max_sales: 0,
       max_watch_count: 10,
@@ -64,7 +64,6 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             onChange={(e) => setMarketplaceFilter(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 bg-white"
           >
-            <option value="All">All Platforms</option>
             <option value="eBay">eBay</option>
             <option value="Shopify">Shopify</option>
           </select>

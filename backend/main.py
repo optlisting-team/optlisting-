@@ -38,14 +38,18 @@ cors_origins = [
 # Filter out empty strings and add Vercel regex pattern
 cors_origins = [origin for origin in cors_origins if origin]
 
+# CORS configuration for Railway + Vercel deployment
+# Important: allow_origins=["*"] requires allow_credentials=False
+# This allows all origins including Vercel preview deployments
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for Railway deployment compatibility
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel subdomains (fixed regex)
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins (Railway + Vercel compatibility)
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Explicitly allow all Vercel subdomains
+    allow_credentials=False,  # Must be False when using allow_origins=["*"]
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
 # Initialize database on startup
@@ -170,7 +174,7 @@ def analyze_zombies(
     max_sales: int = 0,
     max_watch_count: int = 10,
     supplier_filter: str = "All",
-    marketplace: str = "All",
+    marketplace: str = "eBay",  # MVP Scope: Default to eBay (only eBay and Shopify supported)
     store_id: Optional[str] = None,  # Store ID filter - 'all' or None means all stores
     user_id: str = "default-user",  # Default user ID for backward compatibility
     db: Session = Depends(get_db)
@@ -178,7 +182,7 @@ def analyze_zombies(
     """
     Zombie Filter API
     Filters listings based on dynamic criteria:
-    - marketplace: Filter by marketplace - "All", "eBay", "Amazon", "Shopify", "Walmart" (default: "All")
+    - marketplace: Filter by marketplace - MVP Scope: "eBay" or "Shopify" only (default: "eBay")
     - min_days: Minimum days old (default: 3)
     - max_sales: Maximum sales count (default: 0)
     - max_watch_count: Maximum watch count/views (default: 10)
@@ -190,21 +194,10 @@ def analyze_zombies(
     - zombie_count: Number of filtered zombie listings
     - zombies: List of zombie listings
     """
-    # Validate marketplace - Global marketplace list
+    # Validate marketplace - MVP Scope: Only eBay and Shopify
     valid_marketplaces = [
-        "All",
-        # South Korea
-        "Naver Smart Store", "Coupang", "Gmarket", "11st",
-        # North America
-        "eBay", "Amazon", "Shopify", "Walmart", "Etsy", "Target",
-        # Japan & Taiwan
-        "Rakuten", "Qoo10", "Shopee TW", "Momo", "Ruten",
-        # South East Asia
-        "Shopee", "Lazada", "Tokopedia",
-        # Europe
-        "Allegro", "Zalando", "Cdiscount", "Otto",
-        # Latin America & Others
-        "Mercado Libre", "Wildberries", "Flipkart", "Ozon"
+        "eBay",
+        "Shopify"
     ]
     if marketplace not in valid_marketplaces:
         raise HTTPException(
