@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import Response, JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional, List, Dict
@@ -51,6 +51,16 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,  # Cache preflight requests for 1 hour
 )
+
+# Add explicit CORS headers to all responses
+@app.middleware("http")
+async def add_cors_header(request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Expose-Headers"] = "*"
+    return response
 
 # Initialize database on startup
 @app.on_event("startup")
@@ -504,7 +514,7 @@ def get_deletion_history(
     # Get logs (most recent first)
     logs = db.query(DeletionLog).order_by(DeletionLog.deleted_at.desc()).offset(skip).limit(limit).all()
     
-    return {
+    response_data = {
         "total_count": total_count,
         "logs": [
             {
@@ -518,6 +528,16 @@ def get_deletion_history(
             for log in logs
         ]
     }
+    
+    # Return with explicit CORS headers
+    return JSONResponse(
+        content=response_data,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
 
 
 class UpdateListingRequest(BaseModel):
