@@ -382,38 +382,52 @@ def analyze_zombie_listings(
     query = query.filter(or_(*date_filters))
     
     # Sales filter: use metrics['sales'] (JSONB) with robust casting
+    # CRITICAL: Use cast(Listing.metrics['sales'].astext, Integer) for JSONB field access
     # If metrics doesn't have sales, assume 0 (which satisfies <= max_sales when max_sales >= 0)
     if max_sales is not None and max_sales >= 0:
         # Use CASE to safely handle NULL metrics or missing keys
         # If metrics is NULL or sales key doesn't exist, default to 0
-        sales_value = case(
-            (
-                and_(
-                    Listing.metrics.isnot(None),
-                    Listing.metrics.has_key('sales')
+        try:
+            sales_value = case(
+                (
+                    and_(
+                        Listing.metrics.isnot(None),
+                        Listing.metrics.has_key('sales')
+                    ),
+                    cast(Listing.metrics['sales'].astext, Integer)
                 ),
-                cast(Listing.metrics['sales'].astext, Integer)
-            ),
-            else_=0
-        )
-        query = query.filter(sales_value <= max_sales)
+                else_=0
+            )
+            query = query.filter(sales_value <= max_sales)
+        except Exception as e:
+            # Fallback: filter by legacy sold_qty field if JSONB access fails
+            print(f"Warning: JSONB sales filter failed, using legacy field: {e}")
+            if hasattr(Listing, 'sold_qty'):
+                query = query.filter(func.coalesce(Listing.sold_qty, 0) <= max_sales)
     
     # Watch count filter: use metrics['views'] (JSONB) with robust casting
+    # CRITICAL: Use cast(Listing.metrics['views'].astext, Integer) for JSONB field access
     # If metrics doesn't have views, assume 0 (which satisfies <= max_watch_count when max_watch_count >= 0)
     if max_watch_count is not None and max_watch_count >= 0:
         # Use CASE to safely handle NULL metrics or missing keys
         # If metrics is NULL or views key doesn't exist, default to 0
-        views_value = case(
-            (
-                and_(
-                    Listing.metrics.isnot(None),
-                    Listing.metrics.has_key('views')
+        try:
+            views_value = case(
+                (
+                    and_(
+                        Listing.metrics.isnot(None),
+                        Listing.metrics.has_key('views')
+                    ),
+                    cast(Listing.metrics['views'].astext, Integer)
                 ),
-                cast(Listing.metrics['views'].astext, Integer)
-            ),
-            else_=0
-        )
-        query = query.filter(views_value <= max_watch_count)
+                else_=0
+            )
+            query = query.filter(views_value <= max_watch_count)
+        except Exception as e:
+            # Fallback: filter by legacy watch_count field if JSONB access fails
+            print(f"Warning: JSONB views filter failed, using legacy field: {e}")
+            if hasattr(Listing, 'watch_count'):
+                query = query.filter(func.coalesce(Listing.watch_count, 0) <= max_watch_count)
     
     # Apply platform filter (MVP Scope: Only eBay and Shopify)
     if platform_filter and platform_filter in ["eBay", "Shopify"]:
