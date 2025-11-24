@@ -41,6 +41,7 @@ cors_origins = [origin for origin in cors_origins if origin]
 # CORS configuration for Railway + Vercel deployment
 # Important: allow_origins=["*"] requires allow_credentials=False
 # This allows all origins including Vercel preview deployments
+# Add CORS middleware FIRST, before any routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins (Railway + Vercel compatibility)
@@ -51,26 +52,6 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,  # Cache preflight requests for 1 hour
 )
-
-# Add explicit CORS headers to all responses (including OPTIONS preflight)
-@app.middleware("http")
-async def add_cors_header(request, call_next):
-    # Handle OPTIONS preflight requests
-    if request.method == "OPTIONS":
-        response = Response()
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        response.headers["Access-Control-Max-Age"] = "3600"
-        return response
-    
-    # Add CORS headers to all other responses
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    response.headers["Access-Control-Expose-Headers"] = "*"
-    return response
 
 # Initialize database on startup
 @app.on_event("startup")
@@ -525,7 +506,7 @@ def get_deletion_history(
         # Get logs (most recent first)
         logs = db.query(DeletionLog).order_by(DeletionLog.deleted_at.desc()).offset(skip).limit(limit).all()
         
-        response_data = {
+        return {
             "total_count": total_count,
             "logs": [
                 {
@@ -539,30 +520,12 @@ def get_deletion_history(
                 for log in logs
             ]
         }
-        
-        # Return with explicit CORS headers
-        return JSONResponse(
-            content=response_data,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                "Access-Control-Allow-Headers": "*",
-            }
-        )
     except Exception as e:
-        # Log error and return empty response with CORS headers
+        # Log error and return empty response
         print(f"Error fetching deletion history: {e}")
         import traceback
         traceback.print_exc()
-        return JSONResponse(
-            content={"total_count": 0, "logs": []},
-            status_code=200,  # Return 200 to avoid CORS issues
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                "Access-Control-Allow-Headers": "*",
-            }
-        )
+        return {"total_count": 0, "logs": []}
 
 
 class UpdateListingRequest(BaseModel):
