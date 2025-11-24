@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Button } from './ui/button'
 
 function ExportButton({ onExport }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -12,10 +11,10 @@ function ExportButton({ onExport }) {
   return (
     <div className="relative inline-block text-left">
       <div>
-        <Button
+        <button
           type="button"
+          className="inline-flex justify-center items-center rounded-md shadow-sm px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-blue-600 hover:bg-blue-700"
         >
           Export CSV
           <svg
@@ -30,7 +29,7 @@ function ExportButton({ onExport }) {
               clipRule="evenodd"
             />
           </svg>
-        </Button>
+        </button>
       </div>
 
       {isOpen && (
@@ -41,27 +40,24 @@ function ExportButton({ onExport }) {
           ></div>
           <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
             <div className="py-1" role="menu">
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
+              <button
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 onClick={() => handleExport('autods')}
               >
                 For AutoDS
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
+              </button>
+              <button
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 onClick={() => handleExport('yaballe')}
               >
                 For Yaballe
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
+              </button>
+              <button
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 onClick={() => handleExport('ebay')}
               >
                 For eBay File Exchange
-              </Button>
+              </button>
             </div>
           </div>
         </>

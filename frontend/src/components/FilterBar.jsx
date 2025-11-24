@@ -1,57 +1,25 @@
 import { useState, useEffect } from 'react'
-import { Button } from './ui/button'
 
 function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
-  // Calculate default cutoff date (3 days ago)
-  const getDefaultCutoffDate = () => {
-    const defaultDate = new Date()
-    defaultDate.setDate(defaultDate.getDate() - 3)
-    return defaultDate.toISOString().split('T')[0] // Format: YYYY-MM-DD
-  }
-
-  // Convert days to cutoff date string
-  const daysToCutoffDate = (days) => {
-    const date = new Date()
-    date.setDate(date.getDate() - days)
-    return date.toISOString().split('T')[0]
-  }
-
-  // Convert cutoff date to days (difference from today)
-  const cutoffDateToDays = (dateString) => {
-    if (!dateString) return 3
-    const selectedDate = new Date(dateString)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    selectedDate.setHours(0, 0, 0, 0)
-    const diffTime = today - selectedDate
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-    return Math.max(0, diffDays)
-  }
-
   const [marketplaceFilter, setMarketplaceFilter] = useState(initialFilters.marketplace_filter || 'All')
-  const [cutoffDate, setCutoffDate] = useState(
-    initialFilters.cutoff_date || (initialFilters.min_days ? daysToCutoffDate(initialFilters.min_days) : getDefaultCutoffDate())
-  )
+  const [minDays, setMinDays] = useState(initialFilters.min_days || 3)
   const [maxSales, setMaxSales] = useState(initialFilters.max_sales || 0)
   const [maxWatchCount, setMaxWatchCount] = useState(initialFilters.max_watch_count || 10)
-  const [supplierFilter, setSupplierFilter] = useState(initialFilters.supplier_filter || initialFilters.source_filter || 'All')
+  const [sourceFilter, setSourceFilter] = useState(initialFilters.source_filter || 'All')
 
   // Update state when initialFilters change
   useEffect(() => {
     setMarketplaceFilter(initialFilters.marketplace_filter || 'All')
-    setCutoffDate(
-      initialFilters.cutoff_date || (initialFilters.min_days ? daysToCutoffDate(initialFilters.min_days) : getDefaultCutoffDate())
-    )
+    setMinDays(initialFilters.min_days || 3)
     setMaxSales(initialFilters.max_sales || 0)
     setMaxWatchCount(initialFilters.max_watch_count || 10)
-    setSupplierFilter(initialFilters.supplier_filter || initialFilters.source_filter || 'All')
+    setSourceFilter(initialFilters.source_filter || 'All')
   }, [initialFilters])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Convert cutoff date to days
-    const calculatedDays = cutoffDateToDays(cutoffDate)
-    const safeMinDays = Math.max(0, calculatedDays)
+    // Ensure values are non-negative
+    const safeMinDays = Math.max(0, parseInt(minDays) || 0)
     const safeMaxSales = Math.max(0, parseInt(maxSales) || 0)
     const safeMaxWatchCount = Math.max(0, parseInt(maxWatchCount) || 0)
     
@@ -60,184 +28,135 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
       min_days: safeMinDays,
       max_sales: safeMaxSales,
       max_watch_count: safeMaxWatchCount,
-      supplier_filter: supplierFilter
+      source_filter: sourceFilter
     })
   }
 
   const handleReset = () => {
     setMarketplaceFilter('All')
-    setCutoffDate(getDefaultCutoffDate())
+    setMinDays(3)
     setMaxSales(0)
     setMaxWatchCount(10)
-    setSupplierFilter('All')
-    const defaultDays = cutoffDateToDays(getDefaultCutoffDate())
+    setSourceFilter('All')
     onApplyFilter({
       marketplace_filter: 'All',
-      min_days: defaultDays,
+      min_days: 3,
       max_sales: 0,
       max_watch_count: 10,
-      supplier_filter: 'All'
+      source_filter: 'All'
     })
   }
 
   return (
-    <div className="bg-white p-5 rounded-xl border border-gray-200 mb-8 shadow-sm">
-      <form onSubmit={handleSubmit} className="flex items-center gap-4 flex-wrap">
-        {/* Platform Filter */}
-        <div className="flex-1 min-w-[200px]">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400 text-sm">🏪</span>
-            </div>
-            <select
-              id="marketplaceFilter"
-              value={marketplaceFilter}
-              onChange={(e) => setMarketplaceFilter(e.target.value)}
-              className="w-full pl-10 pr-3 h-9 text-sm px-3 rounded-md border border-gray-300 focus:ring-1 focus:ring-black focus:border-black bg-white"
-            >
+    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        Filter Low Interest Items
+      </h3>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+        {/* Platform Filter - First and Most Important */}
+        <div>
+          <label htmlFor="marketplaceFilter" className="block text-sm font-medium text-gray-700 mb-2">
+            <span className="mr-1">🏪</span> Platform
+          </label>
+          <select
+            id="marketplaceFilter"
+            value={marketplaceFilter}
+            onChange={(e) => setMarketplaceFilter(e.target.value)}
+            className="w-full px-3 py-2 border-2 border-purple-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-purple-50"
+          >
             <option value="All">All Platforms</option>
-            
-            <optgroup label="🇰🇷 South Korea">
-              <option value="Naver Smart Store">🇰🇷 Naver Smart Store</option>
-              <option value="Coupang">🇰🇷 Coupang</option>
-              <option value="Gmarket">🇰🇷 Gmarket</option>
-              <option value="11st">🇰🇷 11st</option>
-            </optgroup>
-            
-            <optgroup label="🇺🇸 North America">
-              <option value="eBay">🇺🇸 eBay</option>
-              <option value="Amazon">🇺🇸 Amazon</option>
-              <option value="Shopify">🇨🇦 Shopify</option>
-              <option value="Walmart">🇺🇸 Walmart</option>
-              <option value="Etsy">🇺🇸 Etsy</option>
-              <option value="Target">🇺🇸 Target</option>
-            </optgroup>
-            
-            <optgroup label="🇯🇵🇹🇼 Japan & Taiwan">
-              <option value="Rakuten">🇯🇵 Rakuten</option>
-              <option value="Qoo10">🇸🇬 Qoo10</option>
-              <option value="Shopee TW">🇹🇼 Shopee TW</option>
-              <option value="Momo">🇹🇼 Momo</option>
-              <option value="Ruten">🇹🇼 Ruten</option>
-            </optgroup>
-            
-            <optgroup label="🌏 South East Asia">
-              <option value="Shopee">🇸🇬 Shopee</option>
-              <option value="Lazada">🇸🇬 Lazada</option>
-              <option value="Tokopedia">🇮🇩 Tokopedia</option>
-            </optgroup>
-            
-            <optgroup label="🇪🇺 Europe">
-              <option value="Allegro">🇵🇱 Allegro</option>
-              <option value="Zalando">🇩🇪 Zalando</option>
-              <option value="Cdiscount">🇫🇷 Cdiscount</option>
-              <option value="Otto">🇩🇪 Otto</option>
-            </optgroup>
-            
-            <optgroup label="🌎 Latin America & Others">
-              <option value="Mercado Libre">🇦🇷 Mercado Libre</option>
-              <option value="Wildberries">🇷🇺 Wildberries</option>
-              <option value="Flipkart">🇮🇳 Flipkart</option>
-              <option value="Ozon">🇷🇺 Ozon</option>
-            </optgroup>
+            <option value="eBay">eBay</option>
+            <option value="Shopify">Shopify</option>
           </select>
-          </div>
         </div>
 
-        {/* Listed Before - Date Picker */}
-        <div className="min-w-[180px]">
-          <label htmlFor="cutoffDate" className="block text-xs font-medium text-slate-700 mb-1">
-            Listed Before
+        {/* Days Older Than */}
+        <div>
+          <label htmlFor="minDays" className="block text-sm font-medium text-gray-700 mb-2">
+            Days Older Than
           </label>
           <input
-            type="date"
-            id="cutoffDate"
-            value={cutoffDate}
-            onChange={(e) => setCutoffDate(e.target.value)}
-            className="cursor-pointer h-9 text-sm px-3 rounded-md border border-gray-300 focus:ring-1 focus:ring-black focus:border-black bg-white block w-full"
+            type="number"
+            id="minDays"
+            min="0"
+            value={minDays}
+            onChange={(e) => setMinDays(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="3"
           />
         </div>
 
         {/* Max Sales */}
-        <div className="min-w-[120px]">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400 text-sm">💰</span>
-            </div>
-            <input
-              type="number"
-              id="maxSales"
-              min="0"
-              value={maxSales}
-              onChange={(e) => setMaxSales(e.target.value)}
-              className="w-full pl-10 pr-3 h-9 text-sm px-3 rounded-md border border-gray-300 focus:ring-1 focus:ring-black focus:border-black bg-white"
-              placeholder="0"
-            />
-          </div>
+        <div>
+          <label htmlFor="maxSales" className="block text-sm font-medium text-gray-700 mb-2">
+            Max Sales
+          </label>
+          <input
+            type="number"
+            id="maxSales"
+            min="0"
+            value={maxSales}
+            onChange={(e) => setMaxSales(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="0"
+          />
         </div>
 
         {/* Max Watch Count */}
-        <div className="min-w-[140px]">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400 text-sm">👁️</span>
-            </div>
-            <input
-              type="number"
-              id="maxWatchCount"
-              min="0"
-              value={maxWatchCount}
-              onChange={(e) => setMaxWatchCount(e.target.value)}
-              className="w-full pl-10 pr-3 h-9 text-sm px-3 rounded-md border border-gray-300 focus:ring-1 focus:ring-black focus:border-black bg-white"
-              placeholder="10"
-            />
-          </div>
+        <div>
+          <label htmlFor="maxWatchCount" className="block text-sm font-medium text-gray-700 mb-2">
+            Max Watch Count
+          </label>
+          <input
+            type="number"
+            id="maxWatchCount"
+            min="0"
+            value={maxWatchCount}
+            onChange={(e) => setMaxWatchCount(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="10"
+          />
         </div>
 
-        {/* Supplier Filter */}
-        <div className="min-w-[160px]">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400 text-sm">🏭</span>
-            </div>
-            <select
-              id="supplierFilter"
-              value={supplierFilter}
-              onChange={(e) => setSupplierFilter(e.target.value)}
-              className="w-full pl-10 pr-3 h-9 text-sm px-3 rounded-md border border-gray-300 focus:ring-1 focus:ring-black focus:border-black bg-white"
-            >
-            <option value="All">All Suppliers</option>
+        {/* Source Filter */}
+        <div>
+          <label htmlFor="sourceFilter" className="block text-sm font-medium text-gray-700 mb-2">
+            Source
+          </label>
+          <select
+            id="sourceFilter"
+            value={sourceFilter}
+            onChange={(e) => setSourceFilter(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="All">All Sources</option>
             <option value="Amazon">Amazon</option>
             <option value="Walmart">Walmart</option>
-            <option value="Wholesale2B">Wholesale2B</option>
-            <option value="Doba">Doba</option>
-            <option value="DSers">DSers</option>
-            <option value="Spocket">Spocket</option>
+            <option value="Home Depot">Home Depot</option>
+            <option value="AliExpress">AliExpress</option>
             <option value="CJ Dropshipping">CJ Dropshipping</option>
-            <option value="Unknown">Unknown</option>
+            <option value="Wholesale2B">Wholesale2B</option>
+            <option value="Costway">Costway</option>
           </select>
-          </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-2 ml-auto">
-          <Button
+        <div className="flex gap-2">
+          <button
             type="submit"
             disabled={loading}
-            variant="default"
-            size="default"
+            className="flex-1 px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? 'Loading...' : 'Apply'}
-          </Button>
-          <Button
+            {loading ? 'Loading...' : 'Apply Filter'}
+          </button>
+          <button
             type="button"
             onClick={handleReset}
             disabled={loading}
-            variant="outline"
-            size="default"
+            className="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Reset
-          </Button>
+          </button>
         </div>
       </form>
     </div>

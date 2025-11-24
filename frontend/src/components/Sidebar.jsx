@@ -1,118 +1,88 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useState } from 'react'
-import { LayoutDashboard, List, History, Settings, Store } from 'lucide-react'
-import { useStore } from '../contexts/StoreContext'
-import StoreSwitcher, { getConnectedStoreCount } from './StoreSwitcher'
+import StoreSwitcher from './StoreSwitcher'
+import { LayoutDashboard, List, History, User } from 'lucide-react'
 
 function Sidebar() {
   const location = useLocation()
-  const { selectedStore, setSelectedStore } = useStore()
-  const [currentPlan] = useState("PRO")
-  const connectedStoreCount = getConnectedStoreCount()
-
-  // Get max store limit based on plan
-  const getMaxStoreLimit = (plan) => {
-    switch (plan) {
-      case "Starter":
-        return 1
-      case "PRO":
-        return 10
-      case "MASTER":
-        return 25
-      case "Enterprise":
-        return Infinity
-      default:
-        return 10
-    }
-  }
-
-  const maxStoreLimit = getMaxStoreLimit(currentPlan)
-
-  const formatStoreUtilization = () => {
-    if (maxStoreLimit === Infinity) {
-      return `💎 ${currentPlan}: ${connectedStoreCount} / ∞ Stores`
-    }
-    return `💎 ${currentPlan}: ${connectedStoreCount} / ${maxStoreLimit} Stores`
-  }
-
-  const menuItems = [
-    { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/listings', icon: List, label: 'Listings' },
-    { path: '/history', icon: History, label: 'History' },
-    { path: '/settings', icon: Settings, label: 'Settings' }
-  ]
 
   const isActive = (path) => {
-    if (path === '/dashboard') {
-      return location.pathname === '/dashboard'
-    }
-    return location.pathname.startsWith(path)
+    return location.pathname === path
   }
 
+  const navItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/listings', label: 'Listings', icon: List },
+    { path: '/history', label: 'History', icon: History }
+  ]
+
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 bg-[#0a0a0a] border-r border-gray-800 flex flex-col z-50">
-      {/* Top: Logo */}
-      <div className="px-6 py-6 border-b border-gray-800">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="flex flex-col h-screen bg-white border-r border-slate-200 w-64">
+      {/* Top Section - Header */}
+      <div className="px-4 py-6 border-b border-slate-200">
+        {/* Logo */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <span className="text-xl font-semibold tracking-tight text-white">OptListing</span>
-        </Link>
-      </div>
+          <span className="text-xl font-bold text-slate-800">OptListing</span>
+        </div>
 
-      {/* Middle: Navigation Menu */}
-      <nav className="flex-1 px-4 py-6 overflow-y-auto">
-        <ul className="space-y-1">
-          {menuItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.path)
-            return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                    active
-                      ? 'bg-gray-800 text-white font-medium'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="text-sm">{item.label}</span>
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
-
-      {/* Bottom: Tools & User Info */}
-      <div className="px-4 py-6 border-t border-gray-800 space-y-3">
         {/* Store Switcher */}
         <div className="mb-4">
-          <div className="flex items-center gap-2 mb-2 px-2">
-            <Store className="h-4 w-4 text-gray-400" />
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Store</span>
+          <StoreSwitcher />
+        </div>
+
+        {/* API Status Badge */}
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-xs font-medium text-green-700">API Connected</span>
+        </div>
+      </div>
+
+      {/* Middle Section - Navigation */}
+      <nav className="flex-1 px-4 py-4 overflow-y-auto">
+        <div className="space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  isActive(item.path)
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
+
+      {/* Bottom Section - Footer */}
+      <div className="px-4 py-4 border-t border-slate-200">
+        {/* User Profile */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-slate-600" />
           </div>
-          <div className="px-2">
-            <StoreSwitcher currentStore={selectedStore} onStoreChange={setSelectedStore} isInSidebar={true} />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-slate-900 truncate">User</p>
+            <p className="text-xs text-slate-500 truncate">user@example.com</p>
           </div>
         </div>
 
         {/* Plan Badge */}
-        <Link
-          to="/billing"
-          className="block px-3 py-2 bg-gray-800 rounded-md text-xs font-medium text-gray-300 hover:bg-gray-700 transition-colors"
-        >
-          {formatStoreUtilization()}
-        </Link>
-
-        {/* Status Badge */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-gray-800 rounded-md">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span className="text-xs font-medium text-gray-300">API Connected</span>
+        <div className="px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-purple-700">PLAN:</span>
+            <span className="text-xs font-bold text-purple-900">PRO</span>
+          </div>
         </div>
       </div>
     </div>
@@ -120,4 +90,3 @@ function Sidebar() {
 }
 
 export default Sidebar
-

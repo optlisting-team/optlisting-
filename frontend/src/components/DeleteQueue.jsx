@@ -1,6 +1,4 @@
 import SourceBadge from './SourceBadge'
-import { Button } from './ui/button'
-import { Card } from './ui/card'
 
 function DeleteQueue({ queue, onRemove, onExport, loading }) {
   // Group items by source
@@ -74,11 +72,9 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
                     </div>
 
                     {/* Remove Button (X) */}
-                    <Button
+                    <button
                       onClick={() => onRemove(item.id)}
-                      variant="ghost"
-                      size="icon"
-                      className="flex-shrink-0 h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      className="flex-shrink-0 p-0.5 text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Remove from queue"
                     >
                       <svg
@@ -94,7 +90,7 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
                           d="M6 18L18 6M6 6l12 12"
                         />
                       </svg>
-                    </Button>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -103,47 +99,46 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
         </div>
 
         {/* Export Button */}
-        <Button
+        <button
           onClick={() => handleSourceExport(source, 'autods')}
-          className={`w-full ${buttonBgClass} text-white font-semibold`}
-          size="sm"
+          className={`w-full px-3 py-2 ${buttonBgClass} text-white text-xs font-semibold rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2`}
         >
           <span>Download {source} CSV</span>
           <span className="px-1.5 py-0.5 bg-white bg-opacity-20 rounded text-xs font-bold">
             {items.length}
           </span>
-        </Button>
+        </button>
       </div>
     )
   }
 
   if (queue.length === 0) {
     return (
-      <Card className="p-4 h-full flex flex-col">
+      <div className="bg-white rounded-lg shadow-md p-4 h-full flex flex-col">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-lg font-semibold text-gray-800">
             Ready to Delete
           </h3>
-          <p className="text-sm text-muted-foreground">Count: 0</p>
+          <p className="text-sm text-gray-500">Count: 0</p>
         </div>
-        <div className="flex-1 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
-          <p className="text-muted-foreground text-center text-sm">
+        <div className="flex-1 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
+          <p className="text-gray-500 text-center text-sm">
             No items in queue.<br />
             Select items from the left to add them here.
           </p>
         </div>
-      </Card>
+      </div>
     )
   }
 
   return (
-    <Card className="p-4 h-full flex flex-col">
+    <div className="bg-white rounded-lg shadow-md p-4 h-full flex flex-col">
       {/* Header */}
       <div className="mb-4">
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-lg font-semibold text-gray-800">
           Ready to Delete
         </h3>
-        <p className="text-sm text-muted-foreground">Total: {queue.length} items</p>
+        <p className="text-sm text-gray-500">Total: {queue.length} items</p>
       </div>
 
       {/* Categorized Queue - Scrollable */}
@@ -178,7 +173,7 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
           'bg-gray-600'
         )}
       </div>
-    </Card>
+    </div>
   )
 }
 

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useStore } from '../contexts/StoreContext'
-import { StatsCards } from './StatsCards'
-import { OrdersTable } from './OrdersTable'
+import SummaryCard from './SummaryCard'
 import ZombieTable from './ZombieTable'
 import FilterBar from './FilterBar'
 import DeleteQueue from './DeleteQueue'
@@ -10,7 +9,6 @@ import HistoryTable from './HistoryTable'
 import QueueReviewPanel from './QueueReviewPanel'
 import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
-import { FileText } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
@@ -338,32 +336,21 @@ function Dashboard() {
   }
 
   return (
-    <div className="font-sans">
-      {/* Stats Cards */}
-      <StatsCards 
-        totalListings={totalListings}
-        platformBreakdown={platformBreakdown}
-        totalZombies={totalZombies} 
-        queueCount={queue.length}
-        totalDeleted={totalDeleted}
-        loading={loading}
-        viewMode={viewMode}
-        onViewModeChange={handleViewModeChange}
-      />
-
-      {/* Info Message for All Listings View */}
-      {viewMode === 'all' && (
-        <div className="rounded-md border border-blue-500/20 bg-blue-500/10 p-4 flex items-start gap-3">
-          <FileText className="h-5 w-5 text-blue-400 mt-0.5" />
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-blue-100">Viewing All Listings</p>
-            <p className="text-sm text-blue-200/80">
-              Click the <span className="font-semibold text-blue-100">"Low Interest Detected"</span> card above to
-              filter and optimize inventory effectively.
-            </p>
-          </div>
-        </div>
-      )}
+    <div className="font-sans bg-slate-50 min-h-full">
+      <div className="px-6">
+        {/* Summary Card */}
+        <SummaryCard 
+            totalListings={totalListings}
+            totalBreakdown={totalBreakdown}
+            platformBreakdown={platformBreakdown}
+            totalZombies={totalZombies} 
+            queueCount={queue.length}
+            totalDeleted={totalDeleted}
+            loading={loading}
+            filters={filters}
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+          />
 
         {/* Dynamic Layout: Full Width for 'all', Split View for 'zombies' */}
         <div className={`flex gap-8 transition-all duration-300 ${
@@ -501,7 +488,7 @@ function Dashboard() {
                   
                   if (isEmpty) {
                     return (
-                      <div className="p-8 text-center text-muted-foreground">
+                      <div className="p-8 text-center text-slate-500">
                         {viewMode === 'all' 
                           ? "No listings found."
                           : queue.length > 0 
@@ -513,14 +500,15 @@ function Dashboard() {
                   }
                   
                   return (
-                    <OrdersTable 
-                      listings={currentData}
-                      selectedIds={selectedIds}
-                      onSelect={handleSelect}
-                      onSelectAll={handleSelectAll}
-                      onSourceChange={handleSourceChange}
-                      loading={loading}
-                    />
+                    <div className="p-6">
+                      <ZombieTable 
+                        zombies={currentData}
+                        selectedIds={selectedIds}
+                        onSelect={handleSelect}
+                        onSelectAll={handleSelectAll}
+                        onSourceChange={handleSourceChange}
+                      />
+                    </div>
                   )
                 })()}
               </div>
@@ -541,6 +529,7 @@ function Dashboard() {
             </div>
           )}
         </div>
+      </div>
     </div>
   )
 }

@@ -1,29 +1,27 @@
 import SourceBadge from './SourceBadge'
 import ExportButton from './ExportButton'
-import { Button } from './ui/button'
-import { Card } from './ui/card'
 
 function QueueList({ queue, onRemove, onExport, loading }) {
   if (queue.length === 0) {
     return (
-      <Card className="p-6 h-full">
-        <h3 className="text-lg font-semibold mb-4">
+      <div className="bg-white rounded-lg shadow-md p-6 h-full">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
           Ready to Export (Final Check)
         </h3>
-        <div className="flex items-center justify-center h-64 border-2 border-dashed border-border rounded-lg">
-          <p className="text-muted-foreground text-center">
+        <div className="flex items-center justify-center h-64 border-2 border-dashed border-gray-300 rounded-lg">
+          <p className="text-gray-500 text-center">
             No items in queue.<br />
             Select items from the left to add them here.
           </p>
         </div>
-      </Card>
+      </div>
     )
   }
 
   return (
-    <Card className="bg-blue-50 p-6 h-full border-2 border-blue-200">
+    <div className="bg-blue-50 rounded-lg shadow-md p-6 h-full border-2 border-blue-200">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-lg font-semibold text-gray-800">
           Ready to Export (Final Check)
         </h3>
         <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
@@ -73,11 +71,9 @@ function QueueList({ queue, onRemove, onExport, loading }) {
                   </div>
 
                   {/* Remove Button */}
-                  <Button
+                  <button
                     onClick={() => onRemove(item.id)}
-                    variant="ghost"
-                    size="icon"
-                    className="flex-shrink-0 h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="flex-shrink-0 p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
                     title="Remove from queue"
                   >
                     <svg
@@ -93,14 +89,14 @@ function QueueList({ queue, onRemove, onExport, loading }) {
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   )
 }
 

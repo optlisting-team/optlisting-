@@ -1,6 +1,3 @@
-import { cn } from "@/lib/utils"
-import { Package, TrendingDown, Trash2, History } from "lucide-react"
-
 function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {}, totalZombies, queueCount, totalDeleted, loading, filters = {}, viewMode = 'zombies', onViewModeChange }) {
   const handleCardClick = (mode) => {
     if (onViewModeChange) {
@@ -8,136 +5,133 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
     }
   }
 
-  // Get top 3 platforms for breakdown display
-  const getTopPlatforms = () => {
-    if (!platformBreakdown || Object.keys(platformBreakdown).length === 0) return []
-    
-    const platforms = Object.entries(platformBreakdown)
-      .filter(([platform, count]) => count > 0)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3)
-    
-    return platforms
-  }
-
-  const topPlatforms = getTopPlatforms()
-  const remainingCount = Object.entries(platformBreakdown || {})
-    .filter(([platform, count]) => count > 0)
-    .length - topPlatforms.length
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {/* Card 1: Total Listings */}
-      <div
-        onClick={() => handleCardClick('all')}
-        className={cn(
-          "bg-white border border-gray-200 rounded-xl p-6 cursor-pointer transition-all hover:shadow-sm relative",
-          viewMode === 'all' && 'border-gray-300 shadow-sm'
-        )}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-              Total Listings
-            </p>
-            <p className="text-4xl font-extrabold text-gray-900 mt-2">
-              {loading ? '...' : (totalListings || 0).toLocaleString()}
-            </p>
-            
-            {/* Platform Breakdown - Top 3 Only */}
-            {!loading && totalListings > 0 && topPlatforms.length > 0 && (
-              <div className="mt-6 space-y-1.5">
-                {topPlatforms.map(([platform, count]) => (
-                  <div key={platform} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
-                    <span className="text-xs text-gray-600 font-medium">
-                      {platform}: {count.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-                {remainingCount > 0 && (
-                  <div className="text-xs text-gray-500 font-medium pt-1">
-                    ...and {remainingCount} more
-                  </div>
-                )}
-              </div>
-            )}
+    <div className="bg-white rounded-2xl shadow-xl p-8 border-0">
+      {/* Pipeline: Single Flex Container */}
+      <div className="flex items-center justify-between gap-4">
+        {/* Card 1: Total Listings */}
+        <div 
+          onClick={() => handleCardClick('all')}
+          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-white cursor-pointer ${
+            viewMode === 'all' 
+              ? 'ring-4 ring-slate-200 scale-105' 
+              : 'hover:scale-105'
+          }`}
+        >
+          <div className="text-4xl mb-3">📦</div>
+          <div className="text-5xl font-extrabold text-slate-700 mb-2">
+            {loading ? '...' : (totalListings || 0).toLocaleString()}
           </div>
-          <Package className="h-5 w-5 text-gray-400 flex-shrink-0" />
+          <div className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">
+            Total Listings
+          </div>
+          {/* Platform Breakdown (판매처 플랫폼만 표시) */}
+          {!loading && totalListings > 0 && (
+            <div className="flex gap-2 justify-center mt-2 flex-wrap">
+              <span className="text-xs font-medium text-purple-600">
+                🟣 eBay: {platformBreakdown?.eBay || 0}
+              </span>
+              {platformBreakdown?.["Naver Smart Store"] > 0 && (
+                <span className="text-xs font-medium text-green-600">
+                  🟢 Naver: {platformBreakdown["Naver Smart Store"]}
+                </span>
+              )}
+              {platformBreakdown?.Amazon > 0 && (
+                <span className="text-xs font-medium text-yellow-600">
+                  🟡 Amazon: {platformBreakdown.Amazon}
+                </span>
+              )}
+              {platformBreakdown?.Shopify > 0 && (
+                <span className="text-xs font-medium text-green-600">
+                  🟢 Shopify: {platformBreakdown.Shopify}
+                </span>
+              )}
+              {platformBreakdown?.Walmart > 0 && (
+                <span className="text-xs font-medium text-blue-600">
+                  🔵 Walmart: {platformBreakdown.Walmart}
+                </span>
+              )}
+              {platformBreakdown?.Coupang > 0 && (
+                <span className="text-xs font-medium text-rose-600">
+                  🔴 Coupang: {platformBreakdown.Coupang}
+                </span>
+              )}
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Card 2: Low Interest Items Found */}
-      <div
-        onClick={() => handleCardClick('zombies')}
-        className={cn(
-          "bg-white border border-gray-200 rounded-xl p-6 cursor-pointer transition-all hover:shadow-sm relative",
-          viewMode === 'zombies' && 'border-gray-300 shadow-sm'
-        )}
-      >
-        {totalZombies > 0 && !loading && (
-          <div className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-        )}
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-              Low Interest Detected
-            </p>
-            <p className="text-4xl font-extrabold text-gray-900 mt-2">
-              {loading ? '...' : totalZombies.toLocaleString()}
-            </p>
-            
-            {/* Trend Indicator */}
-            {!loading && totalZombies > 0 && (
-              <div className="mt-6 flex items-center gap-1 text-xs text-red-600">
-                <span>↗</span>
-                <span>Action required</span>
-              </div>
-            )}
-          </div>
-          <TrendingDown className="h-5 w-5 text-gray-400 flex-shrink-0" />
+        {/* Arrow 1 */}
+        <div className="text-gray-300 text-3xl flex-shrink-0">
+          ›
         </div>
-      </div>
 
-      {/* Card 3: In Queue */}
-      <div
-        onClick={() => handleCardClick('queue')}
-        className={cn(
-          "bg-white border border-gray-200 rounded-xl p-6 cursor-pointer transition-all hover:shadow-sm",
-          viewMode === 'queue' && 'border-gray-300 shadow-sm'
-        )}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-              Ready to Delete
-            </p>
-            <p className="text-4xl font-extrabold text-gray-900 mt-2">
-              {queueCount || 0}
-            </p>
+        {/* Card 2: Low Interest Items Found */}
+        <div 
+          onClick={() => handleCardClick('zombies')}
+          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-rose-50 relative cursor-pointer ${
+            viewMode === 'zombies' 
+              ? 'ring-4 ring-rose-100 scale-105' 
+              : 'hover:scale-105'
+          }`}
+        >
+          {totalZombies > 0 && !loading && (
+            <div className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full animate-pulse"></div>
+          )}
+          <div className="text-4xl mb-3">📉</div>
+          <div className="text-5xl font-extrabold text-rose-600 mb-2">
+            {loading ? '...' : totalZombies.toLocaleString()}
           </div>
-          <Trash2 className="h-5 w-5 text-gray-400 flex-shrink-0" />
+          <div className="text-xs font-bold text-rose-400 tracking-wider uppercase">
+            Low Interest Detected
+          </div>
+
         </div>
-      </div>
 
-      {/* Card 4: History */}
-      <div
-        onClick={() => handleCardClick('history')}
-        className={cn(
-          "bg-white border border-gray-200 rounded-xl p-6 cursor-pointer transition-all hover:shadow-sm",
-          viewMode === 'history' && 'border-gray-300 shadow-sm'
-        )}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-              Total Items Removed
-            </p>
-            <p className="text-4xl font-extrabold text-gray-900 mt-2">
-              {loading ? '...' : (totalDeleted || 0).toLocaleString()}
-            </p>
+        {/* Arrow 2 */}
+        <div className="text-gray-300 text-3xl flex-shrink-0">
+          ›
+        </div>
+
+        {/* Card 3: In Queue (The Solution) */}
+        <div 
+          onClick={() => handleCardClick('queue')}
+          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-blue-50 cursor-pointer ${
+            viewMode === 'queue' 
+              ? 'ring-4 ring-blue-100 scale-105' 
+              : 'hover:scale-105'
+          }`}
+        >
+          <div className="text-4xl mb-3">🗑️</div>
+          <div className="text-5xl font-extrabold text-blue-600 mb-2">
+            {queueCount || 0}
           </div>
-          <History className="h-5 w-5 text-gray-400 flex-shrink-0" />
+          <div className="text-xs font-bold text-blue-400 tracking-wider uppercase">
+            Ready to Delete
+          </div>
+
+        </div>
+
+        {/* Arrow 3 */}
+        <div className="text-gray-300 text-3xl flex-shrink-0">
+          ›
+        </div>
+
+        {/* Card 4: History (Trophy / Graveyard) */}
+        <div 
+          onClick={() => handleCardClick('history')}
+          className={`p-6 rounded-2xl shadow-lg border-0 flex-1 text-center transition-all duration-200 bg-slate-800 cursor-pointer ${
+            viewMode === 'history' 
+              ? 'ring-4 ring-slate-300 scale-105' 
+              : 'hover:scale-105'
+          }`}
+        >
+          <div className="text-4xl mb-3">💀</div>
+          <div className="text-5xl font-extrabold text-white mb-2">
+            {loading ? '...' : (totalDeleted || 0).toLocaleString()}
+          </div>
+          <div className="text-xs font-bold text-slate-300 tracking-wider uppercase">
+            Total Items Removed
+          </div>
         </div>
       </div>
     </div>

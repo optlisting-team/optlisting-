@@ -1,24 +1,20 @@
 import { useState, useRef, useEffect } from 'react'
-import { Button } from './ui/button'
 
-// Pro Dropshipping Aggregators Only - High-Volume Sellers using Automation Tools
+// MVP Scope: Final 7 Suppliers Only
 const AVAILABLE_SOURCES = [
   'Amazon',
   'Walmart',
-  'Wholesale2B',
-  'Doba',
-  'DSers',
-  'Spocket',
+  'Home Depot',
+  'AliExpress',
   'CJ Dropshipping',
-  'Unverified'  // Edge case only - supplier detection failed, still automation tool compatible
+  'Wholesale2B',
+  'Costway'
 ]
 
 function SourceBadge({ source, editable = false, onSourceChange = null, itemId = null }) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentSource, setCurrentSource] = useState(source)
-  const [searchQuery, setSearchQuery] = useState('')
   const dropdownRef = useRef(null)
-  const searchInputRef = useRef(null)
 
   // Update current source when prop changes
   useEffect(() => {
@@ -28,18 +24,6 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
       setIsOpen(true)
     }
   }, [source, editable])
-
-  // Focus search input when dropdown opens
-  useEffect(() => {
-    if (isOpen && searchInputRef.current) {
-      searchInputRef.current.focus()
-    }
-  }, [isOpen])
-
-  // Filter sources based on search query
-  const filteredSources = AVAILABLE_SOURCES.filter(src =>
-    src.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -59,37 +43,41 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
   }, [isOpen])
 
   const getBadgeColor = (source) => {
-    // Monochrome badges for Vercel style - only use color for critical status
     switch (source) {
-      case 'Unverified':
-        return 'bg-red-50 text-red-700 border border-red-200' // Critical status - use red
+      // Retail Suppliers
+      case 'Amazon':
+        return 'bg-yellow-50 text-yellow-700'
+      case 'Walmart':
+        return 'bg-cyan-50 text-cyan-700'
+      case 'Home Depot':
+        return 'bg-orange-100 text-orange-800'
+      // China Suppliers
+      case 'AliExpress':
+        return 'bg-red-100 text-red-800'
+      case 'CJ Dropshipping':
+        return 'bg-gray-800 text-white'
+      // Pro Aggregators
+      case 'Wholesale2B':
+        return 'bg-blue-600 text-white'
+      case 'Costway':
+        return 'bg-pink-500 text-white'
       default:
-        return 'bg-gray-100 text-gray-800 border border-gray-200' // Monochrome for all others
+        return 'bg-gray-100 text-gray-500'
     }
   }
 
   const handleSourceSelect = async (newSource) => {
     if (newSource === currentSource) {
       setIsOpen(false)
-      setSearchQuery('')
       return
     }
 
     setCurrentSource(newSource)
     setIsOpen(false)
-    setSearchQuery('')
 
     // Call parent handler if provided
     if (onSourceChange && itemId) {
       await onSourceChange(itemId, newSource)
-    }
-  }
-
-  const handleToggle = () => {
-    const newIsOpen = !isOpen
-    setIsOpen(newIsOpen)
-    if (!newIsOpen) {
-      setSearchQuery('')
     }
   }
 
@@ -108,65 +96,39 @@ function SourceBadge({ source, editable = false, onSourceChange = null, itemId =
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
-      <Button
+      <button
         type="button"
-        onClick={handleToggle}
-        variant="ghost"
-        size="sm"
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium h-auto ${getBadgeColor(
+        onClick={() => setIsOpen(!isOpen)}
+        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getBadgeColor(
           currentSource
-        )} hover:opacity-80 transition-opacity`}
+        )} hover:opacity-80 transition-opacity cursor-pointer`}
         title={currentSource === 'Unverified' ? '⚠️ Source needs verification - Click to identify' : 'Click to change source'}
       >
         {currentSource === 'Unverified' && <span className="text-xs">⚠️</span>}
         <span>{currentSource === 'Unverified' ? 'Unverified' : currentSource}</span>
         <span className="text-[10px] opacity-70">✏️</span>
-      </Button>
+      </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-white shadow-xl rounded-lg border border-gray-200 z-50">
-          {/* Search Input */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-3 py-2 rounded-t-lg">
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search source..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              onClick={(e) => e.stopPropagation()}
-            />
+        <div className="absolute z-50 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 max-h-60 overflow-auto">
+          <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase border-b border-gray-100">
+            Change Source to...
           </div>
-
-          {/* Scrollable List */}
-          <div className="max-h-60 overflow-y-auto">
-            {filteredSources.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                No sources found
-              </div>
-            ) : (
-              filteredSources.map((src) => (
-                <Button
-                  key={src}
-                  type="button"
-                  onClick={() => handleSourceSelect(src)}
-                  variant="ghost"
-                  className={`w-full justify-start px-4 py-2.5 ${
-                    src === currentSource ? 'bg-accent' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getBadgeColor(src)}`}>
-                      {src}
-                    </span>
-                  </div>
-                  {src === currentSource && (
-                    <span className="text-primary font-semibold">✓</span>
-                  )}
-                </Button>
-              ))
-            )}
-          </div>
+          {AVAILABLE_SOURCES.map((src) => (
+            <button
+              key={src}
+              type="button"
+              onClick={() => handleSourceSelect(src)}
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                src === currentSource ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+              }`}
+            >
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getBadgeColor(src)}`}>
+                {src}
+              </span>
+              {src === currentSource && <span className="ml-2 text-blue-600">✓</span>}
+            </button>
+          ))}
         </div>
       )}
     </div>

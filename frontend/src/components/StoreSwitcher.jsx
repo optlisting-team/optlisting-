@@ -1,19 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
-import { Button } from './ui/button'
+import { useStore } from '../contexts/StoreContext'
+import { ChevronDown } from 'lucide-react'
 
 export const MY_STORES = [
-  { id: 'all', name: '🌍 All Stores', platform: 'Global', color: 'bg-gray-100 text-gray-800' },
-  { id: 'store_ebay_1', name: 'eBay Main Store', platform: 'eBay', color: 'bg-slate-100 text-slate-700' },
-  { id: 'store_amazon_1', name: 'Amazon US', platform: 'Amazon', color: 'bg-yellow-100 text-yellow-800' },
-  { id: 'store_coupang_1', name: 'Coupang KR', platform: 'Coupang', color: 'bg-red-100 text-red-700' }
+  { id: 'all', name: 'All Stores', platform: 'All' },
+  { id: 'store-1', name: 'eBay Store', platform: 'eBay' },
+  { id: 'store-2', name: 'Amazon Store', platform: 'Amazon' },
+  { id: 'store-3', name: 'Shopify Store', platform: 'Shopify' },
+  { id: 'store-4', name: 'Walmart Store', platform: 'Walmart' }
 ]
 
-// Get connected stores count (excluding 'all')
-export const getConnectedStoreCount = () => {
-  return MY_STORES.filter(store => store.id !== 'all').length
-}
-
-function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
+function StoreSwitcher() {
+  const { stores, selectedStore, setSelectedStore } = useStore()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
 
@@ -31,80 +29,51 @@ function StoreSwitcher({ currentStore, onStoreChange, isInSidebar = false }) {
     }
   }, [])
 
-  const handleStoreSelect = (store) => {
-    if (store.id !== currentStore?.id) {
-      onStoreChange(store)
-    }
+  const handleSelectStore = (store) => {
+    setSelectedStore(store)
     setIsOpen(false)
   }
 
-  const currentStoreData = currentStore || MY_STORES[0] // Default to "All Stores"
-  
-  const sidebarButtonClass = isInSidebar 
-    ? "flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-800 text-gray-300 transition-colors hover:bg-gray-700 w-full"
-    : `flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all hover:shadow-md ${currentStoreData.color}`
-
   return (
-    <div className="relative w-full" ref={dropdownRef}>
-      {/* Current Store Button */}
-      <Button
+    <div className="relative" ref={dropdownRef}>
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        variant={isInSidebar ? "secondary" : "outline"}
-        className={sidebarButtonClass}
+        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-colors"
       >
-        <span className="font-bold">{currentStoreData.platform}</span>
-        <span className={isInSidebar ? "opacity-90" : "opacity-80"}>{currentStoreData.name}</span>
-        <svg 
-          className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </Button>
-
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div className={`absolute ${isInSidebar ? 'left-0' : 'right-0'} mt-2 w-64 ${isInSidebar ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-lg shadow-xl z-50 overflow-hidden`}>
-          <div className={`px-3 py-2 text-xs font-semibold uppercase border-b ${isInSidebar ? 'text-gray-400 border-gray-800 bg-gray-900' : 'text-gray-500 border-gray-100 bg-gray-50'}`}>
-            Switch Store
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {MY_STORES.map((store) => (
-              <Button
-                key={store.id}
-                onClick={() => handleStoreSelect(store)}
-                variant="ghost"
-                className={`w-full justify-start px-4 py-3 ${
-                  isInSidebar
-                    ? currentStoreData.id === store.id
-                      ? 'bg-gray-800 text-white'
-                      : 'hover:bg-gray-800 text-gray-300'
-                    : currentStoreData.id === store.id
-                      ? 'bg-accent'
-                      : ''
-                }`}
-              >
-                <div className="flex items-center gap-3 flex-1">
-                  <div className={`px-2 py-1 rounded text-xs font-bold ${store.color}`}>
-                    {store.platform}
-                  </div>
-                  <span className={`text-sm font-medium ${isInSidebar ? 'text-gray-300' : ''}`}>{store.name}</span>
-                </div>
-                {currentStoreData.id === store.id && (
-                  <svg className={`w-4 h-4 ${isInSidebar ? 'text-white' : 'text-primary'}`} fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </Button>
-            ))}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-900 font-semibold">{selectedStore?.name || 'Select Store'}</span>
         </div>
+        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          ></div>
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 max-h-60 overflow-auto">
+            <div className="py-1" role="menu">
+              {stores.map((store) => (
+                <button
+                  key={store.id}
+                  onClick={() => handleSelectStore(store)}
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors ${
+                    selectedStore?.id === store.id
+                      ? 'bg-blue-50 text-blue-700 font-medium'
+                      : 'text-slate-700'
+                  }`}
+                  role="menuitem"
+                >
+                  {store.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
 }
 
 export default StoreSwitcher
-
