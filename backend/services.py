@@ -1,7 +1,7 @@
 from datetime import date, timedelta, datetime
 from typing import List, Optional, Dict, Tuple
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, cast, Integer, String, Date
+from sqlalchemy import and_, or_, cast, Integer, String, Date, case, case
 from sqlalchemy.dialects.postgresql import insert
 from backend.models import Listing, DeletionLog
 import pandas as pd
@@ -374,49 +374,37 @@ def analyze_zombie_listings(
     
     query = query.filter(or_(*date_filters))
     
-    # Sales filter: use metrics['sales'] (JSONB only)
+    # Sales filter: use metrics['sales'] (JSONB) with robust casting
     # If metrics doesn't have sales, assume 0 (which satisfies <= max_sales when max_sales >= 0)
-    sales_filters = []
-    if max_sales >= 0:
-        # Items with metrics['sales'] <= max_sales
-        sales_filters.append(
-            and_(
-                Listing.metrics != None,
-                Listing.metrics.has_key('sales'),
-                cast(Listing.metrics['sales'].astext, Integer) <= max_sales
-            )
+    if max_sales is not None and max_sales >= 0:
+        # Use CASE statement to handle NULL/missing values safely
+        sales_value = case(
+            (
+                and_(
+                    Listing.metrics != None,
+                    Listing.metrics.has_key('sales')
+                ),
+                cast(Listing.metrics['sales'].astext, Integer)
+            ),
+            else_=0
         )
-        # Items without metrics or without sales key (assume 0, which satisfies <= max_sales)
-        sales_filters.append(
-            or_(
-                Listing.metrics == None,
-                ~Listing.metrics.has_key('sales')
-            )
-        )
-    if sales_filters:
-        query = query.filter(or_(*sales_filters))
+        query = query.filter(sales_value <= max_sales)
     
-    # Watch count filter: use metrics['views'] (JSONB only)
+    # Watch count filter: use metrics['views'] (JSONB) with robust casting
     # If metrics doesn't have views, assume 0 (which satisfies <= max_watch_count when max_watch_count >= 0)
-    views_filters = []
-    if max_watch_count >= 0:
-        # Items with metrics['views'] <= max_watch_count
-        views_filters.append(
-            and_(
-                Listing.metrics != None,
-                Listing.metrics.has_key('views'),
-                cast(Listing.metrics['views'].astext, Integer) <= max_watch_count
-            )
+    if max_watch_count is not None and max_watch_count >= 0:
+        # Use CASE statement to handle NULL/missing values safely
+        views_value = case(
+            (
+                and_(
+                    Listing.metrics != None,
+                    Listing.metrics.has_key('views')
+                ),
+                cast(Listing.metrics['views'].astext, Integer)
+            ),
+            else_=0
         )
-        # Items without metrics or without views key (assume 0, which satisfies <= max_watch_count)
-        views_filters.append(
-            or_(
-                Listing.metrics == None,
-                ~Listing.metrics.has_key('views')
-            )
-        )
-    if views_filters:
-        query = query.filter(or_(*views_filters))
+        query = query.filter(views_value <= max_watch_count)
     
     # Apply platform filter (MVP Scope: Only eBay and Shopify)
     if platform_filter and platform_filter in ["eBay", "Shopify"]:
@@ -441,8 +429,9 @@ def analyze_zombie_listings(
         # Check if this supplier_id is a global winner across all stores
         is_global_winner = check_global_health(db, user_id, zombie.supplier_id)
         
-        # Set the is_global_winner flag
-        zombie.is_global_winner = 1 if is_global_winner else 0
+        # Set the is_global_winner flag (safe: check if column exists)
+        if hasattr(zombie, 'is_global_winner'):
+            zombie.is_global_winner = 1 if is_global_winner else 0
         
         # Cross-Platform Activity Check: Check if this zombie is active elsewhere
         is_active_elsewhere = False
@@ -501,11 +490,17 @@ def analyze_zombie_listings(
                     is_active_elsewhere = True
                     break  # Found at least one active listing elsewhere
         
-        # Set the is_active_elsewhere flag
-        zombie.is_active_elsewhere = 1 if is_active_elsewhere else 0
+        # Set the is_active_elsewhere flag (safe: check if column exists)
+        if hasattr(zombie, 'is_active_elsewhere'):
+            zombie.is_active_elsewhere = 1 if is_active_elsewhere else 0
         
-        # Commit the update to database
-        db.commit()
+        # Commit the update to database (only if columns exist)
+        try:
+            db.commit()
+        except Exception as e:
+            # If commit fails due to missing columns, rollback and continue
+            db.rollback()
+            print(f"Warning: Could not update flags (columns may not exist): {e}")
     
     # Sort zombies: Primary by is_active_elsewhere (DESC - True first), Secondary by age (oldest first)
     def sort_key(z):
