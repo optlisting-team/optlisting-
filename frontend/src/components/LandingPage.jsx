@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, TrendingDown, Ban, DollarSign, Check, CheckCircle, Zap, TrendingUp, Clock, Puzzle } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card'
+import { Button } from './ui/button'
 
 function LandingPage() {
   const fadeInUp = {
@@ -326,7 +328,7 @@ function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 px-4 bg-white" id="pricing">
+      <section className="py-24 px-4 bg-slate-50" id="pricing">
         <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -351,128 +353,143 @@ function LandingPage() {
             className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
           >
             {/* Starter */}
-            <motion.div
-              variants={fadeInUp}
-              className="bg-white rounded-2xl shadow-xl p-8"
-            >
-              <h3 className="text-sm font-semibold uppercase tracking-widest text-indigo-600 mb-6 font-sans">Starter</h3>
-              <div className="mb-8">
-                <span className="text-6xl font-extrabold tracking-tighter text-slate-900 font-sans">$12.9</span>
-                <span className="text-slate-500 text-lg ml-1">/mo</span>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">1 Store</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">Up to 2,000 listings</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">Basic detection</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">Daily CSV export</span>
-                </li>
-              </ul>
-              <a
-                href="/dashboard"
-                className="block w-full text-center py-4 bg-slate-100 text-slate-900 rounded-xl font-bold hover:bg-slate-200 transition-colors font-sans"
-              >
-                Get Started
-              </a>
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full flex flex-col border-2 border-slate-200 hover:border-slate-300 transition-colors">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-blue-600 mb-2">
+                    Starter
+                  </CardTitle>
+                  <div className="mt-4">
+                    <span className="text-5xl font-extrabold tracking-tight text-slate-900">$19.99</span>
+                    <span className="text-slate-500 text-lg ml-1">/mo</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Up to 5,000 total listings</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">1 Store</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Basic detection</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Daily CSV export</span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button asChild className="w-full" variant="outline">
+                    <a href="/dashboard">Get Started</a>
+                  </Button>
+                </CardFooter>
+              </Card>
             </motion.div>
 
             {/* Pro (Recommended) - Premium Highlight */}
-            <motion.div
-              variants={fadeInUp}
-              className="relative"
-            >
-              {/* Soft Gradient Glow */}
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-75"></div>
-              
-              {/* Card Content */}
-              <div className="relative bg-white rounded-2xl p-8 shadow-2xl z-10">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold px-4 py-1.5 rounded-full font-sans">
+            <motion.div variants={fadeInUp} className="relative">
+              {/* Recommended Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                <span className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
                   RECOMMENDED
-                </div>
-                <h3 className="text-sm font-semibold uppercase tracking-widest text-indigo-600 mb-6 font-sans">Pro</h3>
-                <div className="mb-8">
-                  <span className="text-6xl font-extrabold tracking-tighter text-slate-900 font-sans">$24.9</span>
-                  <span className="text-slate-500 text-lg ml-1">/mo</span>
-                </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                    <span className="text-slate-600 font-medium font-sans">2 Stores</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                    <span className="text-slate-600 font-medium font-sans">Up to 7,500 listings</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                    <span className="text-slate-600 font-medium font-sans">Advanced detection</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                    <span className="text-slate-600 font-medium font-sans">Unlimited CSV export</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                    <span className="text-slate-600 font-medium font-sans">Fast scan speed</span>
-                  </li>
-                </ul>
-                <a
-                  href="/dashboard"
-                  className="block w-full text-center py-4 bg-slate-900 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 transition-transform duration-200 font-sans"
-                >
-                  Get Started
-                </a>
+                </span>
               </div>
+              
+              {/* Card with Blue Border */}
+              <Card className="h-full flex flex-col border-2 border-blue-500 bg-blue-50/30 shadow-xl relative">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-blue-700 mb-2">
+                    Pro
+                  </CardTitle>
+                  <div className="mt-4">
+                    <span className="text-5xl font-extrabold tracking-tight text-slate-900">$49.99</span>
+                    <span className="text-slate-500 text-lg ml-1">/mo</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Up to 35,000 total listings</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">2 Stores</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Advanced detection</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Unlimited CSV export</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Fast scan speed</span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
+                    <a href="/dashboard">Get Started</a>
+                  </Button>
+                </CardFooter>
+              </Card>
             </motion.div>
 
-            {/* Enterprise */}
-            <motion.div
-              variants={fadeInUp}
-              className="bg-white rounded-2xl shadow-xl p-8"
-            >
-              <h3 className="text-sm font-semibold uppercase tracking-widest text-indigo-600 mb-6 font-sans">Enterprise</h3>
-              <div className="mb-8">
-                <span className="text-6xl font-extrabold tracking-tighter text-slate-900 font-sans">From $99</span>
-                <span className="text-slate-500 text-lg ml-1">/mo</span>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">10+ Stores</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">Up to 50,000 listings</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">5 team seats</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">Priority scan speed</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-                  <span className="text-slate-600 font-medium font-sans">Dedicated support</span>
-                </li>
-              </ul>
-              <a
-                href="/dashboard"
-                className="block w-full text-center py-4 bg-slate-100 text-slate-900 rounded-xl font-bold hover:bg-slate-200 transition-colors font-sans"
-              >
-                Get Started
-              </a>
+            {/* Power Seller */}
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full flex flex-col border-2 border-slate-200 hover:border-slate-300 transition-colors">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-purple-600 mb-2">
+                    Power Seller
+                  </CardTitle>
+                  <div className="mt-4">
+                    <span className="text-5xl font-extrabold tracking-tight text-slate-900">$99.99</span>
+                    <span className="text-slate-500 text-lg ml-1">/mo</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Up to 100,000 total listings</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Unlimited stores</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Priority detection</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Unlimited CSV export</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Fastest scan speed</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-medium">Priority support</span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button asChild className="w-full" variant="outline">
+                    <a href="/dashboard">Get Started</a>
+                  </Button>
+                </CardFooter>
+              </Card>
             </motion.div>
           </motion.div>
         </div>

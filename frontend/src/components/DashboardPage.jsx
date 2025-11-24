@@ -1,24 +1,23 @@
-import Sidebar from './Sidebar'
-import PageHeader from './PageHeader'
-import Dashboard from './Dashboard'
+import { Suspense, lazy } from 'react'
+import DashboardLayout, { DashboardSkeleton } from './DashboardLayout'
+
+// Lazy load Dashboard component to prevent FOUC
+const Dashboard = lazy(() => import('./Dashboard'))
 
 function DashboardPage() {
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans">
-      {/* Sidebar */}
-      <Sidebar />
-      
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Page Header */}
-        <PageHeader />
-        
-        {/* Main Content */}
-        <div className="flex-1 overflow-y-auto">
-          <Dashboard />
+    <DashboardLayout>
+      <Suspense fallback={
+        <div className="p-6">
+          <div className="space-y-4">
+            <div className="h-32 bg-white rounded-xl border border-gray-200 animate-pulse"></div>
+            <div className="h-96 bg-white rounded-xl border border-gray-200 animate-pulse"></div>
+          </div>
         </div>
-      </div>
-    </div>
+      }>
+        <Dashboard />
+      </Suspense>
+    </DashboardLayout>
   )
 }
 

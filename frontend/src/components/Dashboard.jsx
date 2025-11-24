@@ -15,6 +15,11 @@ const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
 
 function Dashboard() {
   const { selectedStore } = useStore()
+  
+  // Debug: Log store context
+  useEffect(() => {
+    console.log('Dashboard mounted, selectedStore:', selectedStore)
+  }, [selectedStore])
   const [zombies, setZombies] = useState([])
   const [allListings, setAllListings] = useState([]) // All listings for 'all' view mode
   const [totalZombies, setTotalZombies] = useState(0)
@@ -259,11 +264,14 @@ function Dashboard() {
       console.log('Store changed to:', selectedStore.id, '- Refetching data...')
       fetchZombies()
       fetchAllListings()
+    } else {
+      console.warn('selectedStore is null/undefined, using default')
     }
   }, [selectedStore?.id]) // Only depend on store ID to avoid unnecessary re-renders
 
   useEffect(() => {
     // Default to 'all' view on initial load
+    console.log('Dashboard initial mount - fetching all listings')
     fetchAllListings()
     // Fetch history separately (non-blocking)
     fetchHistory().catch(err => {
@@ -333,6 +341,17 @@ function Dashboard() {
       alert('Failed to export CSV')
       console.error(err)
     }
+  }
+
+  // Safety check: Ensure selectedStore exists
+  if (!selectedStore) {
+    return (
+      <div className="font-sans bg-slate-50 min-h-full flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-600 mb-4">Loading store context...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
