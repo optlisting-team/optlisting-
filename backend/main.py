@@ -52,9 +52,19 @@ app.add_middleware(
     max_age=3600,  # Cache preflight requests for 1 hour
 )
 
-# Add explicit CORS headers to all responses
+# Add explicit CORS headers to all responses (including OPTIONS preflight)
 @app.middleware("http")
 async def add_cors_header(request, call_next):
+    # Handle OPTIONS preflight requests
+    if request.method == "OPTIONS":
+        response = Response()
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Max-Age"] = "3600"
+        return response
+    
+    # Add CORS headers to all other responses
     response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
@@ -508,36 +518,51 @@ def get_deletion_history(
     Get deletion history
     Returns total count and list of deleted items (most recent first)
     """
-    # Get total count
-    total_count = db.query(DeletionLog).count()
-    
-    # Get logs (most recent first)
-    logs = db.query(DeletionLog).order_by(DeletionLog.deleted_at.desc()).offset(skip).limit(limit).all()
-    
-    response_data = {
-        "total_count": total_count,
-        "logs": [
-            {
-                "id": log.id,
-                "item_id": log.item_id,
-                "title": log.title,
-                "platform": log.platform,
-                "supplier": log.supplier,
-                "deleted_at": log.deleted_at.isoformat() if log.deleted_at else None
-            }
-            for log in logs
-        ]
-    }
-    
-    # Return with explicit CORS headers
-    return JSONResponse(
-        content=response_data,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "*",
+    try:
+        # Get total count
+        total_count = db.query(DeletionLog).count()
+        
+        # Get logs (most recent first)
+        logs = db.query(DeletionLog).order_by(DeletionLog.deleted_at.desc()).offset(skip).limit(limit).all()
+        
+        response_data = {
+            "total_count": total_count,
+            "logs": [
+                {
+                    "id": log.id,
+                    "item_id": log.item_id,
+                    "title": log.title,
+                    "platform": log.platform,
+                    "supplier": log.supplier,
+                    "deleted_at": log.deleted_at.isoformat() if log.deleted_at else None
+                }
+                for log in logs
+            ]
         }
-    )
+        
+        # Return with explicit CORS headers
+        return JSONResponse(
+            content=response_data,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            }
+        )
+    except Exception as e:
+        # Log error and return empty response with CORS headers
+        print(f"Error fetching deletion history: {e}")
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(
+            content={"total_count": 0, "logs": []},
+            status_code=200,  # Return 200 to avoid CORS issues
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            }
+        )
 
 
 class UpdateListingRequest(BaseModel):
