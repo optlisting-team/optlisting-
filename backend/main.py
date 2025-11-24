@@ -27,8 +27,9 @@ import os
 import re
 
 # Define the allowed exact origins (for production build)
+# CRITICAL: Include all variations of production URL (with and without trailing slash)
 allowed_origins = [
-    # Production Vercel deployment - All variations
+    # Production Vercel deployment - All variations (CRITICAL for CORS)
     "https://optlisting.vercel.app",
     "https://optlisting.vercel.app/",
     "https://www.optlisting.vercel.app",
@@ -44,12 +45,16 @@ allowed_origins = [
 frontend_url = os.getenv("FRONTEND_URL", "")
 if frontend_url:
     allowed_origins.append(frontend_url)
+    # Also add with trailing slash if not present
+    if not frontend_url.endswith("/"):
+        allowed_origins.append(f"{frontend_url}/")
 
 # Filter out empty strings
 allowed_origins = [origin for origin in allowed_origins if origin]
 
 # Define regex pattern to cover all Vercel deploy previews (*.vercel.app)
-# This is necessary for Vercel deployment environment (preview deployments, branch deployments, etc.)
+# CRITICAL: This regex MUST cover all Vercel subdomains (production, preview, branch deployments)
+# Pattern matches: https://*.vercel.app (any subdomain)
 vercel_regex = r"https://.*\.vercel\.app"
 
 # CORS configuration for Railway + Vercel deployment

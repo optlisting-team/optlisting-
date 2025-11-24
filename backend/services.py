@@ -297,7 +297,9 @@ def analyze_zombie_listings(
     max_watch_count: int = 10,
     supplier_filter: str = "All",
     platform_filter: str = "eBay",  # MVP Scope: Default to eBay (only eBay and Shopify supported)
-    store_id: Optional[str] = None
+    store_id: Optional[str] = None,
+    skip: int = 0,  # Pagination: skip N records
+    limit: int = 100  # Pagination: limit to N records
 ) -> Tuple[List[Listing], Dict[str, int]]:
     """
     Low Interest Items Filter Logic (formerly Zombie Filter)
@@ -421,7 +423,10 @@ def analyze_zombie_listings(
     if supplier_filter and supplier_filter != "All":
         query = query.filter(Listing.supplier_name == supplier_filter)
     
-    zombies = query.all()
+    # Apply pagination (skip and limit)
+    skip = max(0, skip)
+    limit = min(max(1, limit), 1000)  # Clamp between 1 and 1000
+    zombies = query.offset(skip).limit(limit).all()
     
     # Get current platform(s) being analyzed
     current_platforms = set()
