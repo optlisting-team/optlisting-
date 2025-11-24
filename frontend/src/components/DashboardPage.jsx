@@ -1,7 +1,6 @@
 import { Suspense, lazy } from 'react'
-import DashboardLayout, { DashboardSkeleton } from './DashboardLayout'
+import DashboardLayout from './DashboardLayout'
 
-// Lazy load Dashboard component to prevent FOUC
 const Dashboard = lazy(() => import('./Dashboard'))
 
 function DashboardPage() {

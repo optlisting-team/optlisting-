@@ -8,18 +8,12 @@ import DeleteQueue from './DeleteQueue'
 import HistoryTable from './HistoryTable'
 import QueueReviewPanel from './QueueReviewPanel'
 import { Button } from './ui/button'
-import { Card, CardContent } from './ui/card'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const CURRENT_USER_ID = "default-user" // Temporary user ID for MVP phase
 
 function Dashboard() {
   const { selectedStore } = useStore()
-  
-  // Debug: Log store context
-  useEffect(() => {
-    console.log('Dashboard mounted, selectedStore:', selectedStore)
-  }, [selectedStore])
   const [zombies, setZombies] = useState([])
   const [allListings, setAllListings] = useState([]) // All listings for 'all' view mode
   const [totalZombies, setTotalZombies] = useState(0)
@@ -64,8 +58,6 @@ function Dashboard() {
       setTotalBreakdown(breakdown)
       const platformBreakdown = response.data.platform_breakdown || { eBay: 0, Amazon: 0, Shopify: 0, Walmart: 0 }
       setPlatformBreakdown(platformBreakdown)
-      console.log('Total Breakdown:', breakdown) // Debug log
-      console.log('Platform Breakdown:', platformBreakdown) // Debug log
       setError(null)
     } catch (err) {
       setError('Failed to fetch low interest listings')
@@ -250,7 +242,6 @@ function Dashboard() {
         // Note: QueueReviewPanel automatically regroups by supplier, so the item will move to the correct group
       }
 
-      console.log(`Supplier updated for item ${itemId}: ${newSupplier}`)
     } catch (err) {
       console.error('Failed to update source:', err)
       alert('Failed to update source. Please try again.')
@@ -258,20 +249,15 @@ function Dashboard() {
     }
   }
 
-  // Fetch data when store changes - CRITICAL: This ensures data updates when store is switched
+  // Fetch data when store changes
   useEffect(() => {
     if (selectedStore) {
-      console.log('Store changed to:', selectedStore.id, '- Refetching data...')
       fetchZombies()
       fetchAllListings()
-    } else {
-      console.warn('selectedStore is null/undefined, using default')
     }
-  }, [selectedStore?.id]) // Only depend on store ID to avoid unnecessary re-renders
+  }, [selectedStore?.id])
 
   useEffect(() => {
-    // Default to 'all' view on initial load
-    console.log('Dashboard initial mount - fetching all listings')
     fetchAllListings()
     // Fetch history separately (non-blocking)
     fetchHistory().catch(err => {
