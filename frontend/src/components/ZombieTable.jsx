@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react'
 import SourceBadge from './SourceBadge'
 import PlatformBadge from './PlatformBadge'
 
@@ -76,16 +77,16 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
   }
 
   return (
-    <div className="w-full border border-gray-200 rounded-lg overflow-x-auto">
+    <div className="w-full border border-gray-300 rounded-lg overflow-x-auto bg-white">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <thead className="bg-white border-b border-gray-300">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <input
                 type="checkbox"
                 checked={selectedIds.length === zombies.length && zombies.length > 0}
                 onChange={(e) => onSelectAll(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
               />
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -116,13 +117,13 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {zombies.map((zombie) => (
-            <tr key={zombie.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={zombie.id} className="hover:bg-zinc-50 transition-colors">
               <td className="w-10 px-4 py-5 whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(zombie.id)}
                   onChange={(e) => onSelect(zombie.id, e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
                 />
               </td>
               <td className="px-6 py-5 whitespace-nowrap">

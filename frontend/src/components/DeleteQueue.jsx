@@ -27,14 +27,14 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
     await onExport(mode, sourceItems)
   }
 
-  const renderSourceSection = (source, items, colorClass, borderClass, bgClass, buttonBgClass) => {
+  const renderSourceSection = (source, items) => {
     if (items.length === 0) return null
 
     return (
-      <div className={`rounded-lg border-2 ${borderClass} ${bgClass} p-3 mb-3`}>
+      <div className="rounded-lg border border-gray-300 bg-white p-3 mb-3">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
-          <h4 className={`text-sm font-semibold ${colorClass} uppercase tracking-wide`}>
+          <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
             {source} ({items.length})
           </h4>
         </div>
@@ -74,7 +74,7 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
                     {/* Remove Button (X) */}
                     <button
                       onClick={() => onRemove(item.id)}
-                      className="flex-shrink-0 p-0.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="flex-shrink-0 p-0.5 text-gray-600 hover:bg-gray-100 rounded transition-colors"
                       title="Remove from queue"
                     >
                       <svg
@@ -101,10 +101,10 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
         {/* Export Button */}
         <button
           onClick={() => handleSourceExport(source, 'autods')}
-          className={`w-full px-3 py-2 ${buttonBgClass} text-white text-xs font-semibold rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2`}
+          className="w-full px-3 py-2 bg-black text-white text-xs font-semibold rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors flex items-center justify-center gap-2"
         >
           <span>Download {source} CSV</span>
-          <span className="px-1.5 py-0.5 bg-white bg-opacity-20 rounded text-xs font-bold">
+          <span className="px-1.5 py-0.5 bg-gray-800 rounded text-xs font-bold">
             {items.length}
           </span>
         </button>
@@ -114,9 +114,9 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
 
   if (queue.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-4 h-full flex flex-col">
+      <div className="bg-white rounded-lg border border-gray-300 p-4 h-full flex flex-col">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className="text-lg font-semibold text-gray-900">
             Ready to Delete
           </h3>
           <p className="text-sm text-gray-500">Count: 0</p>
@@ -132,10 +132,10 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 h-full flex flex-col">
+    <div className="bg-white rounded-lg border border-gray-300 p-4 h-full flex flex-col">
       {/* Header */}
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">
+        <h3 className="text-lg font-semibold text-gray-900">
           Ready to Delete
         </h3>
         <p className="text-sm text-gray-500">Total: {queue.length} items</p>
@@ -144,34 +144,13 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
       {/* Categorized Queue - Scrollable */}
       <div className="flex-1 overflow-y-auto space-y-3 mb-4">
         {/* Amazon Section */}
-        {renderSourceSection(
-          'Amazon',
-          amazonItems,
-          'text-orange-600',
-          'border-orange-300',
-          'bg-orange-50',
-          'bg-orange-600'
-        )}
+        {renderSourceSection('Amazon', amazonItems)}
 
         {/* Walmart Section */}
-        {renderSourceSection(
-          'Walmart',
-          walmartItems,
-          'text-blue-600',
-          'border-blue-300',
-          'bg-blue-50',
-          'bg-blue-600'
-        )}
+        {renderSourceSection('Walmart', walmartItems)}
 
         {/* Unknown Section */}
-        {renderSourceSection(
-          'Unknown',
-          unknownItems,
-          'text-gray-600',
-          'border-gray-300',
-          'bg-gray-50',
-          'bg-gray-600'
-        )}
+        {renderSourceSection('Unknown', unknownItems)}
       </div>
     </div>
   )

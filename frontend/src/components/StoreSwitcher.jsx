@@ -38,12 +38,12 @@ function StoreSwitcher() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-lg hover:bg-zinc-700 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <span className="text-slate-900 font-semibold">{selectedStore?.name || 'Select Store'}</span>
+          <span className="text-white font-semibold">{selectedStore?.name || 'Select Store'}</span>
         </div>
-        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
@@ -52,16 +52,16 @@ function StoreSwitcher() {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           ></div>
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 max-h-60 overflow-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg z-20 max-h-60 overflow-auto">
             <div className="py-1" role="menu">
               {stores.map((store) => (
                 <button
                   key={store.id}
                   onClick={() => handleSelectStore(store)}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors ${
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-zinc-700 transition-colors ${
                     selectedStore?.id === store.id
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-slate-700'
+                      ? 'bg-white text-zinc-900 font-medium'
+                      : 'text-zinc-300'
                   }`}
                   role="menuitem"
                 >

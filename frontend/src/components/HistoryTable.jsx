@@ -36,9 +36,9 @@ function HistoryTable({ logs, loading }) {
   }
 
   return (
-    <div className="w-full border border-gray-200 rounded-lg overflow-x-auto">
+    <div className="w-full border border-gray-300 rounded-lg overflow-x-auto bg-white">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <thead className="bg-white border-b border-gray-300">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Deleted On
@@ -59,7 +59,7 @@ function HistoryTable({ logs, loading }) {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {logs.map((log) => (
-            <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={log.id} className="hover:bg-zinc-50 transition-colors">
               <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
                 {formatDateTime(log.deleted_at)}
               </td>

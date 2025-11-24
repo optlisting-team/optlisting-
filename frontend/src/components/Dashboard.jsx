@@ -331,7 +331,7 @@ function Dashboard() {
 
 
   return (
-    <div className="font-sans bg-slate-50 min-h-full">
+    <div className="font-sans bg-zinc-50 min-h-full">
       <div className="px-6">
         {/* Summary Card */}
         <SummaryCard 
@@ -368,7 +368,7 @@ function Dashboard() {
 
             {/* View Mode Info */}
             {viewMode === 'all' && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
                 <p className="text-sm text-gray-600">
                   📋 <strong className="text-gray-900">Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
                 </p>
@@ -377,7 +377,7 @@ function Dashboard() {
 
             {/* Briefing Text for Low Interest Items View */}
             {viewMode === 'zombies' && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
                 <p className="text-sm text-gray-600">
                   🔍 <strong className="text-gray-900">Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong className="text-gray-900">All Platforms</strong> : <strong className="text-gray-900">[{filters.marketplace_filter}]</strong>} listings older than <strong className="text-gray-900">{filters.min_days} days</strong> with <strong className="text-gray-900">{filters.max_sales} sales</strong> and <strong className="text-gray-900">≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
                 </p>
@@ -386,7 +386,7 @@ function Dashboard() {
 
             {/* Briefing Text for Queue View */}
             {viewMode === 'queue' && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
                 <p className="text-sm text-gray-600">
                   ✅ <strong className="text-gray-900">Full-Screen Final Review Mode</strong> - Review all items grouped by source. Each section has its own download button.
                 </p>
@@ -395,7 +395,7 @@ function Dashboard() {
 
             {/* Briefing Text for History View */}
             {viewMode === 'history' && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
                 <p className="text-sm text-gray-600">
                   💀 <strong className="text-gray-900">Deletion History</strong> - View all items that have been exported for deletion. This is your permanent record.
                 </p>
@@ -404,7 +404,7 @@ function Dashboard() {
 
             {/* Bulk Action Bar - Show for zombies view only (queue uses QueueReviewPanel) */}
             {viewMode === 'zombies' && zombies.length > 0 && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
                 <div className="flex items-center justify-between gap-4">
                   {/* Left Side: Select All */}
                   <div className="flex items-center gap-3">
@@ -417,7 +417,7 @@ function Dashboard() {
                             : selectedIds.length === zombies.length && zombies.length > 0
                         }
                         onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
                       />
                       <span className="text-sm font-medium text-gray-700">
                         Select All ({viewMode === 'queue' ? queue.length : zombies.length} items)
@@ -434,12 +434,12 @@ function Dashboard() {
                   <Button
                     onClick={handleAddToQueue}
                     disabled={selectedIds.length === 0}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold"
+                    className="bg-black hover:bg-gray-900 text-white font-semibold"
                   >
                     <span>Add Selected to Queue</span>
                     <span className="text-lg">➡️</span>
                     {selectedIds.length > 0 && (
-                      <span className="ml-1 px-2 py-0.5 bg-green-700 rounded text-xs font-bold">
+                      <span className="ml-1 px-2 py-0.5 bg-gray-700 rounded text-xs font-bold">
                         {selectedIds.length}
                       </span>
                     )}
@@ -464,7 +464,7 @@ function Dashboard() {
                 }}
               />
             ) : (
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
                 {viewMode === 'history' ? (
                   <div className="p-6">
                     <HistoryTable logs={historyLogs} loading={loading} />

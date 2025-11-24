@@ -83,143 +83,23 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
     }
   }
 
-  const getSourceColor = (source) => {
-    switch (source) {
-      case 'Amazon':
-        return {
-          headerBg: 'bg-orange-600',
-          headerText: 'text-white',
-          border: 'border-orange-300',
-          bg: 'bg-orange-50',
-          buttonBg: 'bg-orange-600',
-          buttonHover: 'hover:bg-orange-700'
-        }
-      case 'Walmart':
-        return {
-          headerBg: 'bg-blue-600',
-          headerText: 'text-white',
-          border: 'border-blue-300',
-          bg: 'bg-blue-50',
-          buttonBg: 'bg-blue-600',
-          buttonHover: 'hover:bg-blue-700'
-        }
-      case 'AliExpress':
-        return {
-          headerBg: 'bg-red-600',
-          headerText: 'text-white',
-          border: 'border-red-300',
-          bg: 'bg-red-50',
-          buttonBg: 'bg-red-600',
-          buttonHover: 'hover:bg-red-700'
-        }
-      case 'CJ Dropshipping':
-        return {
-          headerBg: 'bg-gray-800',
-          headerText: 'text-white',
-          border: 'border-gray-300',
-          bg: 'bg-gray-50',
-          buttonBg: 'bg-gray-800',
-          buttonHover: 'hover:bg-gray-900'
-        }
-      case 'Home Depot':
-        return {
-          headerBg: 'bg-orange-500',
-          headerText: 'text-white',
-          border: 'border-orange-300',
-          bg: 'bg-orange-50',
-          buttonBg: 'bg-orange-500',
-          buttonHover: 'hover:bg-orange-600'
-        }
-      case 'Wayfair':
-        return {
-          headerBg: 'bg-violet-600',
-          headerText: 'text-white',
-          border: 'border-violet-300',
-          bg: 'bg-violet-50',
-          buttonBg: 'bg-violet-600',
-          buttonHover: 'hover:bg-violet-700'
-        }
-      case 'Costco':
-        return {
-          headerBg: 'bg-blue-500',
-          headerText: 'text-white',
-          border: 'border-blue-300',
-          bg: 'bg-blue-50',
-          buttonBg: 'bg-blue-500',
-          buttonHover: 'hover:bg-blue-600'
-        }
-      // Pro Aggregators - Professional look
-      case 'Wholesale2B':
-        return {
-          headerBg: 'bg-blue-900',
-          headerText: 'text-white',
-          border: 'border-blue-700',
-          bg: 'bg-blue-50',
-          buttonBg: 'bg-blue-900',
-          buttonHover: 'hover:bg-blue-950'
-        }
-      case 'Spocket':
-        return {
-          headerBg: 'bg-purple-600',
-          headerText: 'text-white',
-          border: 'border-purple-400',
-          bg: 'bg-purple-50',
-          buttonBg: 'bg-purple-600',
-          buttonHover: 'hover:bg-purple-700'
-        }
-      case 'SaleHoo':
-        return {
-          headerBg: 'bg-sky-500',
-          headerText: 'text-white',
-          border: 'border-sky-300',
-          bg: 'bg-sky-50',
-          buttonBg: 'bg-sky-500',
-          buttonHover: 'hover:bg-sky-600'
-        }
-      case 'Inventory Source':
-        return {
-          headerBg: 'bg-green-700',
-          headerText: 'text-white',
-          border: 'border-green-500',
-          bg: 'bg-green-50',
-          buttonBg: 'bg-green-700',
-          buttonHover: 'hover:bg-green-800'
-        }
-      case 'Dropified':
-        return {
-          headerBg: 'bg-gray-900',
-          headerText: 'text-white',
-          border: 'border-gray-700',
-          bg: 'bg-gray-50',
-          buttonBg: 'bg-gray-900',
-          buttonHover: 'hover:bg-black'
-        }
-      case 'Unverified':
-        return {
-          headerBg: 'bg-amber-500',
-          headerText: 'text-white',
-          border: 'border-amber-300',
-          bg: 'bg-amber-50',
-          buttonBg: 'bg-gray-400',
-          buttonHover: 'hover:bg-gray-400'
-        }
-      default:
-        return {
-          headerBg: 'bg-gray-600',
-          headerText: 'text-white',
-          border: 'border-gray-300',
-          bg: 'bg-gray-50',
-          buttonBg: 'bg-gray-600',
-          buttonHover: 'hover:bg-gray-700'
-        }
+  // Monochrome theme - all sources use same styling
+  const getSourceColor = () => {
+    return {
+      headerBg: 'bg-black',
+      headerText: 'text-white',
+      border: 'border-gray-300',
+      bg: 'bg-white',
+      buttonBg: 'bg-black',
+      buttonHover: 'hover:bg-gray-900'
     }
   }
 
   if (queue.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
+      <div className="bg-white rounded-lg border border-gray-300 p-8 text-center">
         <div className="text-4xl mb-4">🗑️</div>
-        <p className="text-lg font-semibold text-gray-700 mb-2">No Items in Queue</p>
+        <p className="text-lg font-semibold text-gray-900 mb-2">No Items in Queue</p>
         <p className="text-sm text-gray-500">
           Add items from the low interest items list to review them here.
         </p>
@@ -227,18 +107,18 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
     )
   }
 
+  const colors = getSourceColor()
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
       {Object.entries(groupedBySource).map(([source, items]) => {
-        const colors = getSourceColor(source)
-        
         return (
           <div
             key={source}
-            className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col"
+            className="bg-white rounded-lg border border-gray-300 overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className={`${colors.headerBg} ${colors.headerText} px-6 py-4 flex-shrink-0`}>
+            <div className={`${colors.headerBg} ${colors.headerText} px-6 py-4 flex-shrink-0 border-b border-gray-300`}>
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold">
                   {source.toUpperCase()} - {items.length} Item{items.length !== 1 ? 's' : ''}
@@ -250,7 +130,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
             {/* Table Area (Scrollable Body) */}
             <div className="flex-1 overflow-x-auto overflow-y-auto max-h-96 bg-white">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50 sticky top-0 z-10">
+                <thead className="bg-white border-b border-gray-300 sticky top-0 z-10">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Platform
@@ -277,7 +157,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {items.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={item.id} className="hover:bg-zinc-50 transition-colors">
                       <td className="px-4 py-3 whitespace-nowrap">
                         <PlatformBadge marketplace={item.marketplace || 'eBay'} />
                       </td>
@@ -304,7 +184,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                       <td className="px-4 py-3 whitespace-nowrap text-sm">
                         <button
                           onClick={() => onRemove(item.id)}
-                          className="text-red-600 hover:text-red-800 font-medium text-xs"
+                          className="text-gray-600 hover:text-gray-900 font-medium text-xs"
                         >
                           Remove
                         </button>
@@ -316,17 +196,17 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
             </div>
 
             {/* Footer (Download Button) */}
-            <div className="bg-gray-50 px-4 py-4 border-t border-gray-200 flex-shrink-0">
+            <div className="bg-white px-4 py-4 border-t border-gray-300 flex-shrink-0">
               {source === 'Unverified' ? (
                 <div className="space-y-3">
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <div className="bg-gray-50 border border-gray-300 rounded-lg p-3">
                     <div className="flex items-start gap-2">
-                      <span className="text-amber-600 text-lg">⚠️</span>
+                      <span className="text-gray-600 text-lg">⚠️</span>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-amber-800 mb-1">
+                        <p className="text-sm font-semibold text-gray-900 mb-1">
                           Source Verification Required
                         </p>
-                        <p className="text-xs text-amber-700">
+                        <p className="text-xs text-gray-600">
                           Please identify the source manually to generate the correct CSV. Click on the source badges above to verify each item.
                         </p>
                       </div>
@@ -334,7 +214,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                   </div>
                   <button
                     disabled
-                    className="w-full bg-gray-400 text-gray-600 font-bold py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full bg-gray-300 text-gray-600 font-bold py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <span>🔒</span>
                     <span>Download Disabled - Verify Sources First</span>
@@ -343,7 +223,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
               ) : (
                 <button
                   onClick={() => handleSourceExport(source, items)}
-                  className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md`}
+                  className={`w-full ${colors.buttonBg} ${colors.buttonHover} text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2`}
                 >
                   <span>📥</span>
                   <span>Download {source} CSV ({items.length} items)</span>
