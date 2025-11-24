@@ -376,14 +376,13 @@ def analyze_zombies(
         if platform:  # Only include non-null platforms
             platform_breakdown[platform] = count
     
-    # Use cached KPI if available, otherwise calculate fresh
+    # Use cached KPI if available, otherwise use freshly calculated values above
     if cached_kpi:
         total_count = cached_kpi.get("total_count", total_count)
         total_breakdown = cached_kpi.get("total_breakdown", total_breakdown)
         platform_breakdown = cached_kpi.get("platform_breakdown", platform_breakdown)
-    else:
-        # Calculate fresh KPI metrics
-        # Cache will be set after zombie analysis
+    # If not cached, use the freshly calculated values (total_count, total_breakdown, platform_breakdown)
+    # Cache will be set after zombie analysis if this is a full page request
     
     # Get zombie listings (filtered) - pass user_id, skip, and limit
     zombies, zombie_breakdown = analyze_zombie_listings(
