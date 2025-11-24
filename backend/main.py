@@ -6,7 +6,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional, List, Dict
-from datetime import date
+from datetime import date, datetime, timedelta
 import json
 from pydantic import BaseModel
 
@@ -15,6 +15,11 @@ from backend.services import detect_source, extract_supplier_info, analyze_zombi
 from backend.dummy_data import generate_dummy_listings
 
 app = FastAPI(title="OptListing API", version="1.0.0")
+
+# In-memory cache for KPI metrics (5-minute TTL)
+# Structure: {cache_key: {"data": {...}, "timestamp": datetime}}
+kpi_cache: Dict[str, Dict] = {}
+CACHE_TTL_SECONDS = 300  # 5 minutes
 
 # CORS middleware for React frontend
 # Allow both local development and production frontend URLs
@@ -245,6 +250,8 @@ def analyze_zombies(
     marketplace: str = "eBay",  # MVP Scope: Default to eBay (only eBay and Shopify supported)
     store_id: Optional[str] = None,  # Store ID filter - 'all' or None means all stores
     user_id: str = "default-user",  # Default user ID for backward compatibility
+    skip: int = 0,  # Pagination: skip N records
+    limit: int = 100,  # Pagination: limit to N records (default 100, max 1000)
     db: Session = Depends(get_db)
 ):
     """
@@ -255,12 +262,14 @@ def analyze_zombies(
     - max_sales: Maximum sales count (default: 0)
     - max_watch_count: Maximum watch count/views (default: 10)
     - supplier_filter: Filter by supplier - "All", "Amazon", "Walmart", etc. (default: "All")
+    - skip: Pagination offset (default: 0)
+    - limit: Pagination limit (default: 100, max: 1000)
     
     Returns:
     - total_count: Total number of ALL listings in the database
     - total_breakdown: Breakdown by source for ALL listings
     - zombie_count: Number of filtered zombie listings
-    - zombies: List of zombie listings
+    - zombies: List of zombie listings (paginated)
     """
     # Validate marketplace - MVP Scope: Only eBay and Shopify
     valid_marketplaces = [
@@ -285,6 +294,26 @@ def analyze_zombies(
     min_days = max(0, min_days)
     max_sales = max(0, max_sales)
     max_watch_count = max(0, max_watch_count)
+    
+    # Validate and clamp pagination parameters
+    skip = max(0, skip)
+    limit = min(max(1, limit), 1000)  # Clamp between 1 and 1000
+    
+    # Check cache for KPI metrics (total_count, total_breakdown, platform_breakdown)
+    # Only cache when skip=0 and limit >= 100 (full page requests)
+    # Don't cache paginated requests (skip > 0 or limit < 100)
+    cache_filters = {
+        "min_days": min_days,
+        "max_sales": max_sales,
+        "max_watch_count": max_watch_count,
+        "supplier_filter": supplier_filter
+    }
+    cache_key = get_cache_key(user_id, store_id, marketplace, cache_filters)
+    cached_kpi = None
+    
+    # Only use cache for full page requests (not paginated)
+    if skip == 0 and limit >= 100:
+        cached_kpi = get_cached_kpi(cache_key)
     
     # Build base query with user_id filter
     base_query = db.query(Listing).filter(Listing.user_id == user_id)
@@ -341,7 +370,16 @@ def analyze_zombies(
         if platform:  # Only include non-null platforms
             platform_breakdown[platform] = count
     
-    # Get zombie listings (filtered) - pass user_id
+    # Use cached KPI if available, otherwise calculate fresh
+    if cached_kpi:
+        total_count = cached_kpi.get("total_count", total_count)
+        total_breakdown = cached_kpi.get("total_breakdown", total_breakdown)
+        platform_breakdown = cached_kpi.get("platform_breakdown", platform_breakdown)
+    else:
+        # Calculate fresh KPI metrics
+        # Cache will be set after zombie analysis
+    
+    # Get zombie listings (filtered) - pass user_id, skip, and limit
     zombies, zombie_breakdown = analyze_zombie_listings(
         db,
         user_id=user_id,
@@ -350,8 +388,19 @@ def analyze_zombies(
         max_watch_count=max_watch_count,
         supplier_filter=supplier_filter,
         platform_filter=marketplace,
-        store_id=store_id
+        store_id=store_id,
+        skip=skip,
+        limit=limit
     )
+    
+    # Cache KPI metrics if this is a full page request
+    if skip == 0 and limit >= 100 and not cached_kpi:
+        kpi_data = {
+            "total_count": total_count,
+            "total_breakdown": total_breakdown,
+            "platform_breakdown": platform_breakdown
+        }
+        set_cached_kpi(cache_key, kpi_data)
     
     return {
         "total_count": total_count,
