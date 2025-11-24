@@ -335,7 +335,7 @@ function Dashboard() {
 
 
   return (
-    <div className="font-sans bg-zinc-50 min-h-full">
+    <div className="font-sans bg-black dark:bg-black min-h-full">
       <div className="px-6">
         {/* Summary Card */}
         <SummaryCard 
@@ -373,8 +373,8 @@ function Dashboard() {
 
             {/* View Mode Info */}
             {viewMode === 'all' && (
-              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
-                <p className="text-sm text-gray-600">
+              <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-6 mb-4">
+                <p className="text-sm text-zinc-400 dark:text-zinc-400">
                   📋 <strong className="text-gray-900">Viewing All Listings</strong> - Click "Low Interest Detected" card to filter and optimize inventory.
                 </p>
               </div>
@@ -382,8 +382,8 @@ function Dashboard() {
 
             {/* Briefing Text for Low Interest Items View */}
             {viewMode === 'zombies' && (
-              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
-                <p className="text-sm text-gray-600">
+              <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-6 mb-4">
+                <p className="text-sm text-zinc-400 dark:text-zinc-400">
                   🔍 <strong className="text-gray-900">Current Filter:</strong> Showing {filters.marketplace_filter === 'All' ? <strong className="text-gray-900">All Platforms</strong> : <strong className="text-gray-900">[{filters.marketplace_filter}]</strong>} listings older than <strong className="text-gray-900">{filters.min_days} days</strong> with <strong className="text-gray-900">{filters.max_sales} sales</strong> and <strong className="text-gray-900">≤ {filters.max_watch_count} views</strong>. These items have low customer interest and may need optimization.
                 </p>
               </div>
@@ -391,8 +391,8 @@ function Dashboard() {
 
             {/* Briefing Text for Queue View */}
             {viewMode === 'queue' && (
-              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
-                <p className="text-sm text-gray-600">
+              <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-6 mb-4">
+                <p className="text-sm text-zinc-400 dark:text-zinc-400">
                   ✅ <strong className="text-gray-900">Full-Screen Final Review Mode</strong> - Review all items grouped by source. Each section has its own download button.
                 </p>
               </div>
@@ -400,8 +400,8 @@ function Dashboard() {
 
             {/* Briefing Text for History View */}
             {viewMode === 'history' && (
-              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
-                <p className="text-sm text-gray-600">
+              <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-6 mb-4">
+                <p className="text-sm text-zinc-400 dark:text-zinc-400">
                   💀 <strong className="text-gray-900">Deletion History</strong> - View all items that have been exported for deletion. This is your permanent record.
                 </p>
               </div>
@@ -409,7 +409,7 @@ function Dashboard() {
 
             {/* Bulk Action Bar - Show for zombies view only (queue uses QueueReviewPanel) */}
             {viewMode === 'zombies' && zombies.length > 0 && (
-              <div className="bg-white border border-gray-300 rounded-lg p-6 mb-4">
+              <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-6 mb-4">
                 <div className="flex items-center justify-between gap-4">
                   {/* Left Side: Select All */}
                   <div className="flex items-center gap-3">
@@ -422,14 +422,14 @@ function Dashboard() {
                             : selectedIds.length === zombies.length && zombies.length > 0
                         }
                         onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                        className="w-4 h-4 rounded border-zinc-700 dark:border-zinc-700 text-white dark:text-white focus:ring-white dark:focus:ring-white bg-zinc-800 dark:bg-zinc-800"
                       />
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-zinc-300 dark:text-zinc-300">
                         Select All ({viewMode === 'queue' ? queue.length : zombies.length} items)
                       </span>
                     </label>
                     {selectedIds.length > 0 && (
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-zinc-400 dark:text-zinc-400">
                         {selectedIds.length} item{selectedIds.length !== 1 ? 's' : ''} selected
                       </span>
                     )}
@@ -469,7 +469,7 @@ function Dashboard() {
                 }}
               />
             ) : (
-              <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
+              <div className="bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg overflow-hidden">
                 {viewMode === 'history' ? (
                   <div className="p-6">
                     <HistoryTable logs={historyLogs} loading={loading} />

@@ -48,21 +48,21 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-300 p-6 mb-8">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    <div className="bg-zinc-900 dark:bg-zinc-900 rounded-lg border border-zinc-800 dark:border-zinc-800 p-6 mb-8">
+      <h3 className="text-lg font-semibold text-white dark:text-white mb-4">
         Filter Low Interest Items
       </h3>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         {/* Platform Filter - First and Most Important */}
         <div>
-          <label htmlFor="marketplaceFilter" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="marketplaceFilter" className="block text-sm font-medium text-zinc-300 dark:text-zinc-300 mb-2">
             Platform
           </label>
           <select
             id="marketplaceFilter"
             value={marketplaceFilter}
             onChange={(e) => setMarketplaceFilter(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 bg-white"
+            className="w-full px-3 py-2 border border-zinc-700 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-white focus:border-white dark:focus:border-white bg-zinc-800 dark:bg-zinc-800 text-white dark:text-white"
           >
             <option value="eBay">eBay</option>
             <option value="Shopify">Shopify</option>
@@ -80,7 +80,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             min="0"
             value={minDays}
             onChange={(e) => setMinDays(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 bg-white"
+            className="w-full px-3 py-2 border border-zinc-700 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-white focus:border-white dark:focus:border-white bg-zinc-800 dark:bg-zinc-800 text-white dark:text-white"
             placeholder="3"
           />
         </div>
@@ -96,7 +96,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             min="0"
             value={maxSales}
             onChange={(e) => setMaxSales(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 bg-white"
+            className="w-full px-3 py-2 border border-zinc-700 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-white focus:border-white dark:focus:border-white bg-zinc-800 dark:bg-zinc-800 text-white dark:text-white"
             placeholder="0"
           />
         </div>
@@ -112,7 +112,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             min="0"
             value={maxWatchCount}
             onChange={(e) => setMaxWatchCount(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 bg-white"
+            className="w-full px-3 py-2 border border-zinc-700 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-white focus:border-white dark:focus:border-white bg-zinc-800 dark:bg-zinc-800 text-white dark:text-white"
             placeholder="10"
           />
         </div>
@@ -126,7 +126,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             id="sourceFilter"
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 bg-white"
+            className="w-full px-3 py-2 border border-zinc-700 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-white focus:border-white dark:focus:border-white bg-zinc-800 dark:bg-zinc-800 text-white dark:text-white"
           >
             <option value="All">All Sources</option>
             <option value="Amazon">Amazon</option>
@@ -152,7 +152,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             type="button"
             onClick={handleReset}
             disabled={loading}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-900 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-zinc-800 dark:bg-zinc-800 border border-zinc-700 dark:border-zinc-700 text-white dark:text-white font-medium rounded-md hover:bg-zinc-700 dark:hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Reset
           </button>

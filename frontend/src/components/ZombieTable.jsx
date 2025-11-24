@@ -93,70 +93,70 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
   }
 
   return (
-    <div className="w-full border border-gray-300 rounded-lg overflow-x-auto bg-white">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-white border-b border-gray-300">
+    <div className="w-full border border-zinc-800 dark:border-zinc-800 rounded-lg overflow-x-auto bg-zinc-900 dark:bg-zinc-900">
+      <table className="min-w-full divide-y divide-zinc-800 dark:divide-zinc-800">
+        <thead className="bg-zinc-900 dark:bg-zinc-900 border-b border-zinc-800 dark:border-zinc-800">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               <input
                 type="checkbox"
                 checked={selectedIds.length === zombies.length && zombies.length > 0}
                 onChange={(e) => onSelectAll(e.target.checked)}
-                className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                className="rounded border-zinc-700 dark:border-zinc-700 text-white dark:text-white focus:ring-white dark:focus:ring-white bg-zinc-800 dark:bg-zinc-800"
               />
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               Platform
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               eBay Item ID
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-xs">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider max-w-xs">
               Title
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               Source
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               SKU
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               Price
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               Date Listed
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 dark:text-zinc-400 uppercase tracking-wider">
               Watch Count
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-zinc-900 dark:bg-zinc-900 divide-y divide-zinc-800 dark:divide-zinc-800">
           {zombies.map((zombie) => (
-            <tr key={zombie.id} className="hover:bg-zinc-50 transition-colors">
+            <tr key={zombie.id} className="hover:bg-zinc-800 dark:hover:bg-zinc-800 transition-colors">
               <td className="w-10 px-4 py-5 whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(zombie.id)}
                   onChange={(e) => onSelect(zombie.id, e.target.checked)}
-                  className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                  className="rounded border-zinc-700 dark:border-zinc-700 text-white dark:text-white focus:ring-white dark:focus:ring-white bg-zinc-800 dark:bg-zinc-800"
                 />
               </td>
               <td className="px-6 py-5 whitespace-nowrap">
                 <div className="relative group inline-block">
                   <PlatformBadge marketplace={zombie.marketplace || 'eBay'} />
                   {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-50">
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-zinc-800 dark:bg-zinc-800 text-white dark:text-white text-xs rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-50">
                     {getManagementHubTooltip(zombie)}
                     {/* Tooltip arrow */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-zinc-800 dark:border-t-zinc-800"></div>
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-gray-900">
+              <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-white dark:text-white">
                 {zombie.ebay_item_id}
               </td>
-              <td className="px-6 py-5 text-sm font-semibold text-gray-900 max-w-xs truncate" title={zombie.title}>
+              <td className="px-6 py-5 text-sm font-semibold text-white dark:text-white max-w-xs truncate" title={zombie.title}>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="truncate">{zombie.title}</span>
                   {zombie.is_active_elsewhere && (
@@ -179,16 +179,16 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                   itemId={zombie.id}
                 />
               </td>
-              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-5 whitespace-nowrap text-sm text-zinc-400 dark:text-zinc-400">
                 {zombie.sku}
               </td>
-              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-6 py-5 whitespace-nowrap text-sm text-white dark:text-white">
                 {formatPrice(zombie.price)}
               </td>
-              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-5 whitespace-nowrap text-sm text-zinc-400 dark:text-zinc-400">
                 {formatDate(zombie.date_listed)}
               </td>
-              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-5 whitespace-nowrap text-sm text-zinc-400 dark:text-zinc-400">
                 {zombie.watch_count}
               </td>
             </tr>
