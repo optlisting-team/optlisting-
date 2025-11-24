@@ -382,26 +382,36 @@ def analyze_zombie_listings(
     # Sales filter: use metrics['sales'] (JSONB) with robust casting
     # If metrics doesn't have sales, assume 0 (which satisfies <= max_sales when max_sales >= 0)
     if max_sales is not None and max_sales >= 0:
-        # Direct cast: PostgreSQL handles NULL metrics gracefully with ->>
-        # If metrics is NULL or sales key doesn't exist, cast returns NULL, which we handle with COALESCE
-        query = query.filter(
-            func.coalesce(
-                cast(Listing.metrics['sales'].astext, Integer),
-                0
-            ) <= max_sales
+        # Use CASE to safely handle NULL metrics or missing keys
+        # If metrics is NULL or sales key doesn't exist, default to 0
+        sales_value = case(
+            (
+                and_(
+                    Listing.metrics.isnot(None),
+                    Listing.metrics.has_key('sales')
+                ),
+                cast(Listing.metrics['sales'].astext, Integer)
+            ),
+            else_=0
         )
+        query = query.filter(sales_value <= max_sales)
     
     # Watch count filter: use metrics['views'] (JSONB) with robust casting
     # If metrics doesn't have views, assume 0 (which satisfies <= max_watch_count when max_watch_count >= 0)
     if max_watch_count is not None and max_watch_count >= 0:
-        # Direct cast: PostgreSQL handles NULL metrics gracefully with ->>
-        # If metrics is NULL or views key doesn't exist, cast returns NULL, which we handle with COALESCE
-        query = query.filter(
-            func.coalesce(
-                cast(Listing.metrics['views'].astext, Integer),
-                0
-            ) <= max_watch_count
+        # Use CASE to safely handle NULL metrics or missing keys
+        # If metrics is NULL or views key doesn't exist, default to 0
+        views_value = case(
+            (
+                and_(
+                    Listing.metrics.isnot(None),
+                    Listing.metrics.has_key('views')
+                ),
+                cast(Listing.metrics['views'].astext, Integer)
+            ),
+            else_=0
         )
+        query = query.filter(views_value <= max_watch_count)
     
     # Apply platform filter (MVP Scope: Only eBay and Shopify)
     if platform_filter and platform_filter in ["eBay", "Shopify"]:
