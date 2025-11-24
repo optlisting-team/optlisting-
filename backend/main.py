@@ -584,6 +584,7 @@ def log_deletion(
     """
     Log deleted items to history
     Accepts a list of items from the queue that were exported/deleted
+    Uses supplier_name (not source) and stores full snapshot in JSONB
     """
     items = request.items
     
@@ -593,17 +594,44 @@ def log_deletion(
     # Create deletion log entries
     logs = []
     for item in items:
+        # Extract supplier_name (prefer supplier_name over supplier over source)
+        supplier = item.get("supplier_name") or item.get("supplier") or item.get("source", "Unknown")
+        
+        # Extract platform/marketplace
+        platform = item.get("platform") or item.get("marketplace") or "eBay"
+        
+        # Create snapshot JSONB with full item data for future reference
+        snapshot_data = {
+            "supplier_name": supplier,
+            "supplier_id": item.get("supplier_id"),
+            "platform": platform,
+            "title": item.get("title", "Unknown"),
+            "price": item.get("price"),
+            "sold_qty": item.get("sold_qty"),
+            "watch_count": item.get("watch_count"),
+            # Include all other fields for completeness
+            **{k: v for k, v in item.items() if k not in ["supplier_name", "supplier", "source", "platform", "marketplace"]}
+        }
+        
         log_entry = DeletionLog(
             item_id=item.get("ebay_item_id") or item.get("item_id") or str(item.get("id", "")),
             title=item.get("title", "Unknown"),
-            platform=item.get("marketplace") or item.get("platform") or "eBay",
-            supplier=item.get("supplier") or item.get("supplier_name") or item.get("source", "Unknown")
+            platform=platform,
+            supplier=supplier,  # Use supplier_name (not source)
+            snapshot=snapshot_data  # Store full snapshot in JSONB
         )
         logs.append(log_entry)
     
     # Bulk insert
-    db.add_all(logs)
-    db.commit()
+    try:
+        db.add_all(logs)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        print(f"Error logging deletions: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to log deletions: {str(e)}")
     
     return {
         "message": f"Logged {len(logs)} deletions",
@@ -620,34 +648,81 @@ def get_deletion_history(
     """
     Get deletion history
     Returns total count and list of deleted items (most recent first)
+    Uses supplier field from DeletionLog (not source) and safely handles JSONB snapshot
     """
     try:
+        # Validate pagination parameters
+        skip = max(0, skip)
+        limit = min(max(1, limit), 10000)  # Clamp between 1 and 10000
+        
         # Get total count
         total_count = db.query(DeletionLog).count()
         
         # Get logs (most recent first)
         logs = db.query(DeletionLog).order_by(DeletionLog.deleted_at.desc()).offset(skip).limit(limit).all()
         
+        # Build response with safe field access
+        log_list = []
+        for log in logs:
+            # Safely extract supplier (handle NULL and fallback to snapshot or "Unknown")
+            supplier = None
+            if hasattr(log, 'supplier') and log.supplier:
+                supplier = log.supplier
+            elif hasattr(log, 'snapshot') and log.snapshot:
+                # Try to get supplier from snapshot JSONB if available
+                if isinstance(log.snapshot, dict):
+                    supplier = log.snapshot.get('supplier_name') or log.snapshot.get('supplier') or log.snapshot.get('source')
+                elif isinstance(log.snapshot, str):
+                    try:
+                        import json
+                        snapshot_dict = json.loads(log.snapshot)
+                        supplier = snapshot_dict.get('supplier_name') or snapshot_dict.get('supplier') or snapshot_dict.get('source')
+                    except:
+                        pass
+            
+            # Default to "Unknown" if supplier is still None
+            supplier = supplier or "Unknown"
+            
+            # Safely extract platform
+            platform = None
+            if hasattr(log, 'platform') and log.platform:
+                platform = log.platform
+            elif hasattr(log, 'snapshot') and log.snapshot:
+                if isinstance(log.snapshot, dict):
+                    platform = log.snapshot.get('platform') or log.snapshot.get('marketplace')
+                elif isinstance(log.snapshot, str):
+                    try:
+                        import json
+                        snapshot_dict = json.loads(log.snapshot)
+                        platform = snapshot_dict.get('platform') or snapshot_dict.get('marketplace')
+                    except:
+                        pass
+            
+            platform = platform or "eBay"  # Default platform
+            
+            log_list.append({
+                "id": log.id,
+                "item_id": log.item_id if hasattr(log, 'item_id') else "",
+                "title": log.title if hasattr(log, 'title') else "Unknown",
+                "platform": platform,
+                "supplier": supplier,
+                "deleted_at": log.deleted_at.isoformat() if hasattr(log, 'deleted_at') and log.deleted_at else None
+            })
+        
         return {
             "total_count": total_count,
-            "logs": [
-                {
-                    "id": log.id,
-                    "item_id": log.item_id,
-                    "title": log.title,
-                    "platform": log.platform,
-                    "supplier": log.supplier,
-                    "deleted_at": log.deleted_at.isoformat() if log.deleted_at else None
-                }
-                for log in logs
-            ]
+            "logs": log_list
         }
     except Exception as e:
-        # Log error and return empty response
+        # Log error with full traceback
         print(f"Error fetching deletion history: {e}")
         import traceback
         traceback.print_exc()
-        return {"total_count": 0, "logs": []}
+        # Return error response with CORS headers (not empty response)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch deletion history: {str(e)}"
+        )
 
 
 class UpdateListingRequest(BaseModel):
