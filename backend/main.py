@@ -41,9 +41,9 @@ cors_origins = [
 cors_origins = [origin for origin in cors_origins if origin]
 
 # CORS configuration for Railway + Vercel deployment
-# Important: allow_origins=["*"] requires allow_credentials=False
-# This allows all origins including Vercel preview deployments
+# CRITICAL: Ensure all Vercel domains are explicitly allowed
 # Add CORS middleware FIRST, before any routes
+# Use allow_origins=["*"] for maximum compatibility (Railway + Vercel)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins (Railway + Vercel compatibility)
@@ -102,32 +102,53 @@ async def global_exception_handler(request, exc):
 # Initialize database on startup
 @app.on_event("startup")
 def startup_event():
+    """
+    Initialize database connection and create tables.
+    This function must not crash the server if database connection fails.
+    """
     try:
+        # Test database connection first
+        print("Testing database connection...")
+        from backend.models import engine
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        print("Database connection successful")
+        
         # Create tables if they don't exist (works for both SQLite and Supabase)
         print("Creating database tables if they don't exist...")
         Base.metadata.create_all(bind=engine)
         print("Database tables created/verified successfully")
         
-        # Generate dummy data on first startup
-        db = next(get_db())
+        # Generate dummy data on first startup (non-blocking)
         try:
-            count = db.query(Listing).count()
-            if count == 0:
-                print("Generating 5000 dummy listings... This may take a moment.")
-                generate_dummy_listings(db, count=5000, user_id="default-user")
-                print("Dummy data generated successfully")
-            else:
-                print(f"Database already contains {count} listings")
+            db = next(get_db())
+            try:
+                count = db.query(Listing).count()
+                if count == 0:
+                    print("Generating 5000 dummy listings... This may take a moment.")
+                    generate_dummy_listings(db, count=5000, user_id="default-user")
+                    print("Dummy data generated successfully")
+                else:
+                    print(f"Database already contains {count} listings")
+            except Exception as e:
+                print(f"Error generating dummy data: {e}")
+                import traceback
+                traceback.print_exc()
+            finally:
+                db.close()
         except Exception as e:
-            print(f"Error generating dummy data: {e}")
+            print(f"Warning: Could not generate dummy data: {e}")
+            # Don't crash the server if dummy data generation fails
             import traceback
             traceback.print_exc()
-        finally:
-            db.close()
     except Exception as e:
-        print(f"Startup error: {e}")
+        # Log error but don't crash the server
+        print(f"CRITICAL: Database connection failed: {e}")
+        print("Server will continue to start, but database operations may fail.")
         import traceback
         traceback.print_exc()
+        # Server should still start even if database connection fails
 
 
 @app.get("/")
