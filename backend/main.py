@@ -26,34 +26,40 @@ CACHE_TTL_SECONDS = 300  # 5 minutes
 import os
 import re
 
-cors_origins = [
-    # Local development environments
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    
+# Define the allowed exact origins (for production build)
+allowed_origins = [
     # Production Vercel deployment - All variations
     "https://optlisting.vercel.app",
     "https://optlisting.vercel.app/",
     "https://www.optlisting.vercel.app",
     "https://www.optlisting.vercel.app/",
     
-    # Environment variable for additional frontend URLs
-    os.getenv("FRONTEND_URL", ""),
+    # Local development environments
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
 ]
 
-# Filter out empty strings and add Vercel regex pattern
-cors_origins = [origin for origin in cors_origins if origin]
+# Add environment variable for additional frontend URLs if provided
+frontend_url = os.getenv("FRONTEND_URL", "")
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
+# Filter out empty strings
+allowed_origins = [origin for origin in allowed_origins if origin]
+
+# Define regex pattern to cover all Vercel deploy previews (*.vercel.app)
+# This is necessary for Vercel deployment environment (preview deployments, branch deployments, etc.)
+vercel_regex = r"https://.*\.vercel\.app"
 
 # CORS configuration for Railway + Vercel deployment
 # CRITICAL: Ensure all Vercel domains are explicitly allowed
 # Add CORS middleware FIRST, before any routes
-# Use allow_origins=["*"] for maximum compatibility (Railway + Vercel)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (Railway + Vercel compatibility)
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Explicitly allow all Vercel subdomains
-    allow_credentials=False,  # Must be False when using allow_origins=["*"]
+    allow_origins=allowed_origins,  # Explicit production and local URLs
+    allow_origin_regex=vercel_regex,  # CRITICAL: Regex pattern for all Vercel subdomains
+    allow_credentials=True,  # Enable credentials for authenticated requests
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
