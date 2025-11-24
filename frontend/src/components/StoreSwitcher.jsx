@@ -3,7 +3,6 @@ import { useStore } from '../contexts/StoreContext'
 import { ChevronDown } from 'lucide-react'
 
 export const MY_STORES = [
-  { id: 'all', name: 'All Stores', platform: 'All' },
   { id: 'store-1', name: 'eBay Store', platform: 'eBay' },
   { id: 'store-2', name: 'Amazon Store', platform: 'Amazon' },
   { id: 'store-3', name: 'Shopify Store', platform: 'Shopify' },

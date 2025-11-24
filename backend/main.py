@@ -40,11 +40,12 @@ cors_origins = [origin for origin in cors_origins if origin]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins if cors_origins else ["*"],  # Fallback to all if no origins specified
-    allow_origin_regex="https://.*\\.vercel\\.app",  # Allow all Vercel subdomains
+    allow_origins=["*"],  # Allow all origins for Railway deployment compatibility
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel subdomains (fixed regex)
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Initialize database on startup
@@ -280,7 +281,7 @@ def analyze_zombies(
             platform_breakdown[platform] = count
     
     # Get zombie listings (filtered) - pass user_id
-    zombies = analyze_zombie_listings(
+    zombies, zombie_breakdown = analyze_zombie_listings(
         db,
         user_id=user_id,
         min_days=min_days, 
@@ -296,6 +297,7 @@ def analyze_zombies(
         "total_breakdown": total_breakdown,
         "platform_breakdown": platform_breakdown,
         "zombie_count": len(zombies),
+        "zombie_breakdown": zombie_breakdown,  # Store-Level Breakdown
         "zombies": [
             {
                 "id": z.id,
@@ -312,7 +314,9 @@ def analyze_zombies(
                 "price": (z.metrics.get('price') if z.metrics and 'price' in z.metrics else None) or z.price,
                 "date_listed": z.date_listed.isoformat() if z.date_listed else None,
                 "sold_qty": (z.metrics.get('sales') if z.metrics and 'sales' in z.metrics else None) or z.sold_qty or 0,
-                "watch_count": (z.metrics.get('views') if z.metrics and 'views' in z.metrics else None) or z.watch_count or 0
+                "watch_count": (z.metrics.get('views') if z.metrics and 'views' in z.metrics else None) or z.watch_count or 0,
+                "is_global_winner": bool(getattr(z, 'is_global_winner', 0)),  # Cross-Platform Health Check flag
+                "is_active_elsewhere": bool(getattr(z, 'is_active_elsewhere', 0))  # Cross-Platform Activity Check flag
             }
             for z in zombies
         ]
@@ -353,7 +357,7 @@ def export_csv(
     max_watch_count = max(0, max_watch_count)
     
     # Get zombie listings with filters
-    zombies = analyze_zombie_listings(
+    zombies, _ = analyze_zombie_listings(
         db, 
         user_id="default-user",  # Default user ID
         min_days=min_days, 

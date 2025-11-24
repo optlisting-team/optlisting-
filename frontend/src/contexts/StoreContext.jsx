@@ -1,8 +1,8 @@
 import { createContext, useContext, useState } from 'react'
 import { MY_STORES } from '../components/StoreSwitcher'
 
-// Default store (All Stores - aggregated view)
-const DEFAULT_STORE = MY_STORES[0] // First item is "All Stores"
+// Default store: First real store (eBay Store)
+const DEFAULT_STORE = MY_STORES[0] // First item is now the first actual store
 
 const StoreContext = createContext({
   stores: MY_STORES,

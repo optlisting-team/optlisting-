@@ -20,6 +20,7 @@ function Dashboard() {
   const [totalListings, setTotalListings] = useState(0)
   const [totalBreakdown, setTotalBreakdown] = useState({ Amazon: 0, Walmart: 0, Unknown: 0 })
   const [platformBreakdown, setPlatformBreakdown] = useState({ eBay: 0, Amazon: 0, Shopify: 0, Walmart: 0 })
+  const [zombieBreakdown, setZombieBreakdown] = useState({})  // Store-Level Breakdown for Low Interest items
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedIds, setSelectedIds] = useState([])
@@ -41,7 +42,7 @@ function Dashboard() {
       // Build params object - ALWAYS include store_id
       const params = {
         user_id: CURRENT_USER_ID,
-        store_id: selectedStore?.id || 'all', // Always include store_id (even if 'all')
+        store_id: selectedStore?.id, // Use selected store ID (no fallback to 'all')
         marketplace: filterParams.marketplace_filter || 'All',
         min_days: filterParams.min_days,
         max_sales: filterParams.max_sales,
@@ -58,6 +59,9 @@ function Dashboard() {
       setTotalBreakdown(breakdown)
       const platformBreakdown = response.data.platform_breakdown || { eBay: 0, Amazon: 0, Shopify: 0, Walmart: 0 }
       setPlatformBreakdown(platformBreakdown)
+      // Store-Level Breakdown for Low Interest items
+      const zombieBreakdown = response.data.zombie_breakdown || {}
+      setZombieBreakdown(zombieBreakdown)
       setError(null)
     } catch (err) {
       setError('Failed to fetch low interest listings')
@@ -77,7 +81,7 @@ function Dashboard() {
         // Build params object - ALWAYS include store_id
         const listingsParams = {
           user_id: CURRENT_USER_ID,
-          store_id: selectedStore?.id || 'all', // Always include store_id (even if 'all')
+          store_id: selectedStore?.id, // Use selected store ID (no fallback to 'all')
           skip: 0,
           limit: 10000 // Get all listings
         }
@@ -335,17 +339,18 @@ function Dashboard() {
       <div className="px-6">
         {/* Summary Card */}
         <SummaryCard 
-            totalListings={totalListings}
-            totalBreakdown={totalBreakdown}
-            platformBreakdown={platformBreakdown}
-            totalZombies={totalZombies} 
-            queueCount={queue.length}
-            totalDeleted={totalDeleted}
-            loading={loading}
-            filters={filters}
-            viewMode={viewMode}
-            onViewModeChange={handleViewModeChange}
-          />
+                totalListings={totalListings}
+                totalBreakdown={totalBreakdown}
+                platformBreakdown={platformBreakdown}
+                totalZombies={totalZombies}
+                zombieBreakdown={zombieBreakdown}
+                queueCount={queue.length}
+                totalDeleted={totalDeleted}
+                loading={loading}
+                filters={filters}
+                viewMode={viewMode}
+                onViewModeChange={handleViewModeChange}
+              />
 
         {/* Dynamic Layout: Full Width for 'all', Split View for 'zombies' */}
         <div className={`flex gap-8 transition-all duration-300 ${

@@ -233,6 +233,57 @@ def detect_source(
     return ("Unverified", "Low")
 
 
+def check_global_health(
+    db: Session,
+    user_id: str,
+    supplier_id: Optional[str]
+) -> bool:
+    """
+    Cross-Platform Health Check: Detect "Global Winners"
+    
+    Checks if a supplier_id is selling well across ALL of the user's connected stores
+    (regardless of platform). This prevents accidental deletion of profitable items
+    that are failing locally but succeeding globally.
+    
+    Args:
+        db: Database session
+        user_id: User ID to check across all their stores
+        supplier_id: Supplier ID to check (e.g., ASIN "B08...", Walmart ID, etc.)
+    
+    Returns:
+        True if SUM(sales) > 20 across all stores (Global Winner), False otherwise
+    
+    Logic:
+        - Sum sales volume for the given supplier_id across ALL stores/platforms for this user
+        - If total sales > 20 (threshold), return True (Global Winner)
+        - Uses metrics['sales'] or legacy sold_qty field
+    """
+    if not supplier_id:
+        return False
+    
+    # Query all listings for this user with matching supplier_id across ALL stores/platforms
+    query = db.query(Listing).filter(
+        Listing.user_id == user_id,
+        Listing.supplier_id == supplier_id
+    )
+    
+    all_listings = query.all()
+    
+    # Sum sales across all listings for this supplier_id
+    total_sales = 0
+    for listing in all_listings:
+        # Try metrics['sales'] first, then fallback to sold_qty
+        if listing.metrics and isinstance(listing.metrics, dict) and 'sales' in listing.metrics:
+            sales = listing.metrics.get('sales', 0)
+            if isinstance(sales, (int, float)):
+                total_sales += int(sales)
+        elif hasattr(listing, 'sold_qty') and listing.sold_qty:
+            total_sales += listing.sold_qty or 0
+    
+    # Threshold: 20 sales across all platforms = Global Winner
+    return total_sales > 20
+
+
 def analyze_zombie_listings(
     db: Session,
     user_id: str,
@@ -242,7 +293,7 @@ def analyze_zombie_listings(
     supplier_filter: str = "All",
     platform_filter: str = "All",
     store_id: Optional[str] = None
-) -> List[Listing]:
+) -> Tuple[List[Listing], Dict[str, int]]:
     """
     Low Interest Items Filter Logic (formerly Zombie Filter)
     Filters listings based on dynamic criteria using new hybrid schema.
@@ -253,6 +304,10 @@ def analyze_zombie_listings(
     - views <= max_watch_count (from metrics['views'] or legacy watch_count)
     - supplier_name matches supplier_filter (if not "All")
     - platform matches platform_filter (if not "All")
+    
+    Returns:
+        Tuple of (list of zombie listings, breakdown dictionary by platform)
+        Example: ([Listing, ...], {"eBay": 150, "Shopify": 23})
     """
     # Ensure min_days is at least 0
     min_days = max(0, min_days)
@@ -373,7 +428,121 @@ def analyze_zombie_listings(
     
     zombies = query.all()
     
-    return zombies
+    # Get current platform(s) being analyzed
+    current_platforms = set()
+    if platform_filter and platform_filter != "All":
+        current_platforms.add(platform_filter)
+    else:
+        # If filtering all platforms, get all platforms from zombies
+        current_platforms = {z.platform for z in zombies}
+    
+    # Cross-Platform Health Check & Activity Check: Check each zombie
+    for zombie in zombies:
+        # Check if this supplier_id is a global winner across all stores
+        is_global_winner = check_global_health(db, user_id, zombie.supplier_id)
+        
+        # Set the is_global_winner flag
+        zombie.is_global_winner = 1 if is_global_winner else 0
+        
+        # Cross-Platform Activity Check: Check if this zombie is active elsewhere
+        is_active_elsewhere = False
+        if zombie.supplier_id:
+            # Find all other listings with the same supplier_id in OTHER platforms
+            other_listings_query = db.query(Listing).filter(
+                Listing.user_id == user_id,
+                Listing.supplier_id == zombie.supplier_id,
+                Listing.platform != zombie.platform  # Different platform/store
+            )
+            other_listings = other_listings_query.all()
+            
+            # Check if ANY of these other listings are NOT zombies (active)
+            for other_listing in other_listings:
+                # Get sales, views, and age
+                other_sales = 0
+                other_views = 0
+                other_date_listed = None
+                
+                if other_listing.metrics and isinstance(other_listing.metrics, dict):
+                    other_sales = other_listing.metrics.get('sales', 0) or 0
+                    other_views = other_listing.metrics.get('views', 0) or 0
+                    if 'date_listed' in other_listing.metrics:
+                        date_val = other_listing.metrics['date_listed']
+                        if isinstance(date_val, date):
+                            other_date_listed = date_val
+                        elif isinstance(date_val, str):
+                            try:
+                                other_date_listed = datetime.strptime(date_val, '%Y-%m-%d').date()
+                            except:
+                                pass
+                else:
+                    other_sales = getattr(other_listing, 'sold_qty', 0) or 0
+                    other_views = getattr(other_listing, 'watch_count', 0) or 0
+                    other_date_listed = getattr(other_listing, 'date_listed', None)
+                
+                # Calculate age
+                if other_date_listed:
+                    age_days = (date.today() - other_date_listed).days
+                else:
+                    # Use last_synced_at as fallback
+                    if other_listing.last_synced_at:
+                        age_days = (date.today() - other_listing.last_synced_at.date()).days
+                    else:
+                        age_days = 999  # Very old if no date
+                
+                # Check if this listing is NOT a zombie (active)
+                # Active if: Sales > 0 OR Views > 10 OR Age < 3 days
+                is_active = (
+                    other_sales > 0 or
+                    other_views > 10 or
+                    age_days < 3
+                )
+                
+                if is_active:
+                    is_active_elsewhere = True
+                    break  # Found at least one active listing elsewhere
+        
+        # Set the is_active_elsewhere flag
+        zombie.is_active_elsewhere = 1 if is_active_elsewhere else 0
+        
+        # Commit the update to database
+        db.commit()
+    
+    # Sort zombies: Primary by is_active_elsewhere (DESC - True first), Secondary by age (oldest first)
+    def sort_key(z):
+        # Primary: is_active_elsewhere (True = 1, False = 0, so DESC means True comes first)
+        # Secondary: age (oldest first)
+        is_active = getattr(z, 'is_active_elsewhere', 0)
+        
+        # Calculate age for secondary sort
+        z_date_listed = None
+        if z.metrics and isinstance(z.metrics, dict) and 'date_listed' in z.metrics:
+            date_val = z.metrics['date_listed']
+            if isinstance(date_val, date):
+                z_date_listed = date_val
+            elif isinstance(date_val, str):
+                try:
+                    z_date_listed = datetime.strptime(date_val, '%Y-%m-%d').date()
+                except:
+                    pass
+        if not z_date_listed:
+            z_date_listed = getattr(z, 'date_listed', None)
+        if not z_date_listed and z.last_synced_at:
+            z_date_listed = z.last_synced_at.date()
+        
+        age_days = (date.today() - z_date_listed).days if z_date_listed else 999
+        
+        # Return tuple: (negative is_active for DESC, age_days for ASC)
+        return (-is_active, age_days)
+    
+    zombies = sorted(zombies, key=sort_key)
+    
+    # Calculate Store-Level Breakdown: Group zombies by platform
+    zombie_breakdown = {}
+    for zombie in zombies:
+        platform = zombie.platform or "Unknown"
+        zombie_breakdown[platform] = zombie_breakdown.get(platform, 0) + 1
+    
+    return zombies, zombie_breakdown
 
 
 def upsert_listings(db: Session, listings: List[Listing]) -> int:

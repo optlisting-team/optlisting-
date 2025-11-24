@@ -52,6 +52,12 @@ class Listing(Base):
     sold_qty = Column(Integer, default=0)  # Use metrics['sales'] instead
     watch_count = Column(Integer, default=0)  # Use metrics['views'] instead
     
+    # Cross-Platform Health Check
+    is_global_winner = Column(Integer, default=0, nullable=False)  # Boolean: 0=False, 1=True. Item selling well across all platforms
+    
+    # Cross-Platform Activity Check
+    is_active_elsewhere = Column(Integer, default=0, nullable=False)  # Boolean: 0=False, 1=True. Zombie in current store but active in another store/platform
+    
     # Unique constraint: prevent duplicates per user/platform/item_id
     __table_args__ = (
         Index('idx_user_platform_item', 'user_id', 'platform', 'item_id', unique=True),

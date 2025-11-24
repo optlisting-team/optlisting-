@@ -1,4 +1,4 @@
-function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {}, totalZombies, queueCount, totalDeleted, loading, filters = {}, viewMode = 'zombies', onViewModeChange }) {
+function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {}, totalZombies, zombieBreakdown = {}, queueCount, totalDeleted, loading, filters = {}, viewMode = 'zombies', onViewModeChange }) {
   const handleCardClick = (mode) => {
     if (onViewModeChange) {
       onViewModeChange(mode)
@@ -68,6 +68,16 @@ function SummaryCard({ totalListings, totalBreakdown = {}, platformBreakdown = {
           }`}>
             Low Interest Detected
           </div>
+          {/* Store-Level Breakdown */}
+          {!loading && totalZombies > 0 && Object.keys(zombieBreakdown).length > 0 && (
+            <div className="flex gap-2 justify-center mt-2 flex-wrap">
+              {Object.entries(zombieBreakdown).map(([platform, count]) => (
+                <span key={platform} className="text-xs font-medium text-red-600">
+                  {platform}: {count}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Arrow 2 */}

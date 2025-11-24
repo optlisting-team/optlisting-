@@ -21,6 +21,22 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
     return `$${price.toFixed(2)}`
   }
 
+  const getManagementHubTooltip = (listing) => {
+    const platform = listing.marketplace || 'eBay'
+    const managementHub = listing.management_hub
+
+    if (managementHub === 'Shopify') {
+      return `Listed on ${platform}, Managed by Shopify Hub.`
+    } else if (managementHub === 'eBay Direct') {
+      return 'Direct listing via eBay File Exchange.'
+    } else if (managementHub === null || managementHub === undefined || managementHub === 'self' || managementHub === 'OptListing') {
+      return 'Managed directly by OptListing.'
+    } else {
+      // Fallback for any other management hub values
+      return `Listed on ${platform}, Managed by ${managementHub}.`
+    }
+  }
+
   // Filter zombies based on search query
   const filteredZombies = useMemo(() => {
     if (!searchQuery.trim()) return zombies
@@ -127,13 +143,33 @@ function ZombieTable({ zombies, selectedIds, onSelect, onSelectAll, onSourceChan
                 />
               </td>
               <td className="px-6 py-5 whitespace-nowrap">
-                <PlatformBadge marketplace={zombie.marketplace || 'eBay'} />
+                <div className="relative group inline-block">
+                  <PlatformBadge marketplace={zombie.marketplace || 'eBay'} />
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-50">
+                    {getManagementHubTooltip(zombie)}
+                    {/* Tooltip arrow */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
               </td>
               <td className="px-6 py-5 whitespace-nowrap text-sm font-mono text-gray-900">
                 {zombie.ebay_item_id}
               </td>
               <td className="px-6 py-5 text-sm font-semibold text-gray-900 max-w-xs truncate" title={zombie.title}>
-                {zombie.title}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="truncate">{zombie.title}</span>
+                  {zombie.is_active_elsewhere && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-300 flex-shrink-0" title="Active Elsewhere - This item is performing well in another store/platform. Manual review required before deletion.">
+                      🔴 Active Elsewhere - Manual Review Required
+                    </span>
+                  )}
+                  {zombie.is_global_winner && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 flex-shrink-0" title="Global Winner - Selling well across all platforms. Review before deleting.">
+                      ⚠️ Global Winner - Review
+                    </span>
+                  )}
+                </div>
               </td>
               <td className="px-6 py-5 whitespace-nowrap">
                 <SourceBadge 
