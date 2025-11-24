@@ -40,10 +40,15 @@ function Dashboard() {
     try {
       setLoading(true)
       // Build params object - ALWAYS include store_id
+      // MVP Scope: Only eBay and Shopify are supported, default to eBay if not specified
+      const marketplace = filterParams.marketplace_filter && filterParams.marketplace_filter !== 'All' 
+        ? filterParams.marketplace_filter 
+        : 'eBay'
+      
       const params = {
         user_id: CURRENT_USER_ID,
         store_id: selectedStore?.id, // Use selected store ID (no fallback to 'all')
-        marketplace: filterParams.marketplace_filter || 'All',
+        marketplace: marketplace,
         min_days: filterParams.min_days,
         max_sales: filterParams.max_sales,
         max_watch_count: filterParams.max_watch_count,
@@ -96,17 +101,59 @@ function Dashboard() {
       }
       
       // Fetch total stats from analyze endpoint (without filters to get all data)
+      // MVP Scope: Fetch stats for both eBay and Shopify separately, then combine
       try {
-        const statsResponse = await axios.get(`${API_BASE_URL}/api/analyze`, {
+        // Fetch eBay stats
+        const ebayStatsResponse = await axios.get(`${API_BASE_URL}/api/analyze`, {
           params: {
             user_id: CURRENT_USER_ID,
             min_days: 0, // No filter
             max_sales: 999999, // No filter
             max_watch_count: 999999, // No filter
             supplier_filter: 'All',
-            marketplace: 'All'
+            marketplace: 'eBay'
           }
         })
+        
+        // Fetch Shopify stats
+        const shopifyStatsResponse = await axios.get(`${API_BASE_URL}/api/analyze`, {
+          params: {
+            user_id: CURRENT_USER_ID,
+            min_days: 0, // No filter
+            max_sales: 999999, // No filter
+            max_watch_count: 999999, // No filter
+            supplier_filter: 'All',
+            marketplace: 'Shopify'
+          }
+        })
+        
+        // Combine stats from both platforms
+        const ebayStats = ebayStatsResponse.data
+        const shopifyStats = shopifyStatsResponse.data
+        const statsResponse = {
+          data: {
+            total_count: (ebayStats.total_count || 0) + (shopifyStats.total_count || 0),
+            total_breakdown: {},
+            platform_breakdown: {
+              eBay: ebayStats.total_count || 0,
+              Shopify: shopifyStats.total_count || 0
+            }
+          }
+        }
+        
+        // Merge supplier breakdowns
+        const combinedBreakdown = {}
+        if (ebayStats.total_breakdown) {
+          Object.keys(ebayStats.total_breakdown).forEach(key => {
+            combinedBreakdown[key] = (combinedBreakdown[key] || 0) + ebayStats.total_breakdown[key]
+          })
+        }
+        if (shopifyStats.total_breakdown) {
+          Object.keys(shopifyStats.total_breakdown).forEach(key => {
+            combinedBreakdown[key] = (combinedBreakdown[key] || 0) + shopifyStats.total_breakdown[key]
+          })
+        }
+        statsResponse.data.total_breakdown = combinedBreakdown
         
         // Update total stats
         setTotalListings(statsResponse.data.total_count || 0)
