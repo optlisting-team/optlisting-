@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
+function FilterBar({ onApplyFilter, onSync, loading, initialFilters = {} }) {
   const [marketplaceFilter, setMarketplaceFilter] = useState(initialFilters.marketplace_filter || 'eBay')
   const [minDays, setMinDays] = useState(initialFilters.min_days || 3)
   const [maxSales, setMaxSales] = useState(initialFilters.max_sales || 0)
@@ -47,6 +47,14 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
     })
   }
 
+  const handleSync = () => {
+    if (onSync) {
+      onSync()
+    } else {
+      console.log('Syncing data...')
+    }
+  }
+
   return (
     <div className="bg-zinc-900 dark:bg-zinc-900 rounded-lg border border-zinc-800 dark:border-zinc-800 p-6 mb-8">
       <h3 className="text-lg font-semibold text-white dark:text-white mb-4">
@@ -71,7 +79,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
         {/* Days Older Than */}
         <div>
-          <label htmlFor="minDays" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="minDays" className="block text-sm font-medium text-zinc-300 dark:text-zinc-300 mb-2">
             Days Older Than
           </label>
           <input
@@ -87,7 +95,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
         {/* Max Sales */}
         <div>
-          <label htmlFor="maxSales" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="maxSales" className="block text-sm font-medium text-zinc-300 dark:text-zinc-300 mb-2">
             Max Sales
           </label>
           <input
@@ -103,7 +111,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
         {/* Max Watch Count */}
         <div>
-          <label htmlFor="maxWatchCount" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="maxWatchCount" className="block text-sm font-medium text-zinc-300 dark:text-zinc-300 mb-2">
             Max Watch Count
           </label>
           <input
@@ -119,7 +127,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
 
         {/* Source Filter */}
         <div>
-          <label htmlFor="sourceFilter" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="sourceFilter" className="block text-sm font-medium text-zinc-300 dark:text-zinc-300 mb-2">
             Source
           </label>
           <select
@@ -144,7 +152,7 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 px-4 py-2 bg-white dark:bg-white text-black dark:text-black font-medium rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Loading...' : 'Apply Filter'}
           </button>
@@ -155,6 +163,17 @@ function FilterBar({ onApplyFilter, loading, initialFilters = {} }) {
             className="px-4 py-2 bg-zinc-800 dark:bg-zinc-800 border border-zinc-700 dark:border-zinc-700 text-white dark:text-white font-medium rounded-md hover:bg-zinc-700 dark:hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Reset
+          </button>
+          <button
+            type="button"
+            onClick={handleSync}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-zinc-800 dark:bg-zinc-800 border border-zinc-700 dark:border-zinc-700 text-white dark:text-white font-medium rounded-md hover:bg-zinc-700 dark:hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Sync Data</span>
           </button>
         </div>
       </form>

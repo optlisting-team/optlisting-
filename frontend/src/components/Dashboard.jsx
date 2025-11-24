@@ -219,6 +219,15 @@ function Dashboard() {
     setQueue(queue.filter(item => item.id !== id))
   }
 
+  const handleSync = async () => {
+    // Refresh all data
+    await Promise.all([
+      fetchZombies(),
+      fetchAllListings(),
+      fetchHistory().catch(err => console.error('History fetch error:', err))
+    ])
+  }
+
   const handleSourceChange = async (itemId, newSupplier) => {
     try {
       // Step 1: Update in backend database
@@ -366,6 +375,7 @@ function Dashboard() {
             {viewMode === 'zombies' && (
               <FilterBar 
                 onApplyFilter={handleApplyFilter}
+                onSync={handleSync}
                 loading={loading}
                 initialFilters={filters}
               />
