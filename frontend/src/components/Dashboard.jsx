@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useStore } from '../contexts/StoreContext'
 import SummaryCard from './SummaryCard'
@@ -329,16 +329,6 @@ function Dashboard() {
     }
   }
 
-  // Safety check: Ensure selectedStore exists
-  if (!selectedStore) {
-    return (
-      <div className="font-sans bg-slate-50 min-h-full flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-600 mb-4">Loading store context...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="font-sans bg-slate-50 min-h-full">

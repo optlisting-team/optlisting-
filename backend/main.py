@@ -27,17 +27,15 @@ cors_origins = [
     
     # Production Vercel deployment - All variations
     "https://optlisting.vercel.app",
-    "https://optlisting.vercel.app/",  # Trailing slash
-    "https://www.optlisting.vercel.app",  # www subdomain
-    "https://www.optlisting.vercel.app/",  # www subdomain with trailing slash
+    "https://optlisting.vercel.app/",
+    "https://www.optlisting.vercel.app",
+    "https://www.optlisting.vercel.app/",
     
     # Environment variable for additional frontend URLs
-    os.getenv("FRONTEND_URL", ""),  # Production frontend URL from environment
-    
-    # Railway public domain (uncomment when Railway domain is available)
-    # "https://web-production-xxxx.up.railway.app",
+    os.getenv("FRONTEND_URL", ""),
 ]
-# Filter out empty strings
+
+# Filter out empty strings and add Vercel regex pattern
 cors_origins = [origin for origin in cors_origins if origin]
 
 app.add_middleware(
