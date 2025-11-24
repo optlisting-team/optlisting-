@@ -323,8 +323,8 @@ function Dashboard() {
       const link = document.createElement('a')
       link.href = url
       
-      // Determine filename based on source and mode
-      const source = items.length > 0 ? items[0].source.toLowerCase() : 'all'
+      // Determine filename based on supplier and mode
+      const source = items.length > 0 ? (items[0].supplier_name || items[0].supplier || "unknown").toLowerCase() : 'all'
       const filenameMap = {
         autods: `${source}_delete.csv`,
         yaballe: `${source}_delete_yaballe.csv`,

@@ -73,7 +73,7 @@ function HistoryTable({ logs, loading }) {
                 {log.title}
               </td>
               <td className="px-6 py-5 whitespace-nowrap">
-                <SourceBadge source={log.source} />
+                <SourceBadge source={log.supplier || "Unknown"} />
               </td>
             </tr>
           ))}

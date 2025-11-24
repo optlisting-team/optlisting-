@@ -6,12 +6,17 @@ import axios from 'axios'
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, onSourceChange }) {
-  // Group items by source
+  // Group items by supplier
   const groupedBySource = queue.reduce((acc, item) => {
-    if (!acc[item.source]) {
-      acc[item.source] = []
+    // Safely extract supplier name, handling null, undefined, empty string, and "undefined" string
+    let supplier = item.supplier_name || item.supplier || null
+    if (!supplier || supplier === "undefined" || supplier === "null" || supplier.trim() === "") {
+      supplier = "Unknown"
     }
-    acc[item.source].push(item)
+    if (!acc[supplier]) {
+      acc[supplier] = []
+    }
+    acc[supplier].push(item)
     return acc
   }, {})
 
@@ -169,7 +174,7 @@ function QueueReviewPanel({ queue, onRemove, onExportComplete, onHistoryUpdate, 
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <SourceBadge 
-                          source={item.source} 
+                          source={item.supplier_name || item.supplier || "Unknown"} 
                           editable={!!onSourceChange}
                           onSourceChange={onSourceChange}
                           itemId={item.id}

@@ -136,19 +136,19 @@ function LandingPage() {
       </section>
 
       {/* The "Pain" Section */}
-      <section className="py-20 px-4 bg-black dark:bg-black" id="pain">
+      <section className="py-24 px-4 bg-zinc-900 dark:bg-zinc-900" id="pain">
         <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white dark:text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-white dark:text-white mb-4 font-sans">
               Why Your Inventory Needs Optimization
             </h2>
-            <p className="text-xl text-zinc-400 dark:text-zinc-400 max-w-2xl mx-auto">
+            <p className="text-xl text-zinc-400 dark:text-zinc-400 max-w-2xl mx-auto font-sans">
               Dead stock isn't just taking up space—it's actively hurting your business.
             </p>
           </motion.div>
@@ -158,37 +158,43 @@ function LandingPage() {
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-10"
           >
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-zinc-900 dark:bg-zinc-900 p-10 rounded-2xl border border-zinc-800 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all"
             >
-              <div className="text-5xl mb-4">📉</div>
-              <h3 className="text-2xl font-bold text-white dark:text-white mb-3">Marketplace Algorithms Hate Dead Stock</h3>
-              <p className="text-zinc-400 dark:text-zinc-400 text-lg">
+              <div className="w-16 h-16 bg-zinc-800 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+                <TrendingDown className="h-8 w-8 text-white dark:text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white dark:text-white mb-4 font-sans">Marketplace Algorithms Hate Dead Stock</h3>
+              <p className="text-zinc-400 dark:text-zinc-400 text-lg leading-relaxed font-sans">
                 Old, unsold items drag down your search ranking on every major platform. Clear your dead inventory before it hurts your visibility.
               </p>
             </motion.div>
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-zinc-900 dark:bg-zinc-900 p-10 rounded-2xl border border-zinc-800 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all"
             >
-              <div className="text-5xl mb-4">🚫</div>
-              <h3 className="text-2xl font-bold text-white dark:text-white mb-3">Make Room for Winners</h3>
-              <p className="text-zinc-400 dark:text-zinc-400 text-lg">
+              <div className="w-16 h-16 bg-zinc-800 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+                <Ban className="h-8 w-8 text-white dark:text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white dark:text-white mb-4 font-sans">Make Room for Winners</h3>
+              <p className="text-zinc-400 dark:text-zinc-400 text-lg leading-relaxed font-sans">
                 Most marketplaces limit your listing slots. Remove dead stock so you can fill those slots with items that actually sell.
               </p>
             </motion.div>
 
             <motion.div
               variants={fadeInUp}
-              className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+              className="bg-zinc-900 dark:bg-zinc-900 p-10 rounded-2xl border border-zinc-800 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all"
             >
-              <div className="text-5xl mb-4">💸</div>
-              <h3 className="text-2xl font-bold text-white dark:text-white mb-3">Cut 80% of Your Cleanup Time</h3>
-              <p className="text-zinc-400 dark:text-zinc-400 text-lg">
+              <div className="w-16 h-16 bg-zinc-800 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+                <DollarSign className="h-8 w-8 text-white dark:text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white dark:text-white mb-4 font-sans">Cut 80% of Your Cleanup Time</h3>
+              <p className="text-zinc-400 dark:text-zinc-400 text-lg leading-relaxed font-sans">
                 Stop deleting listings one by one. Automate the entire process instantly.
               </p>
             </motion.div>
@@ -446,7 +452,7 @@ function LandingPage() {
 
             {/* Power Seller */}
             <motion.div variants={fadeInUp}>
-              <Card className="h-full flex flex-col border-2 border-zinc-800 dark:border-zinc-800 hover:border-zinc-700 dark:hover:border-zinc-700 transition-colors bg-zinc-900 dark:bg-zinc-900">
+              <Card className="h-full flex flex-col border-2 border-white dark:border-white hover:border-zinc-200 dark:hover:border-zinc-200 transition-colors bg-zinc-900 dark:bg-zinc-900">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-sm font-semibold uppercase tracking-widest text-white dark:text-white mb-2">
                     Power Seller

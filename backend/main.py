@@ -301,9 +301,9 @@ def analyze_zombies(
                 "image_url": z.image_url,
                 "platform": z.platform,
                 "marketplace": z.platform,  # Backward compatibility
-                "supplier_name": z.supplier_name,
-                "supplier": z.supplier_name,  # Backward compatibility
-                "supplier_id": z.supplier_id,
+                "supplier_name": getattr(z, 'supplier_name', None) or "Unknown",
+                "supplier": getattr(z, 'supplier_name', None) or "Unknown",  # Backward compatibility
+                "supplier_id": getattr(z, 'supplier_id', None),
                 "price": (z.metrics.get('price') if z.metrics and 'price' in z.metrics else None) or z.price,
                 "date_listed": z.date_listed.isoformat() if z.date_listed else None,
                 "sold_qty": (z.metrics.get('sales') if z.metrics and 'sales' in z.metrics else None) or z.sold_qty or 0,

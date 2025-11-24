@@ -1,7 +1,7 @@
 from datetime import date, timedelta, datetime
 from typing import List, Optional, Dict, Tuple
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, cast, Integer, String, Date, case, case
+from sqlalchemy import and_, or_, cast, Integer, String, Date, case, func
 from sqlalchemy.dialects.postgresql import insert
 from backend.models import Listing, DeletionLog
 import pandas as pd
@@ -95,6 +95,11 @@ def extract_supplier_info(
     if sku_upper.startswith("CO") or "costco" in image_url_lower:
         co_id = sku_upper.replace("CO", "").strip("-").strip() if sku_upper.startswith("CO") else None
         return ("Costco", co_id)
+    
+    # Costway
+    if sku_upper.startswith("CW") or "costway" in image_url_lower:
+        cw_id = sku_upper.replace("CW", "").strip("-").strip() if sku_upper.startswith("CW") else None
+        return ("Costway", cw_id)
     
     # Pro Aggregators
     if sku_upper.startswith("W2B") or "wholesale2b" in image_url_lower:
@@ -377,34 +382,26 @@ def analyze_zombie_listings(
     # Sales filter: use metrics['sales'] (JSONB) with robust casting
     # If metrics doesn't have sales, assume 0 (which satisfies <= max_sales when max_sales >= 0)
     if max_sales is not None and max_sales >= 0:
-        # Use CASE statement to handle NULL/missing values safely
-        sales_value = case(
-            (
-                and_(
-                    Listing.metrics != None,
-                    Listing.metrics.has_key('sales')
-                ),
-                cast(Listing.metrics['sales'].astext, Integer)
-            ),
-            else_=0
+        # Direct cast: PostgreSQL handles NULL metrics gracefully with ->>
+        # If metrics is NULL or sales key doesn't exist, cast returns NULL, which we handle with COALESCE
+        query = query.filter(
+            func.coalesce(
+                cast(Listing.metrics['sales'].astext, Integer),
+                0
+            ) <= max_sales
         )
-        query = query.filter(sales_value <= max_sales)
     
     # Watch count filter: use metrics['views'] (JSONB) with robust casting
     # If metrics doesn't have views, assume 0 (which satisfies <= max_watch_count when max_watch_count >= 0)
     if max_watch_count is not None and max_watch_count >= 0:
-        # Use CASE statement to handle NULL/missing values safely
-        views_value = case(
-            (
-                and_(
-                    Listing.metrics != None,
-                    Listing.metrics.has_key('views')
-                ),
-                cast(Listing.metrics['views'].astext, Integer)
-            ),
-            else_=0
+        # Direct cast: PostgreSQL handles NULL metrics gracefully with ->>
+        # If metrics is NULL or views key doesn't exist, cast returns NULL, which we handle with COALESCE
+        query = query.filter(
+            func.coalesce(
+                cast(Listing.metrics['views'].astext, Integer),
+                0
+            ) <= max_watch_count
         )
-        query = query.filter(views_value <= max_watch_count)
     
     # Apply platform filter (MVP Scope: Only eBay and Shopify)
     if platform_filter and platform_filter in ["eBay", "Shopify"]:
@@ -667,6 +664,76 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
     return len(listings)
 
 
+def export_zombies_to_csv(zombie_listings: List[Listing]) -> str:
+    """
+    Standard CSV Export Format for Zombie Listings
+    
+    Generates a standardized CSV file with the following columns (in exact order):
+    - item_id: The eBay Listing ID for deletion
+    - supplier_id: Supplier ID for user tracking/reference
+    - supplier_name: Supplier name (e.g., 'AMAZON', 'WALMART')
+    - reason: Static field (e.g., 'Low Interest/Zombie Item')
+    - listing_url: The live eBay listing URL (generated from item_id or extracted from raw_data)
+    
+    Args:
+        zombie_listings: List of Listing objects to export
+        
+    Returns:
+        CSV string with standard format
+    """
+    if not zombie_listings:
+        return ""
+    
+    data = []
+    for listing in zombie_listings:
+        # Extract item_id
+        item_id = listing.item_id if hasattr(listing, 'item_id') else ""
+        
+        # Extract supplier_id (fallback to empty string if None)
+        supplier_id = listing.supplier_id if hasattr(listing, 'supplier_id') and listing.supplier_id else ""
+        
+        # Extract supplier_name (uppercase for consistency)
+        supplier_name = (listing.supplier_name if hasattr(listing, 'supplier_name') else "Unknown").upper()
+        
+        # Generate listing_url: Try to extract from raw_data first, otherwise generate eBay URL
+        listing_url = ""
+        if item_id:
+            # Try to get URL from raw_data if available
+            if hasattr(listing, 'raw_data') and listing.raw_data:
+                raw_data = listing.raw_data
+                if isinstance(raw_data, dict):
+                    listing_url = raw_data.get('listing_url') or raw_data.get('url') or raw_data.get('viewItemURL') or ""
+                elif isinstance(raw_data, str):
+                    try:
+                        parsed_data = json.loads(raw_data)
+                        listing_url = parsed_data.get('listing_url') or parsed_data.get('url') or parsed_data.get('viewItemURL') or ""
+                    except:
+                        pass
+            
+            # If no URL found in raw_data, generate eBay URL
+            if not listing_url:
+                # Format: https://www.ebay.com/itm/{item_id}
+                listing_url = f"https://www.ebay.com/itm/{item_id}"
+        
+        # Static reason field
+        reason = "Low Interest/Zombie Item"
+        
+        # Append row with columns in exact order: item_id, supplier_id, supplier_name, reason, listing_url
+        data.append({
+            "item_id": item_id,
+            "supplier_id": supplier_id,
+            "supplier_name": supplier_name,
+            "reason": reason,
+            "listing_url": listing_url
+        })
+    
+    # Convert to CSV using pandas (columns will be in the order they were added to dict)
+    df = pd.DataFrame(data)
+    output = StringIO()
+    df.to_csv(output, index=False)
+    return output.getvalue()
+
+
 def generate_export_csv(
     listings,
     target_tool: str,
@@ -753,7 +820,7 @@ def generate_export_csv(
                 item_id = listing.item_id if hasattr(listing, 'item_id') else (listing.ebay_item_id if hasattr(listing, 'ebay_item_id') else "")
                 title = listing.title if hasattr(listing, 'title') else "Unknown"
                 platform = listing.platform if hasattr(listing, 'platform') else (listing.marketplace if hasattr(listing, 'marketplace') else "eBay")
-                supplier = listing.supplier_name if hasattr(listing, 'supplier_name') else (listing.source_name if hasattr(listing, 'source_name') else (listing.source if hasattr(listing, 'source') else "Unknown"))
+                supplier = listing.supplier_name if hasattr(listing, 'supplier_name') else "Unknown"
                 price = getattr(listing, 'price', None) or (listing.metrics.get('price') if listing.metrics and isinstance(listing.metrics, dict) else None)
                 views = getattr(listing, 'watch_count', None) or (listing.metrics.get('views') if listing.metrics and isinstance(listing.metrics, dict) else None)
                 sales = getattr(listing, 'sold_qty', None) or (listing.metrics.get('sales') if listing.metrics and isinstance(listing.metrics, dict) else None)
@@ -792,8 +859,8 @@ def generate_export_csv(
         if isinstance(listing, dict):
             item_id = listing.get("item_id") or listing.get("ebay_item_id", "")
             sku = listing.get("sku", "")
-            supplier_id = listing.get("supplier_id", "") or listing.get("source_id", "")  # Backward compatibility
-            supplier_name = listing.get("supplier_name") or listing.get("source_name") or listing.get("source", "")
+            supplier_id = listing.get("supplier_id", "")
+            supplier_name = listing.get("supplier_name") or listing.get("supplier", "") or "Unknown"
             platform = listing.get("platform", "")
             # Try to get handle from raw_data or use SKU as fallback
             raw_data = listing.get("raw_data", {})
@@ -806,8 +873,8 @@ def generate_export_csv(
         else:
             item_id = listing.item_id if hasattr(listing, 'item_id') else (listing.ebay_item_id if hasattr(listing, 'ebay_item_id') else "")
             sku = listing.sku
-            supplier_id = listing.supplier_id if hasattr(listing, 'supplier_id') else (listing.source_id if hasattr(listing, 'source_id') else None)
-            supplier_name = listing.supplier_name if hasattr(listing, 'supplier_name') else (listing.source_name if hasattr(listing, 'source_name') else (listing.source if hasattr(listing, 'source') else ""))
+            supplier_id = listing.supplier_id if hasattr(listing, 'supplier_id') else None
+            supplier_name = listing.supplier_name if hasattr(listing, 'supplier_name') else (listing.supplier if hasattr(listing, 'supplier') else "Unknown")
             platform = listing.platform if hasattr(listing, 'platform') else (listing.marketplace if hasattr(listing, 'marketplace') else "")
             # Try to get handle from raw_data
             raw_data = listing.raw_data if hasattr(listing, 'raw_data') else {}

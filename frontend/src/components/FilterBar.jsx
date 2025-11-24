@@ -55,6 +55,17 @@ function FilterBar({ onApplyFilter, onSync, loading, initialFilters = {} }) {
     }
   }
 
+  // Calculate cutoff date based on minDays
+  const calculateCutoffDate = (days) => {
+    const date = new Date()
+    date.setDate(date.getDate() - (parseInt(days) || 0))
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    })
+  }
+
   return (
     <div className="bg-zinc-900 dark:bg-zinc-900 rounded-lg border border-zinc-800 dark:border-zinc-800 p-6 mb-8">
       <h3 className="text-lg font-semibold text-white dark:text-white mb-4">
@@ -91,6 +102,9 @@ function FilterBar({ onApplyFilter, onSync, loading, initialFilters = {} }) {
             className="w-full px-3 py-2 border border-zinc-700 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-white focus:border-white dark:focus:border-white bg-zinc-800 dark:bg-zinc-800 text-white dark:text-white"
             placeholder="3"
           />
+          <p className="mt-1 text-xs text-blue-400 dark:text-blue-400 font-medium">
+            Cutoff Date: {calculateCutoffDate(minDays)}
+          </p>
         </div>
 
         {/* Max Sales */}

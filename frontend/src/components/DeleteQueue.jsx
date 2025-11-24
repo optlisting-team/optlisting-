@@ -1,12 +1,13 @@
 import SourceBadge from './SourceBadge'
 
 function DeleteQueue({ queue, onRemove, onExport, loading }) {
-  // Group items by source
+  // Group items by supplier
   const groupedBySource = queue.reduce((acc, item) => {
-    if (!acc[item.source]) {
-      acc[item.source] = []
+    const supplier = item.supplier_name || item.supplier || "Unknown"
+    if (!acc[supplier]) {
+      acc[supplier] = []
     }
-    acc[item.source].push(item)
+    acc[supplier].push(item)
     return acc
   }, {})
 
@@ -15,8 +16,8 @@ function DeleteQueue({ queue, onRemove, onExport, loading }) {
   const unknownItems = groupedBySource.Unknown || []
 
   const handleSourceExport = async (source, mode = 'autods') => {
-    // Filter queue items by source
-    const sourceItems = queue.filter(item => item.source === source)
+    // Filter queue items by supplier
+    const sourceItems = queue.filter(item => (item.supplier_name || item.supplier || "Unknown") === source)
     
     if (sourceItems.length === 0) {
       alert(`No ${source} items in queue to export.`)

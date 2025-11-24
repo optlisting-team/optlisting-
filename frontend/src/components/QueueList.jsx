@@ -62,7 +62,7 @@ function QueueList({ queue, onRemove, onExport, loading }) {
                       {item.title}
                     </h4>
                     <div className="flex items-center gap-3 text-xs text-gray-600 mb-2">
-                      <SourceBadge source={item.source} />
+                      <SourceBadge source={item.supplier_name || item.supplier || "Unknown"} />
                       <span className="font-mono">{item.sku}</span>
                     </div>
                     <div className="text-xs text-gray-500">
