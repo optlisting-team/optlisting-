@@ -34,6 +34,11 @@ allowed_origins = [
     "https://optlisting.vercel.app/",
     "https://www.optlisting.vercel.app",
     "https://www.optlisting.vercel.app/",
+    # Actual deployed Vercel domain
+    "https://optlisting-three.vercel.app",
+    "https://optlisting-three.vercel.app/",
+    "https://optlisting-1fev8br9z-optlistings-projects.vercel.app",
+    "https://optlisting-1fev8br9z-optlistings-projects.vercel.app/",
     
     # Local development environments
     "http://localhost:5173",
