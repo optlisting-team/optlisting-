@@ -1,11 +1,9 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, create_engine, Index, BigInteger
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import date, datetime
-import uuid
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,55 +14,22 @@ Base = declarative_base()
 class Listing(Base):
     __tablename__ = "listings"
 
-    # Core Columns
-    id = Column(BigInteger, primary_key=True, index=True)
-    user_id = Column(String, nullable=False, index=True)  # UUID as string for compatibility
-    platform = Column(String, nullable=False)  # "eBay", "Shopify", etc.
-    item_id = Column(String, nullable=False)  # External platform ID (eBay ItemID, Shopify Product ID, etc.)
-    
-    # Basic Info
+    id = Column(Integer, primary_key=True, index=True)
+    ebay_item_id = Column(String, unique=True, index=True, nullable=False)
     title = Column(String, nullable=False)
-    image_url = Column(String, nullable=False)
     sku = Column(String, nullable=False)
-    
-    # Supplier Detection (CRITICAL)
-    supplier_name = Column(String, nullable=False)  # Detected Supplier: "Amazon", "Walmart", "Unverified", etc.
-    supplier_id = Column(String, nullable=True)  # Extracted Supplier ID: ASIN "B08...", Walmart ID, etc.
-    
-    # Metadata
-    brand = Column(String, nullable=True)  # Brand name for forensic supplier detection
-    upc = Column(String, nullable=True)  # UPC/EAN code for supplier identification
-    
-    # Metrics (stored as JSONB for flexibility)
-    metrics = Column(JSONB, nullable=True, default={})  # {"sales": 0, "views": 10, "price": 29.99, "currency": "USD"}
-    
-    # Raw Data (full API response backup)
-    raw_data = Column(JSONB, nullable=True)  # Store complete original API response
-    
-    # Timestamps
-    last_synced_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
-    # Legacy fields for backward compatibility (deprecated, use metrics instead)
-    price = Column(Float, nullable=True)  # Use metrics['price'] instead
-    date_listed = Column(Date, nullable=True)  # Use metrics['date_listed'] instead
-    sold_qty = Column(Integer, default=0)  # Use metrics['sales'] instead
-    watch_count = Column(Integer, default=0)  # Use metrics['views'] instead
-    
-    # Cross-Platform Health Check
-    is_global_winner = Column(Integer, default=0, nullable=False)  # Boolean: 0=False, 1=True. Item selling well across all platforms
-    
-    # Cross-Platform Activity Check
-    is_active_elsewhere = Column(Integer, default=0, nullable=False)  # Boolean: 0=False, 1=True. Zombie in current store but active in another store/platform
-    
-    # Unique constraint: prevent duplicates per user/platform/item_id
-    __table_args__ = (
-        Index('idx_user_platform_item', 'user_id', 'platform', 'item_id', unique=True),
-    )
+    image_url = Column(String, nullable=False)
+    brand = Column(String, nullable=True)  # Brand name for forensic source detection
+    upc = Column(String, nullable=True)  # UPC/EAN code for source identification
+    marketplace = Column(String, nullable=True, default="eBay")  # "eBay", "Amazon", "Shopify", "Walmart"
+    source = Column(String, nullable=False)  # "Amazon", "Walmart", "AliExpress", "CJ Dropshipping", "Home Depot", "Wayfair", "Costco", "Unknown"
+    price = Column(Float, nullable=False)
+    date_listed = Column(Date, nullable=False)
+    sold_qty = Column(Integer, default=0)
+    watch_count = Column(Integer, default=0)
 
     def __repr__(self):
-        return f"<Listing(platform={self.platform}, item_id={self.item_id}, supplier_name={self.supplier_name}, supplier_id={self.supplier_id})>"
+        return f"<Listing(ebay_item_id={self.ebay_item_id}, title={self.title}, source={self.source})>"
 
 
 class DeletionLog(Base):
@@ -74,9 +39,8 @@ class DeletionLog(Base):
     item_id = Column(String, nullable=False, index=True)  # ebay_item_id or similar
     title = Column(String, nullable=False)
     platform = Column(String, nullable=True)  # marketplace: "eBay", "Amazon", "Shopify", "Walmart"
-    supplier = Column(String, nullable=False)  # "Amazon", "Walmart", etc.
+    source = Column(String, nullable=False)  # "Amazon", "Walmart", etc.
     deleted_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
-    snapshot = Column(JSONB, nullable=True, default={})  # Snapshot of item data at deletion time for analytics
 
     def __repr__(self):
         return f"<DeletionLog(item_id={self.item_id}, title={self.title}, deleted_at={self.deleted_at})>"
