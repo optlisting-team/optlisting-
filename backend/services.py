@@ -341,20 +341,32 @@ def analyze_zombie_listings(
     # If store_id is 'all' or None, DO NOT filter by store (return all for user)
     
     # Date filter: use metrics['date_listed'] (JSONB) or fallback to date_listed/last_synced_at
-    # ✅ FIX: JSONB 연산자 안전하게 처리
+    # ✅ FIX: JSONB 연산자 안전하게 처리 및 NULL 체크 강화
     date_filters = []
     
     # Use metrics JSONB if available (안전한 방식)
     if hasattr(Listing, 'metrics'):
+        # ✅ FIX: JSONB ->> 연산자 사용 (astext로 텍스트 추출 후 Date로 변환)
         date_filters.append(
             and_(
                 Listing.metrics.isnot(None),
                 Listing.metrics.has_key('date_listed'),
-                # ✅ FIX: PostgreSQL JSONB ->> 연산자 사용 (텍스트 추출 후 Date로 변환)
-                cast(
-                    func.cast(Listing.metrics['date_listed'], String),
-                    Date
-                ) < cutoff_date
+                # ✅ FIX: jsonb_typeof으로 타입 확인 후 안전하게 추출
+                or_(
+                    # JSONB 값이 문자열인 경우
+                    and_(
+                        func.jsonb_typeof(Listing.metrics['date_listed']) == 'string',
+                        cast(Listing.metrics['date_listed'].astext, Date) < cutoff_date
+                    ),
+                    # JSONB 값이 숫자(타임스탬프)인 경우
+                    and_(
+                        func.jsonb_typeof(Listing.metrics['date_listed']) == 'number',
+                        cast(
+                            func.to_timestamp(cast(Listing.metrics['date_listed'].astext, Integer)),
+                            Date
+                        ) < cutoff_date
+                    )
+                )
             )
         )
     
@@ -363,6 +375,7 @@ def analyze_zombie_listings(
         date_filters.append(
             and_(
                 or_(
+                    not hasattr(Listing, 'metrics'),
                     Listing.metrics == None,
                     ~Listing.metrics.has_key('date_listed')
                 ),
@@ -371,22 +384,27 @@ def analyze_zombie_listings(
             )
         )
     
-    # Always add last_synced_at as final fallback
-    date_filters.append(
-        and_(
-            or_(
-                Listing.metrics == None,
-                ~Listing.metrics.has_key('date_listed')
-            ),
-            or_(
-                not hasattr(Listing, 'date_listed'),
-                Listing.date_listed == None
-            ),
-            Listing.last_synced_at < cutoff_date
+    # Add last_synced_at as final fallback (필드가 있는 경우만)
+    if hasattr(Listing, 'last_synced_at'):
+        date_filters.append(
+            and_(
+                or_(
+                    not hasattr(Listing, 'metrics'),
+                    Listing.metrics == None,
+                    ~Listing.metrics.has_key('date_listed')
+                ),
+                or_(
+                    not hasattr(Listing, 'date_listed'),
+                    Listing.date_listed == None
+                ),
+                Listing.last_synced_at != None,
+                func.date(Listing.last_synced_at) < cutoff_date
+            )
         )
-    )
     
-    query = query.filter(or_(*date_filters))
+    # 날짜 필터가 하나라도 있으면 적용
+    if date_filters:
+        query = query.filter(or_(*date_filters))
     
     # Sales filter: use metrics['sales'] (JSONB) with robust casting
     # ✅ FIX: JSONB 연산자 안전하게 처리 및 타입 검증 추가
@@ -402,9 +420,9 @@ def analyze_zombie_listings(
                     # ✅ FIX: JSONB 값이 숫자 또는 문자열인지 확인
                     func.jsonb_typeof(Listing.metrics['sales']).in_(['number', 'string'])
                 ),
-                # ✅ FIX: 안전한 타입 변환 (JSONB -> String -> Integer)
+                # ✅ FIX: 안전한 타입 변환 (JSONB ->> 텍스트 추출 후 Integer로 변환)
                 cast(
-                    func.cast(Listing.metrics['sales'], String),
+                    Listing.metrics['sales'].astext,
                     Integer
                 )
             ),
@@ -426,9 +444,9 @@ def analyze_zombie_listings(
                     # ✅ FIX: JSONB 값이 숫자 또는 문자열인지 확인
                     func.jsonb_typeof(Listing.metrics['views']).in_(['number', 'string'])
                 ),
-                # ✅ FIX: 안전한 타입 변환 (JSONB -> String -> Integer)
+                # ✅ FIX: 안전한 타입 변환 (JSONB ->> 텍스트 추출 후 Integer로 변환)
                 cast(
-                    func.cast(Listing.metrics['views'], String),
+                    Listing.metrics['views'].astext,
                     Integer
                 )
             ),
@@ -437,8 +455,13 @@ def analyze_zombie_listings(
         query = query.filter(views_value <= max_watch_count)
     
     # Apply platform filter (MVP Scope: Only eBay and Shopify)
+    # ✅ FIX: platform 필드가 없으면 marketplace 사용
     if platform_filter and platform_filter in ["eBay", "Shopify"]:
-        query = query.filter(Listing.platform == platform_filter)
+        # platform 필드가 있으면 사용, 없으면 marketplace 사용
+        if hasattr(Listing, 'platform'):
+            query = query.filter(Listing.platform == platform_filter)
+        else:
+            query = query.filter(Listing.marketplace == platform_filter)
     
     # Apply supplier filter if not "All"
     if supplier_filter and supplier_filter != "All":
@@ -455,7 +478,10 @@ def analyze_zombie_listings(
         current_platforms.add(platform_filter)
     else:
         # If filtering all platforms, get all platforms from zombies
-        current_platforms = {z.platform for z in zombies}
+        # ✅ FIX: platform 필드가 없으면 marketplace 사용
+        for z in zombies:
+            platform = getattr(z, 'platform', None) or getattr(z, 'marketplace', None) or "Unknown"
+            current_platforms.add(platform)
     
     # Cross-Platform Health Check & Activity Check: Check each zombie
     for zombie in zombies:
@@ -470,11 +496,20 @@ def analyze_zombie_listings(
         is_active_elsewhere = False
         if zombie.supplier_id:
             # Find all other listings with the same supplier_id in OTHER platforms
-            other_listings_query = db.query(Listing).filter(
-                Listing.user_id == user_id,
-                Listing.supplier_id == zombie.supplier_id,
-                Listing.platform != zombie.platform  # Different platform/store
-            )
+            # ✅ FIX: platform 필드가 없으면 marketplace 사용
+            zombie_platform = getattr(zombie, 'platform', None) or getattr(zombie, 'marketplace', None)
+            if hasattr(Listing, 'platform'):
+                other_listings_query = db.query(Listing).filter(
+                    Listing.user_id == user_id,
+                    Listing.supplier_id == zombie.supplier_id,
+                    Listing.platform != zombie_platform  # Different platform/store
+                )
+            else:
+                other_listings_query = db.query(Listing).filter(
+                    Listing.user_id == user_id,
+                    Listing.supplier_id == zombie.supplier_id,
+                    Listing.marketplace != zombie_platform  # Different platform/store
+                )
             other_listings = other_listings_query.all()
             
             # Check if ANY of these other listings are NOT zombies (active)
@@ -567,7 +602,8 @@ def analyze_zombie_listings(
     # Calculate Store-Level Breakdown: Group zombies by platform
     zombie_breakdown = {}
     for zombie in zombies:
-        platform = zombie.platform or "Unknown"
+        # ✅ FIX: platform 필드가 없으면 marketplace 사용
+        platform = getattr(zombie, 'platform', None) or getattr(zombie, 'marketplace', None) or "Unknown"
         zombie_breakdown[platform] = zombie_breakdown.get(platform, 0) + 1
     
     return zombies, zombie_breakdown
@@ -609,10 +645,15 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
         values_list = []
         for listing in listings:
             # Convert Listing object to dictionary
+            # ✅ FIX: platform 필드가 없으면 marketplace 사용
+            platform = getattr(listing, 'platform', None) or getattr(listing, 'marketplace', None) or "eBay"
+            # ✅ FIX: item_id 필드가 없으면 ebay_item_id 사용
+            item_id = getattr(listing, 'item_id', None) or getattr(listing, 'ebay_item_id', None) or ""
+            
             values = {
-                'user_id': listing.user_id,
-                'platform': listing.platform,
-                'item_id': listing.item_id,
+                'user_id': getattr(listing, 'user_id', None) or "default-user",
+                'platform': platform,
+                'item_id': item_id,
                 'title': listing.title,
                 'image_url': listing.image_url,
                 'sku': listing.sku,
@@ -637,9 +678,20 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
         
         # On conflict, update these fields (but preserve created_at)
         # Use excluded table reference for PostgreSQL ON CONFLICT
+        # ✅ FIX: platform 필드가 없으면 marketplace 사용, item_id가 없으면 ebay_item_id 사용
+        conflict_columns = ['user_id']
+        if hasattr(Listing, 'platform'):
+            conflict_columns.append('platform')
+        elif hasattr(Listing, 'marketplace'):
+            conflict_columns.append('marketplace')
+        if hasattr(Listing, 'item_id'):
+            conflict_columns.append('item_id')
+        elif hasattr(Listing, 'ebay_item_id'):
+            conflict_columns.append('ebay_item_id')
+        
         excluded = stmt.excluded
         stmt = stmt.on_conflict_do_update(
-            index_elements=['user_id', 'platform', 'item_id'],
+            index_elements=conflict_columns,
             set_={
                 'title': excluded.title,
                 'image_url': excluded.image_url,
@@ -666,12 +718,23 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
     else:
         # SQLite: Use individual INSERT OR REPLACE (less efficient but compatible)
         for listing in listings:
+            # ✅ FIX: platform 필드가 없으면 marketplace 사용, item_id가 없으면 ebay_item_id 사용
+            platform = getattr(listing, 'platform', None) or getattr(listing, 'marketplace', None) or "eBay"
+            item_id = getattr(listing, 'item_id', None) or getattr(listing, 'ebay_item_id', None) or ""
+            user_id = getattr(listing, 'user_id', None) or "default-user"
+            
             # Check if listing exists
-            existing = db.query(Listing).filter(
-                Listing.user_id == listing.user_id,
-                Listing.platform == listing.platform,
-                Listing.item_id == listing.item_id
-            ).first()
+            query = db.query(Listing).filter(Listing.user_id == user_id)
+            if hasattr(Listing, 'platform'):
+                query = query.filter(Listing.platform == platform)
+            elif hasattr(Listing, 'marketplace'):
+                query = query.filter(Listing.marketplace == platform)
+            if hasattr(Listing, 'item_id'):
+                query = query.filter(Listing.item_id == item_id)
+            elif hasattr(Listing, 'ebay_item_id'):
+                query = query.filter(Listing.ebay_item_id == item_id)
+            
+            existing = query.first()
             
             if existing:
                 # Update existing record

@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, create_engine
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, Boolean, create_engine
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import date, datetime
@@ -27,6 +28,20 @@ class Listing(Base):
     date_listed = Column(Date, nullable=False)
     sold_qty = Column(Integer, default=0)
     watch_count = Column(Integer, default=0)
+    
+    # JSONB fields (added via migration)
+    metrics = Column(JSONB, default={}, nullable=True)
+    analysis_meta = Column(JSONB, default={}, nullable=True)
+    
+    # Additional fields (added via migration)
+    item_id = Column(String, nullable=True)  # Generic item ID (ebay_item_id와 별도)
+    platform = Column(String, nullable=True)  # Generic platform (marketplace와 별도)
+    user_id = Column(String, nullable=True, index=True)
+    supplier_id = Column(String, nullable=True)
+    supplier_name = Column(String, nullable=True)
+    last_synced_at = Column(DateTime, nullable=True)
+    is_zombie = Column(Boolean, default=False, nullable=True)
+    zombie_score = Column(Float, nullable=True)
 
     def __repr__(self):
         return f"<Listing(ebay_item_id={self.ebay_item_id}, title={self.title}, source={self.source})>"
