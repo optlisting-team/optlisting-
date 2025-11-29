@@ -3,16 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.requests import Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional, List, Dict
 from datetime import date, datetime, timedelta
 import json
+import logging
 from pydantic import BaseModel
 
-from backend.models import init_db, get_db, Listing, DeletionLog, Base, engine
-from backend.services import detect_source, extract_supplier_info, analyze_zombie_listings, generate_export_csv
-from backend.dummy_data import generate_dummy_listings
+from .models import init_db, get_db, Listing, DeletionLog, Profile, Base, engine
+from .services import detect_source, extract_supplier_info, analyze_zombie_listings, generate_export_csv
+from .dummy_data import generate_dummy_listings
+from .webhooks import verify_webhook_signature, process_webhook_event
 
 app = FastAPI(title="OptListing API", version="1.0.0")
 
@@ -130,7 +133,7 @@ def startup_event():
     try:
         # Test database connection first
         print("Testing database connection...")
-        from backend.models import engine
+        from .models import engine
         from sqlalchemy import text
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
@@ -791,6 +794,78 @@ def create_dummy_data(
     
     generate_dummy_listings(db, count=count, user_id=user_id)
     return {"message": f"Generated {count} dummy listings"}
+
+
+@app.post("/webhooks/lemonsqueezy")
+async def lemonsqueezy_webhook(request: Request, db: Session = Depends(get_db)):
+    """
+    Lemon Squeezy 웹훅 엔드포인트
+    안정성 원칙: 모든 에러는 로깅하고 200 OK 반환 (LS 재시도 방지)
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # 원본 요청 본문 읽기 (시그니처 검증용)
+        body = await request.body()
+        
+        # X-Signature 헤더 확인
+        signature = request.headers.get("X-Signature", "")
+        
+        # 시그니처 검증
+        if not verify_webhook_signature(body, signature):
+            logger.error("웹훅 시그니처 검증 실패")
+            # 안정성: 검증 실패 시에도 200 OK 반환 (LS 재시도 방지)
+            # 실제 운영에서는 401을 반환할 수도 있지만, 로깅으로 모니터링
+            return JSONResponse(
+                status_code=200,  # LS 재시도 방지를 위해 200 반환
+                content={"status": "error", "message": "Invalid signature"},
+                headers={"X-Webhook-Status": "invalid_signature"}
+            )
+        
+        # JSON 파싱
+        try:
+            event_data = json.loads(body.decode('utf-8'))
+        except json.JSONDecodeError as e:
+            logger.error(f"웹훅 JSON 파싱 오류: {e}")
+            return JSONResponse(
+                status_code=200,
+                content={"status": "error", "message": "Invalid JSON"}
+            )
+        
+        # 이벤트 처리
+        try:
+            success = process_webhook_event(db, event_data)
+            
+            if success:
+                logger.info("웹훅 이벤트 처리 성공")
+                return JSONResponse(
+                    status_code=200,
+                    content={"status": "success", "message": "Webhook processed"}
+                )
+            else:
+                logger.warning("웹훅 이벤트 처리 실패 (로깅됨)")
+                # 안정성: 처리 실패해도 200 OK 반환 (에러는 로깅됨)
+                return JSONResponse(
+                    status_code=200,
+                    content={"status": "error", "message": "Processing failed (logged)"}
+                )
+                
+        except Exception as e:
+            logger.error(f"웹훅 이벤트 처리 중 예상치 못한 오류: {e}", exc_info=True)
+            # 안정성: 예외 발생해도 200 OK 반환
+            return JSONResponse(
+                status_code=200,
+                content={"status": "error", "message": "Internal error (logged)"}
+            )
+            
+    except Exception as e:
+        logger.error(f"웹훅 요청 처리 중 예상치 못한 오류: {e}", exc_info=True)
+        # 안정성: 모든 예외를 잡아서 200 OK 반환
+        return JSONResponse(
+            status_code=200,
+            content={"status": "error", "message": "Request processing failed (logged)"}
+        )
 
 
 if __name__ == "__main__":

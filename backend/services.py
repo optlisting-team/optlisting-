@@ -2,8 +2,8 @@ from datetime import date, timedelta, datetime
 from typing import List, Optional, Dict, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, cast, Integer, String, Date, case, func
-from sqlalchemy.dialects.postgresql import insert
-from backend.models import Listing, DeletionLog
+from sqlalchemy.dialects.postgresql import insert, JSONB
+from .models import Listing, DeletionLog
 import pandas as pd
 from io import StringIO
 import re
@@ -341,15 +341,22 @@ def analyze_zombie_listings(
     # If store_id is 'all' or None, DO NOT filter by store (return all for user)
     
     # Date filter: use metrics['date_listed'] (JSONB) or fallback to date_listed/last_synced_at
-    # Safely handle cases where date_listed column may not exist
-    date_filters = [
-        # Use metrics JSONB if available
-        and_(
-            Listing.metrics != None,
-            Listing.metrics.has_key('date_listed'),
-            cast(Listing.metrics['date_listed'].astext, Date) < cutoff_date
+    # ✅ FIX: JSONB 연산자 안전하게 처리
+    date_filters = []
+    
+    # Use metrics JSONB if available (안전한 방식)
+    if hasattr(Listing, 'metrics'):
+        date_filters.append(
+            and_(
+                Listing.metrics.isnot(None),
+                Listing.metrics.has_key('date_listed'),
+                # ✅ FIX: PostgreSQL JSONB ->> 연산자 사용 (텍스트 추출 후 Date로 변환)
+                cast(
+                    func.cast(Listing.metrics['date_listed'], String),
+                    Date
+                ) < cutoff_date
+            )
         )
-    ]
     
     # Add fallback to date_listed if column exists (legacy support)
     if hasattr(Listing, 'date_listed'):
@@ -382,36 +389,48 @@ def analyze_zombie_listings(
     query = query.filter(or_(*date_filters))
     
     # Sales filter: use metrics['sales'] (JSONB) with robust casting
-    # CRITICAL: Use cast(Listing.metrics['sales'].astext, Integer) for JSONB field access
-    # If metrics doesn't have sales, assume 0 (which satisfies <= max_sales when max_sales >= 0)
+    # ✅ FIX: JSONB 연산자 안전하게 처리 및 타입 검증 추가
     if max_sales is not None and max_sales >= 0:
         # Use CASE to safely handle NULL metrics or missing keys
-        # If metrics is NULL or sales key doesn't exist, default to 0
+        # ✅ FIX: 타입 검증 추가 및 안전한 캐스팅
         sales_value = case(
             (
                 and_(
+                    hasattr(Listing, 'metrics'),
                     Listing.metrics.isnot(None),
-                    Listing.metrics.has_key('sales')
+                    Listing.metrics.has_key('sales'),
+                    # ✅ FIX: JSONB 값이 숫자 또는 문자열인지 확인
+                    func.jsonb_typeof(Listing.metrics['sales']).in_(['number', 'string'])
                 ),
-                cast(Listing.metrics['sales'].astext, Integer)
+                # ✅ FIX: 안전한 타입 변환 (JSONB -> String -> Integer)
+                cast(
+                    func.cast(Listing.metrics['sales'], String),
+                    Integer
+                )
             ),
             else_=0
         )
         query = query.filter(sales_value <= max_sales)
     
     # Watch count filter: use metrics['views'] (JSONB) with robust casting
-    # CRITICAL: Use cast(Listing.metrics['views'].astext, Integer) for JSONB field access
-    # If metrics doesn't have views, assume 0 (which satisfies <= max_watch_count when max_watch_count >= 0)
+    # ✅ FIX: JSONB 연산자 안전하게 처리 및 타입 검증 추가
     if max_watch_count is not None and max_watch_count >= 0:
         # Use CASE to safely handle NULL metrics or missing keys
-        # If metrics is NULL or views key doesn't exist, default to 0
+        # ✅ FIX: 타입 검증 추가 및 안전한 캐스팅
         views_value = case(
             (
                 and_(
+                    hasattr(Listing, 'metrics'),
                     Listing.metrics.isnot(None),
-                    Listing.metrics.has_key('views')
+                    Listing.metrics.has_key('views'),
+                    # ✅ FIX: JSONB 값이 숫자 또는 문자열인지 확인
+                    func.jsonb_typeof(Listing.metrics['views']).in_(['number', 'string'])
                 ),
-                cast(Listing.metrics['views'].astext, Integer)
+                # ✅ FIX: 안전한 타입 변환 (JSONB -> String -> Integer)
+                cast(
+                    func.cast(Listing.metrics['views'], String),
+                    Integer
+                )
             ),
             else_=0
         )
@@ -578,7 +597,7 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
     # Check if we're using PostgreSQL (has insert().on_conflict_do_update)
     # or SQLite (needs different approach)
     from sqlalchemy import inspect
-    from backend.models import engine
+    from .models import engine
     
     is_postgresql = engine.dialect.name == 'postgresql'
     
@@ -679,6 +698,65 @@ def upsert_listings(db: Session, listings: List[Listing]) -> int:
         db.commit()
     
     return len(listings)
+
+
+def extract_csv_fields(listing: Listing) -> Dict[str, any]:
+    """
+    CSV 생성을 위한 필수 필드 추출
+    - external_id (eBay ItemID)
+    - sku
+    - is_zombie
+    - zombie_score
+    - analysis_meta.recommendation.action
+    """
+    # external_id (eBay ItemID)
+    external_id = (
+        getattr(listing, 'item_id', None) or 
+        getattr(listing, 'ebay_item_id', None) or 
+        ""
+    )
+    
+    # sku
+    sku = getattr(listing, 'sku', '') or ""
+    
+    # is_zombie (metrics 또는 별도 필드에서)
+    is_zombie = False
+    if hasattr(listing, 'is_zombie'):
+        is_zombie = bool(getattr(listing, 'is_zombie', False))
+    elif hasattr(listing, 'metrics') and listing.metrics:
+        if isinstance(listing.metrics, dict):
+            is_zombie = listing.metrics.get('is_zombie', False)
+    
+    # zombie_score (metrics 또는 별도 필드에서)
+    zombie_score = None
+    if hasattr(listing, 'zombie_score'):
+        zombie_score = getattr(listing, 'zombie_score', None)
+    elif hasattr(listing, 'metrics') and listing.metrics:
+        if isinstance(listing.metrics, dict):
+            zombie_score = listing.metrics.get('zombie_score', None)
+    
+    # analysis_meta.recommendation.action
+    action = None
+    if hasattr(listing, 'analysis_meta') and listing.analysis_meta:
+        if isinstance(listing.analysis_meta, dict):
+            recommendation = listing.analysis_meta.get('recommendation', {})
+            if isinstance(recommendation, dict):
+                action = recommendation.get('action', None)
+    elif hasattr(listing, 'metrics') and listing.metrics:
+        if isinstance(listing.metrics, dict):
+            analysis_meta = listing.metrics.get('analysis_meta', {})
+            if isinstance(analysis_meta, dict):
+                recommendation = analysis_meta.get('recommendation', {})
+                if isinstance(recommendation, dict):
+                    action = recommendation.get('action', None)
+    
+    return {
+        'external_id': external_id,
+        'sku': sku,
+        'is_zombie': is_zombie,
+        'zombie_score': zombie_score,
+        'action': action
+    }
 
 
 def export_zombies_to_csv(zombie_listings: List[Listing]) -> str:

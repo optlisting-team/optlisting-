@@ -46,6 +46,29 @@ class DeletionLog(Base):
         return f"<DeletionLog(item_id={self.item_id}, title={self.title}, deleted_at={self.deleted_at})>"
 
 
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, unique=True, nullable=False, index=True)  # 사용자 고유 ID
+    
+    # Lemon Squeezy 구독 정보
+    ls_customer_id = Column(String, nullable=True, index=True)  # Lemon Squeezy Customer ID
+    ls_subscription_id = Column(String, nullable=True, index=True)  # Lemon Squeezy Subscription ID
+    subscription_status = Column(String, default='inactive')  # 'active', 'cancelled', 'expired', 'inactive'
+    subscription_plan = Column(String, nullable=True)  # 'pro', 'free', etc.
+    
+    # 플랜 제한
+    total_listings_limit = Column(Integer, default=100)  # Pro 플랜: 무제한 또는 큰 수, Free: 100
+    
+    # 메타데이터
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Profile(user_id={self.user_id}, subscription_status={self.subscription_status}, plan={self.subscription_plan})>"
+
+
 # Database setup
 # Use Supabase PostgreSQL if DATABASE_URL is set, otherwise fall back to SQLite
 DATABASE_URL = os.getenv("DATABASE_URL")
