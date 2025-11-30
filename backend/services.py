@@ -345,62 +345,59 @@ def analyze_zombie_listings(
     date_filters = []
     
     # Use metrics JSONB if available (안전한 방식)
-    if hasattr(Listing, 'metrics'):
-        # ✅ FIX: JSONB ->> 연산자 사용 (astext로 텍스트 추출 후 Date로 변환)
-        date_filters.append(
-            and_(
-                Listing.metrics.isnot(None),
-                Listing.metrics.has_key('date_listed'),
-                # ✅ FIX: jsonb_typeof으로 타입 확인 후 안전하게 추출
-                or_(
-                    # JSONB 값이 문자열인 경우
-                    and_(
-                        func.jsonb_typeof(Listing.metrics['date_listed']) == 'string',
-                        cast(Listing.metrics['date_listed'].astext, Date) < cutoff_date
-                    ),
-                    # JSONB 값이 숫자(타임스탬프)인 경우
-                    and_(
-                        func.jsonb_typeof(Listing.metrics['date_listed']) == 'number',
-                        cast(
-                            func.to_timestamp(cast(Listing.metrics['date_listed'].astext, Integer)),
-                            Date
-                        ) < cutoff_date
-                    )
+    # ✅ FIX: hasattr 제거 (SQL 쿼리 레벨에서 의미 없음), NULL 체크 강화
+    date_filters.append(
+        and_(
+            Listing.metrics.isnot(None),
+            Listing.metrics.has_key('date_listed'),
+            # ✅ FIX: jsonb_typeof으로 타입 확인 후 안전하게 추출
+            or_(
+                # JSONB 값이 문자열인 경우
+                and_(
+                    func.jsonb_typeof(Listing.metrics['date_listed']) == 'string',
+                    Listing.metrics['date_listed'].astext.isnot(None),
+                    cast(Listing.metrics['date_listed'].astext, Date) < cutoff_date
+                ),
+                # JSONB 값이 숫자(타임스탬프)인 경우
+                and_(
+                    func.jsonb_typeof(Listing.metrics['date_listed']) == 'number',
+                    Listing.metrics['date_listed'].astext.isnot(None),
+                    cast(
+                        func.to_timestamp(cast(Listing.metrics['date_listed'].astext, Integer)),
+                        Date
+                    ) < cutoff_date
                 )
             )
         )
+    )
     
     # Add fallback to date_listed if column exists (legacy support)
-    if hasattr(Listing, 'date_listed'):
-        date_filters.append(
-            and_(
-                or_(
-                    not hasattr(Listing, 'metrics'),
-                    Listing.metrics == None,
-                    ~Listing.metrics.has_key('date_listed')
-                ),
-                Listing.date_listed != None,
-                Listing.date_listed < cutoff_date
-            )
+    date_filters.append(
+        and_(
+            or_(
+                Listing.metrics == None,
+                ~Listing.metrics.has_key('date_listed')
+            ),
+            Listing.date_listed.isnot(None),
+            Listing.date_listed < cutoff_date
         )
+    )
     
-    # Add last_synced_at as final fallback (필드가 있는 경우만)
-    if hasattr(Listing, 'last_synced_at'):
-        date_filters.append(
-            and_(
-                or_(
-                    not hasattr(Listing, 'metrics'),
-                    Listing.metrics == None,
-                    ~Listing.metrics.has_key('date_listed')
-                ),
-                or_(
-                    not hasattr(Listing, 'date_listed'),
-                    Listing.date_listed == None
-                ),
-                Listing.last_synced_at != None,
-                func.date(Listing.last_synced_at) < cutoff_date
-            )
+    # Add last_synced_at as final fallback
+    date_filters.append(
+        and_(
+            or_(
+                Listing.metrics == None,
+                ~Listing.metrics.has_key('date_listed')
+            ),
+            or_(
+                Listing.date_listed == None,
+                Listing.date_listed.is_(None)
+            ),
+            Listing.last_synced_at.isnot(None),
+            func.date(Listing.last_synced_at) < cutoff_date
         )
+    )
     
     # 날짜 필터가 하나라도 있으면 적용
     if date_filters:
@@ -410,15 +407,16 @@ def analyze_zombie_listings(
     # ✅ FIX: JSONB 연산자 안전하게 처리 및 타입 검증 추가
     if max_sales is not None and max_sales >= 0:
         # Use CASE to safely handle NULL metrics or missing keys
-        # ✅ FIX: 타입 검증 추가 및 안전한 캐스팅
+        # ✅ FIX: hasattr 제거, 타입 검증 추가 및 안전한 캐스팅
         sales_value = case(
             (
                 and_(
-                    hasattr(Listing, 'metrics'),
                     Listing.metrics.isnot(None),
                     Listing.metrics.has_key('sales'),
                     # ✅ FIX: JSONB 값이 숫자 또는 문자열인지 확인
-                    func.jsonb_typeof(Listing.metrics['sales']).in_(['number', 'string'])
+                    func.jsonb_typeof(Listing.metrics['sales']).in_(['number', 'string']),
+                    # ✅ FIX: NULL 체크 추가
+                    Listing.metrics['sales'].astext.isnot(None)
                 ),
                 # ✅ FIX: 안전한 타입 변환 (JSONB ->> 텍스트 추출 후 Integer로 변환)
                 cast(
@@ -434,15 +432,16 @@ def analyze_zombie_listings(
     # ✅ FIX: JSONB 연산자 안전하게 처리 및 타입 검증 추가
     if max_watch_count is not None and max_watch_count >= 0:
         # Use CASE to safely handle NULL metrics or missing keys
-        # ✅ FIX: 타입 검증 추가 및 안전한 캐스팅
+        # ✅ FIX: hasattr 제거, 타입 검증 추가 및 안전한 캐스팅
         views_value = case(
             (
                 and_(
-                    hasattr(Listing, 'metrics'),
                     Listing.metrics.isnot(None),
                     Listing.metrics.has_key('views'),
                     # ✅ FIX: JSONB 값이 숫자 또는 문자열인지 확인
-                    func.jsonb_typeof(Listing.metrics['views']).in_(['number', 'string'])
+                    func.jsonb_typeof(Listing.metrics['views']).in_(['number', 'string']),
+                    # ✅ FIX: NULL 체크 추가
+                    Listing.metrics['views'].astext.isnot(None)
                 ),
                 # ✅ FIX: 안전한 타입 변환 (JSONB ->> 텍스트 추출 후 Integer로 변환)
                 cast(
@@ -799,19 +798,47 @@ def extract_csv_fields(listing: Listing) -> Dict[str, any]:
             zombie_score = listing.metrics.get('zombie_score', None)
     
     # analysis_meta.recommendation.action
+    # ✅ FIX: JSONB 필드 안전하게 추출 (문자열 파싱 지원)
     action = None
-    if hasattr(listing, 'analysis_meta') and listing.analysis_meta:
-        if isinstance(listing.analysis_meta, dict):
-            recommendation = listing.analysis_meta.get('recommendation', {})
-            if isinstance(recommendation, dict):
-                action = recommendation.get('action', None)
-    elif hasattr(listing, 'metrics') and listing.metrics:
-        if isinstance(listing.metrics, dict):
-            analysis_meta = listing.metrics.get('analysis_meta', {})
+    try:
+        if hasattr(listing, 'analysis_meta') and listing.analysis_meta:
+            analysis_meta = listing.analysis_meta
+            # JSONB가 문자열로 저장된 경우 파싱
+            if isinstance(analysis_meta, str):
+                try:
+                    analysis_meta = json.loads(analysis_meta)
+                except (json.JSONDecodeError, TypeError):
+                    analysis_meta = None
+            
             if isinstance(analysis_meta, dict):
                 recommendation = analysis_meta.get('recommendation', {})
                 if isinstance(recommendation, dict):
                     action = recommendation.get('action', None)
+        elif hasattr(listing, 'metrics') and listing.metrics:
+            metrics = listing.metrics
+            # JSONB가 문자열로 저장된 경우 파싱
+            if isinstance(metrics, str):
+                try:
+                    metrics = json.loads(metrics)
+                except (json.JSONDecodeError, TypeError):
+                    metrics = None
+            
+            if isinstance(metrics, dict):
+                analysis_meta = metrics.get('analysis_meta', {})
+                if isinstance(analysis_meta, str):
+                    try:
+                        analysis_meta = json.loads(analysis_meta)
+                    except (json.JSONDecodeError, TypeError):
+                        analysis_meta = None
+                
+                if isinstance(analysis_meta, dict):
+                    recommendation = analysis_meta.get('recommendation', {})
+                    if isinstance(recommendation, dict):
+                        action = recommendation.get('action', None)
+    except Exception as e:
+        # 안정성: 예외 발생 시 None 반환 (500 에러 방지)
+        print(f"Warning: Failed to extract action from analysis_meta: {e}")
+        action = None
     
     return {
         'external_id': external_id,

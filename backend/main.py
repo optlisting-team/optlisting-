@@ -17,7 +17,7 @@ from .services import detect_source, extract_supplier_info, analyze_zombie_listi
 from .dummy_data import generate_dummy_listings
 from .webhooks import verify_webhook_signature, process_webhook_event
 
-app = FastAPI(title="OptListing API", version="1.1.1")
+app = FastAPI(title="OptListing API", version="1.1.2")
 
 # In-memory cache for KPI metrics (5-minute TTL)
 # Structure: {cache_key: {"data": {...}, "timestamp": datetime}}
@@ -211,15 +211,15 @@ def get_listings(
         "listings": [
             {
                 "id": l.id,
-                "item_id": l.item_id,
-                "ebay_item_id": l.item_id,  # Backward compatibility
+                "item_id": getattr(l, 'item_id', None) or getattr(l, 'ebay_item_id', None) or "",
+                "ebay_item_id": getattr(l, 'item_id', None) or getattr(l, 'ebay_item_id', None) or "",  # Backward compatibility
                 "title": l.title,
                 "sku": l.sku,
                 "image_url": l.image_url,
                 "brand": getattr(l, 'brand', None),
                 "upc": getattr(l, 'upc', None),
-                "platform": l.platform,
-                "marketplace": l.platform,  # Backward compatibility
+                "platform": getattr(l, 'platform', None) or getattr(l, 'marketplace', None) or "eBay",
+                "marketplace": getattr(l, 'platform', None) or getattr(l, 'marketplace', None) or "eBay",  # Backward compatibility
                 "supplier_name": getattr(l, 'supplier_name', None) or (l.metrics.get('supplier_name') if l.metrics and isinstance(l.metrics, dict) else None) or "Unknown",
                 "supplier": getattr(l, 'supplier_name', None) or (l.metrics.get('supplier_name') if l.metrics and isinstance(l.metrics, dict) else None) or "Unknown",  # Backward compatibility
                 "supplier_id": getattr(l, 'supplier_id', None) or (l.metrics.get('supplier_id') if l.metrics and isinstance(l.metrics, dict) else None),
@@ -369,8 +369,10 @@ def analyze_zombies(
             total_breakdown["Unknown"] = total_breakdown.get("Unknown", 0) + count
     
     # Calculate breakdown by platform using SQL GROUP BY (dynamic - includes all marketplaces)
+    # ✅ FIX: platform 필드가 없으면 marketplace 사용
+    platform_field = Listing.platform if hasattr(Listing, 'platform') else Listing.marketplace
     platform_query = db.query(
-        Listing.platform,
+        platform_field,
         func.count(Listing.id).label('count')
     ).filter(
         Listing.user_id == user_id
@@ -381,7 +383,7 @@ def analyze_zombies(
         if hasattr(Listing, 'store_id'):
             platform_query = platform_query.filter(Listing.store_id == store_id)
     
-    platform_results = platform_query.group_by(Listing.platform).all()
+    platform_results = platform_query.group_by(platform_field).all()
     
     # Build platform breakdown dictionary from SQL results
     platform_breakdown = {}
@@ -429,13 +431,13 @@ def analyze_zombies(
         "zombies": [
             {
                 "id": z.id,
-                "item_id": z.item_id,
-                "ebay_item_id": z.item_id,  # Backward compatibility
+                "item_id": getattr(z, 'item_id', None) or getattr(z, 'ebay_item_id', None) or "",
+                "ebay_item_id": getattr(z, 'item_id', None) or getattr(z, 'ebay_item_id', None) or "",  # Backward compatibility
                 "title": z.title,
                 "sku": z.sku,
                 "image_url": z.image_url,
-                "platform": z.platform,
-                "marketplace": z.platform,  # Backward compatibility
+                "platform": getattr(z, 'platform', None) or getattr(z, 'marketplace', None) or "eBay",
+                "marketplace": getattr(z, 'platform', None) or getattr(z, 'marketplace', None) or "eBay",  # Backward compatibility
                 "supplier_name": getattr(z, 'supplier_name', None) or "Unknown",
                 "supplier": getattr(z, 'supplier_name', None) or "Unknown",  # Backward compatibility
                 "supplier_id": getattr(z, 'supplier_id', None),
@@ -769,8 +771,8 @@ def update_listing(
     
     return {
         "id": listing.id,
-        "item_id": listing.item_id,
-        "ebay_item_id": listing.item_id,  # Backward compatibility
+        "item_id": getattr(listing, 'item_id', None) or getattr(listing, 'ebay_item_id', None) or "",
+        "ebay_item_id": getattr(listing, 'item_id', None) or getattr(listing, 'ebay_item_id', None) or "",  # Backward compatibility
         "title": listing.title,
         "supplier_name": listing.supplier_name,
         "supplier": listing.supplier_name,  # Backward compatibility
