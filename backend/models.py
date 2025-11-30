@@ -86,19 +86,33 @@ class Profile(Base):
 
 # Database setup
 # Use Supabase PostgreSQL if DATABASE_URL is set, otherwise fall back to SQLite
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
-if DATABASE_URL:
+# ✅ FIX: DATABASE_URL 검증 강화 (빈 문자열, None, 잘못된 형식 체크)
+if DATABASE_URL and DATABASE_URL.startswith(("postgresql://", "postgres://")):
     # Supabase PostgreSQL connection
     SQLALCHEMY_DATABASE_URL = DATABASE_URL
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL,
-        pool_pre_ping=True,  # Verify connections before using them
-        pool_size=5,
-        max_overflow=10
-    )
+    try:
+        engine = create_engine(
+            SQLALCHEMY_DATABASE_URL,
+            pool_pre_ping=True,  # Verify connections before using them
+            pool_size=5,
+            max_overflow=10
+        )
+    except Exception as e:
+        # ✅ FIX: DATABASE_URL 파싱 실패 시 SQLite로 폴백
+        print(f"Warning: Failed to create PostgreSQL engine: {e}")
+        print("Falling back to SQLite...")
+        SQLALCHEMY_DATABASE_URL = "sqlite:///./optlisting.db"
+        engine = create_engine(
+            SQLALCHEMY_DATABASE_URL, 
+            connect_args={"check_same_thread": False}
+        )
 else:
     # Fallback to SQLite for local development
+    if DATABASE_URL:
+        print(f"Warning: DATABASE_URL is set but invalid format: {DATABASE_URL[:50]}...")
+        print("Falling back to SQLite...")
     SQLALCHEMY_DATABASE_URL = "sqlite:///./optlisting.db"
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL, 
